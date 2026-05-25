@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Software, DevSecOps, and Cybersecurity | Chatterguru Consulting LLC</title>
   <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="index.html"><img src="assets/brochure-image.png" alt="Chatterguru Consulting LLC mark"><span>Chatterguru<small>Consulting LLC</small></span></a>
-    <nav class="nav" aria-label="Primary navigation">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
       <a href="index.html">Home</a>
       <a href="capabilities.html">Capabilities</a>
       <a href="systems-engineering.html">Systems and MBSE</a>
@@ -17,6 +19,7 @@
       <a aria-current="page" href="software-cyber.html">Software and Cyber</a>
       <a href="ai-data-science.html">AI and Data</a>
       <a href="team.html">Team</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
     </nav>
     <a class="button" href="contact.html">Contact</a>
   </header>

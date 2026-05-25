@@ -47,6 +47,10 @@ a {
   white-space: nowrap;
 }
 
+.menu-toggle {
+  display: none;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -95,6 +99,10 @@ a {
 .nav a[aria-current="page"] {
   background: #e8f6f8;
   color: var(--teal-dark);
+}
+
+.nav-contact {
+  display: none;
 }
 
 .button,
@@ -444,22 +452,48 @@ h1 {
     font-size: 11px;
   }
 
-  .nav {
-    grid-column: 1 / -1;
-    gap: 4px;
-  }
-
-  .nav a {
-    padding: 6px 7px;
-    font-size: 12px;
-    line-height: 1.2;
-  }
-
-  .site-header > .button {
+  .menu-toggle {
+    display: inline-flex;
     justify-self: end;
     min-height: 34px;
     padding: 7px 10px;
+    border-color: var(--line);
+    background: #ffffff;
+    color: var(--teal-dark);
     font-size: 13px;
+  }
+
+  .nav {
+    display: none;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 2px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(23, 32, 42, 0.1);
+  }
+
+  .site-header.nav-open .nav {
+    display: flex;
+  }
+
+  .nav a {
+    padding: 8px 10px;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .nav-contact {
+    display: block;
+  }
+
+  .site-header > .button {
+    display: none;
   }
 
   .hero {
