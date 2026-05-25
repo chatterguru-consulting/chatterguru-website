@@ -141,8 +141,8 @@ Start with the problem you need to solve.
 
 Contact:
 - Chatterpaul Joseph, Founder
-- chatterpaul@gmail.com
-- (401) 323-4555
+- chatterpaul@chatterguru.com
+- Phone: Available by appointment
 - linkedin.com/in/chatterpaul-joseph
 
 Good first-contact topics:
