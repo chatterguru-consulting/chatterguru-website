@@ -7,10 +7,17 @@
     return;
   }
 
+  function isMobileNav() {
+    return window.matchMedia("(max-width: 700px)").matches;
+  }
+
   function setMenuOpen(isOpen) {
     header.classList.toggle("nav-open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
+    nav.hidden = isMobileNav() && !isOpen;
   }
+
+  setMenuOpen(false);
 
   toggle.addEventListener("click", function () {
     setMenuOpen(toggle.getAttribute("aria-expanded") !== "true");
@@ -24,7 +31,10 @@
   });
 
   window.addEventListener("resize", function () {
-    if (window.matchMedia("(min-width: 701px)").matches) {
+    if (isMobileNav()) {
+      setMenuOpen(toggle.getAttribute("aria-expanded") === "true");
+    } else {
+      nav.hidden = false;
       setMenuOpen(false);
     }
   });

@@ -86,6 +86,10 @@ a {
   gap: 6px;
 }
 
+.nav[hidden] {
+  display: none;
+}
+
 .nav a {
   padding: 8px 10px;
   border-radius: 7px;
@@ -532,5 +536,50 @@ h1 {
   .profile,
   .step {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  header.site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 10px;
+    align-items: center;
+    background: #ffffff;
+    z-index: 100;
+  }
+
+  header.site-header .brand {
+    grid-column: 1;
+  }
+
+  header.site-header .menu-toggle {
+    display: inline-flex;
+    grid-column: 2;
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  header.site-header nav.nav {
+    display: none;
+    grid-column: 1 / -1;
+    max-width: 100%;
+    background: #ffffff;
+  }
+
+  header.site-header.nav-open nav.nav {
+    display: flex;
+  }
+
+  header.site-header > a.button {
+    display: none;
+  }
+
+  header.site-header nav.nav .nav-contact {
+    display: block;
   }
 }
