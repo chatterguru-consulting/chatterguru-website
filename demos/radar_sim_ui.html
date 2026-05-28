@@ -47,6 +47,11 @@
       z-index: 5;
     }
 
+    .header-copy,
+    .dashboard-details {
+      min-width: 0;
+    }
+
     h1 {
       margin: 0;
       font-size: 22px;
@@ -54,10 +59,19 @@
       letter-spacing: 0;
     }
 
+    .title-mobile {
+      display: none;
+    }
+
     .subtitle {
       margin-top: 4px;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .details-toggle,
+    .details-subtitle {
+      display: none;
     }
 
     .status-strip {
@@ -366,12 +380,163 @@
       }
     }
 
-    @media (max-width: 680px) {
-      header {
-        padding: 14px;
+    @media (max-width: 700px) {
+      html,
+      body {
+        overflow-x: hidden;
       }
 
-      .status-strip,
+      body {
+        font-size: 14px;
+      }
+
+      header {
+        position: static;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 10px;
+        align-items: center;
+        padding: 10px 12px;
+      }
+
+      h1 {
+        font-size: 19px;
+        line-height: 1.1;
+      }
+
+      .title-desktop,
+      .header-copy .subtitle {
+        display: none;
+      }
+
+      .title-mobile {
+        display: inline;
+      }
+
+      .details-toggle {
+        display: inline-flex;
+        min-height: 34px;
+        padding: 7px 10px;
+        font-size: 13px;
+      }
+
+      .dashboard-details {
+        display: none;
+        grid-column: 1 / -1;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+      }
+
+      header.details-open .dashboard-details {
+        display: grid;
+      }
+
+      .details-subtitle {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .status-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .status {
+        padding: 7px 8px;
+        border-radius: 7px;
+      }
+
+      .status span {
+        font-size: 10px;
+      }
+
+      .status strong {
+        margin-top: 1px;
+        overflow-wrap: break-word;
+        font-size: 13px;
+      }
+
+      main {
+        gap: 10px;
+        padding: 8px;
+      }
+
+      section,
+      aside {
+        border-radius: 7px;
+        box-shadow: 0 8px 18px rgba(31, 41, 51, 0.08);
+      }
+
+      .panel-header {
+        gap: 8px;
+        padding: 10px 12px 8px;
+      }
+
+      .controls,
+      .analysis {
+        gap: 10px;
+        padding: 10px 12px 12px;
+      }
+
+      fieldset {
+        gap: 7px;
+      }
+
+      legend {
+        margin-bottom: 0;
+        font-size: 11px;
+      }
+
+      label {
+        gap: 4px;
+      }
+
+      label span {
+        font-size: 12px;
+      }
+
+      input,
+      select {
+        min-height: 38px;
+        padding: 7px 8px;
+      }
+
+      input[type="range"] {
+        min-height: 24px;
+      }
+
+      .toggle-row {
+        padding: 8px;
+      }
+
+      button {
+        min-height: 38px;
+        padding: 8px 10px;
+      }
+
+      .viz {
+        grid-template-rows: auto auto auto;
+        min-height: auto;
+      }
+
+      .canvas-wrap {
+        padding: 10px;
+      }
+
+      canvas {
+        height: 320px;
+        min-height: 320px;
+      }
+
+      .legend {
+        gap: 8px;
+        padding: 0 10px 10px;
+        font-size: 11px;
+      }
+
       .metric-grid {
         grid-template-columns: 1fr;
       }
@@ -380,22 +545,28 @@
         grid-template-columns: 1fr;
       }
 
-      canvas {
-        min-height: 420px;
+      @media (max-width: 360px) {
+        .status-strip {
+          grid-template-columns: 1fr;
+        }
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>ECCM Sandbox Scenario Dashboard</h1>
+    <div class="header-copy">
+      <h1><span class="title-desktop">ECCM Sandbox Scenario Dashboard</span><span class="title-mobile">ECCM Sandbox</span></h1>
       <div class="subtitle">Synthetic range-Doppler setup, run, and visualization surface for the high-fidelity prototype.</div>
     </div>
-    <div class="status-strip" aria-label="Run status">
-      <div class="status"><span>Scenario</span><strong id="statusScenario">Closing target</strong></div>
-      <div class="status"><span>Backend</span><strong>Browser CPU</strong></div>
-      <div class="status"><span>Model class</span><strong>Synthetic</strong></div>
+    <button class="details-toggle secondary" id="detailsToggle" type="button" aria-expanded="false" aria-controls="dashboardDetails">Details</button>
+    <div class="dashboard-details" id="dashboardDetails">
+      <div class="details-subtitle">Synthetic range-Doppler setup, run, and visualization surface for the high-fidelity prototype.</div>
+      <div class="status-strip" aria-label="Run status">
+        <div class="status"><span>Scenario</span><strong id="statusScenario">Closing target</strong></div>
+        <div class="status"><span>Backend</span><strong>Browser CPU</strong></div>
+        <div class="status"><span>Model class</span><strong>Synthetic</strong></div>
+      </div>
     </div>
   </header>
 
@@ -521,6 +692,8 @@
     const controls = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
     const canvas = document.getElementById("rdmCanvas");
     const ctx = canvas.getContext("2d");
+    const dashboardHeader = document.querySelector("header");
+    const detailsToggle = document.getElementById("detailsToggle");
 
     const presets = {
       closing: { targetRange: 1800, targetVelocity: -22, clutterType: "land", clutter: 0.35, wind: 8, platformVelocity: 0, motionComp: true },
@@ -776,6 +949,11 @@
     });
     document.getElementById("runButton").addEventListener("click", runSimulation);
     document.getElementById("resetButton").addEventListener("click", () => applyPreset("closing"));
+    detailsToggle.addEventListener("click", () => {
+      const isOpen = detailsToggle.getAttribute("aria-expanded") === "true";
+      detailsToggle.setAttribute("aria-expanded", String(!isOpen));
+      dashboardHeader.classList.toggle("details-open", !isOpen);
+    });
     window.addEventListener("resize", runSimulation);
     applyPreset("closing");
   </script>
