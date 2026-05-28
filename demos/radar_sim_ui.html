@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ECCM Sandbox Scenario Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f8;
+      --panel: #ffffff;
+      --ink: #1f2933;
+      --muted: #61717d;
+      --line: #d8e0e5;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --amber: #b7791f;
+      --red: #b91c1c;
+      --violet: #6d5bd0;
+      --range: #e6f3f1;
+      --shadow: 0 14px 32px rgba(31, 41, 51, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .header-copy,
+    .dashboard-details {
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+
+    .title-mobile {
+      display: none;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .details-toggle,
+    .details-subtitle {
+      display: none;
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 8px;
+      min-width: 420px;
+    }
+
+    .status {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fbfcfd;
+    }
+
+    .status span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 15px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 340px minmax(480px, 1fr) 330px;
+      gap: 18px;
+      padding: 18px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    section,
+    aside {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .controls {
+      padding: 14px 16px 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    fieldset {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    legend {
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    label span {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    label small {
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--ink);
+      padding: 9px 10px;
+      font: inherit;
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+      padding: 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfd;
+    }
+
+    .toggle-row input {
+      width: auto;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 10px 12px;
+      background: var(--accent);
+      color: #ffffff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--accent-strong);
+      border-color: var(--line);
+    }
+
+    button:hover {
+      background: var(--accent-strong);
+    }
+
+    button.secondary:hover {
+      background: var(--range);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .viz {
+      display: grid;
+      grid-template-rows: auto minmax(360px, 1fr) auto;
+      min-height: 720px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      padding: 16px;
+      min-height: 0;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111827;
+      display: block;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .colorbar {
+      height: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: linear-gradient(90deg, #101827 0%, #14515b 28%, #2ea66f 52%, #f2c94c 76%, #f97316 100%);
+    }
+
+    .analysis {
+      padding: 14px 16px 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfd;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 18px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 8px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 9px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #ffffff;
+    }
+
+    .flow-step b {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: var(--range);
+      color: var(--accent-strong);
+      font-size: 12px;
+    }
+
+    .notes {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      background: #fbfcfd;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1180px) {
+      header,
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .status-strip {
+        min-width: 0;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      .viz {
+        min-height: 620px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
+      body {
+        font-size: 14px;
+      }
+
+      header {
+        position: static;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 10px;
+        align-items: center;
+        padding: 10px 12px;
+      }
+
+      h1 {
+        font-size: 19px;
+        line-height: 1.1;
+      }
+
+      .title-desktop,
+      .header-copy .subtitle {
+        display: none;
+      }
+
+      .title-mobile {
+        display: inline;
+      }
+
+      .details-toggle {
+        display: inline-flex;
+        min-height: 34px;
+        padding: 7px 10px;
+        font-size: 13px;
+      }
+
+      .dashboard-details {
+        display: none;
+        grid-column: 1 / -1;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+      }
+
+      header.details-open .dashboard-details {
+        display: grid;
+      }
+
+      .details-subtitle {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .status-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .status {
+        padding: 7px 8px;
+        border-radius: 7px;
+      }
+
+      .status span {
+        font-size: 10px;
+      }
+
+      .status strong {
+        margin-top: 1px;
+        overflow-wrap: break-word;
+        font-size: 13px;
+      }
+
+      main {
+        gap: 10px;
+        padding: 8px;
+      }
+
+      section,
+      aside {
+        border-radius: 7px;
+        box-shadow: 0 8px 18px rgba(31, 41, 51, 0.08);
+      }
+
+      .panel-header {
+        gap: 8px;
+        padding: 10px 12px 8px;
+      }
+
+      .controls,
+      .analysis {
+        gap: 10px;
+        padding: 10px 12px 12px;
+      }
+
+      fieldset {
+        gap: 7px;
+      }
+
+      legend {
+        margin-bottom: 0;
+        font-size: 11px;
+      }
+
+      label {
+        gap: 4px;
+      }
+
+      label span {
+        font-size: 12px;
+      }
+
+      input,
+      select {
+        min-height: 38px;
+        padding: 7px 8px;
+      }
+
+      input[type="range"] {
+        min-height: 24px;
+      }
+
+      .toggle-row {
+        padding: 8px;
+      }
+
+      button {
+        min-height: 38px;
+        padding: 8px 10px;
+      }
+
+      .viz {
+        grid-template-rows: auto auto auto;
+        min-height: auto;
+      }
+
+      .canvas-wrap {
+        padding: 10px;
+      }
+
+      canvas {
+        height: 320px;
+        min-height: 320px;
+      }
+
+      .legend {
+        gap: 8px;
+        padding: 0 10px 10px;
+        font-size: 11px;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      @media (max-width: 360px) {
+        .status-strip {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-copy">
+      <h1><span class="title-desktop">ECCM Sandbox Scenario Dashboard</span><span class="title-mobile">ECCM Sandbox</span></h1>
+      <div class="subtitle">Synthetic range-Doppler setup, run, and visualization surface for the high-fidelity prototype.</div>
+    </div>
+    <button class="details-toggle secondary" id="detailsToggle" type="button" aria-expanded="false" aria-controls="dashboardDetails">Details</button>
+    <div class="dashboard-details" id="dashboardDetails">
+      <div class="details-subtitle">Synthetic range-Doppler setup, run, and visualization surface for the high-fidelity prototype.</div>
+      <div class="status-strip" aria-label="Run status">
+        <div class="status"><span>Scenario</span><strong id="statusScenario">Closing target</strong></div>
+        <div class="status"><span>Backend</span><strong>Browser CPU</strong></div>
+        <div class="status"><span>Model class</span><strong>Synthetic</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside aria-label="Scenario controls">
+      <div class="panel-header">
+        <h2>Scenario Setup</h2>
+        <span class="pill">No real parameters</span>
+      </div>
+      <div class="controls">
+        <fieldset>
+          <legend>Preset</legend>
+          <label>
+            <span>Scenario</span>
+            <select id="preset">
+              <option value="closing">Closing target</option>
+              <option value="opening">Opening target</option>
+              <option value="sea">Sea clutter stress</option>
+              <option value="rain">Rain volume clutter</option>
+              <option value="moving">Moving radar compensation</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Radar and waveform</legend>
+          <label><span>Transmit power <small id="powerValue">1000 W</small></span><input id="power" type="range" min="100" max="5000" step="100" value="1000"></label>
+          <label><span>Antenna gain <small id="gainValue">20 dB</small></span><input id="gain" type="range" min="0" max="36" step="1" value="20"></label>
+          <label><span>Bandwidth <small id="bandwidthValue">300 kHz</small></span><input id="bandwidth" type="range" min="50" max="900" step="25" value="300"></label>
+          <label><span>Pulse count <small id="pulseValue">16</small></span><input id="pulses" type="range" min="8" max="64" step="4" value="16"></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Target motion</legend>
+          <label><span>Initial slant range <small id="rangeValue">1800 m</small></span><input id="targetRange" type="range" min="300" max="4800" step="50" value="1800"></label>
+          <label><span>Radial velocity <small id="velocityValue">-22 m/s</small></span><input id="targetVelocity" type="range" min="-60" max="60" step="1" value="-22"></label>
+          <label><span>Relative size <small id="rcsValue">2.0</small></span><input id="rcs" type="range" min="0.2" max="8" step="0.2" value="2"></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Environment</legend>
+          <label>
+            <span>Clutter model</span>
+            <select id="clutterType">
+              <option value="land">Land</option>
+              <option value="sea">Sea</option>
+              <option value="rain">Rain</option>
+              <option value="snow">Snow</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label><span>Clutter intensity <small id="clutterValue">0.35</small></span><input id="clutter" type="range" min="0" max="1.5" step="0.05" value="0.35"></label>
+          <label><span>Wind speed <small id="windValue">8 m/s</small></span><input id="wind" type="range" min="0" max="30" step="1" value="8"></label>
+          <label><span>Noise floor <small id="noiseValue">0.04</small></span><input id="noise" type="range" min="0" max="0.18" step="0.01" value="0.04"></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Motion compensation</legend>
+          <label><span>Radar platform velocity <small id="platformValue">0 m/s</small></span><input id="platformVelocity" type="range" min="-80" max="80" step="2" value="0"></label>
+          <div class="toggle-row">
+            <span>Apply motion compensation</span>
+            <input id="motionComp" type="checkbox" checked>
+          </div>
+        </fieldset>
+
+        <div class="button-row">
+          <button id="runButton" type="button">Run Simulation</button>
+          <button id="resetButton" class="secondary" type="button">Reset View</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="viz" aria-label="Range-Doppler visualization">
+      <div class="panel-header">
+        <h2>Range-Doppler Map</h2>
+        <span class="pill">Velocity x-axis, range y-axis</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="rdmCanvas" width="960" height="640" aria-label="Synthetic range-Doppler heatmap"></canvas>
+      </div>
+      <div class="legend">
+        <div class="colorbar" aria-hidden="true"></div>
+        <span>Relative intensity</span>
+      </div>
+    </section>
+
+    <aside aria-label="Analysis summary">
+      <div class="panel-header">
+        <h2>Run Analysis</h2>
+        <span class="pill" id="compStatus">Compensated</span>
+      </div>
+      <div class="analysis">
+        <div class="metric-grid">
+          <div class="metric"><span>Peak range</span><strong id="peakRange">-</strong></div>
+          <div class="metric"><span>Peak velocity</span><strong id="peakVelocity">-</strong></div>
+          <div class="metric"><span>Relative amplitude</span><strong id="peakAmp">-</strong></div>
+          <div class="metric"><span>Motion residual</span><strong id="motionResidual">-</strong></div>
+        </div>
+
+        <div>
+          <h2>Model Flow</h2>
+          <div class="flow" aria-label="Model flow">
+            <div class="flow-step"><b>1</b><span>Configure waveform, radar, target, clutter, and platform motion.</span></div>
+            <div class="flow-step"><b>2</b><span>Estimate target return strength with range-dependent scaling.</span></div>
+            <div class="flow-step"><b>3</b><span>Add synthetic land, sea, rain, snow, and receiver noise components.</span></div>
+            <div class="flow-step"><b>4</b><span>Apply motion-compensated apparent Doppler when selected.</span></div>
+            <div class="flow-step"><b>5</b><span>Render a range-by-radial-velocity intensity map.</span></div>
+          </div>
+        </div>
+
+        <p class="notes">
+          This browser dashboard mirrors the repository model flow for fast scenario exploration. It uses fictional, synthetic, unclassified values and display scaling only (not a physics-validated model); use the Python signal chain for tested waveform-driven runs.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const ids = [
+      "preset", "power", "gain", "bandwidth", "pulses", "targetRange", "targetVelocity",
+      "rcs", "clutterType", "clutter", "wind", "noise", "platformVelocity", "motionComp"
+    ];
+    const controls = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+    const canvas = document.getElementById("rdmCanvas");
+    const ctx = canvas.getContext("2d");
+    const dashboardHeader = document.querySelector("header");
+    const detailsToggle = document.getElementById("detailsToggle");
+
+    const presets = {
+      closing: { targetRange: 1800, targetVelocity: -22, clutterType: "land", clutter: 0.35, wind: 8, platformVelocity: 0, motionComp: true },
+      opening: { targetRange: 900, targetVelocity: 26, clutterType: "land", clutter: 0.25, wind: 6, platformVelocity: 0, motionComp: true },
+      sea: { targetRange: 2600, targetVelocity: 14, clutterType: "sea", clutter: 0.8, wind: 18, platformVelocity: 0, motionComp: true },
+      rain: { targetRange: 2200, targetVelocity: -12, clutterType: "rain", clutter: 0.9, wind: 10, platformVelocity: 0, motionComp: true },
+      moving: { targetRange: 2400, targetVelocity: 8, clutterType: "snow", clutter: 0.55, wind: 14, platformVelocity: 34, motionComp: true }
+    };
+
+    function value(id) {
+      const control = controls[id];
+      return control.type === "checkbox" ? control.checked : Number(control.value);
+    }
+
+    function setValue(id, next) {
+      const control = controls[id];
+      if (control.type === "checkbox") {
+        control.checked = Boolean(next);
+      } else {
+        control.value = String(next);
+      }
+    }
+
+    function updateLabels() {
+      document.getElementById("statusScenario").textContent = controls.preset.options[controls.preset.selectedIndex].text;
+      document.getElementById("powerValue").textContent = `${value("power")} W`;
+      document.getElementById("gainValue").textContent = `${value("gain")} dB`;
+      document.getElementById("bandwidthValue").textContent = `${value("bandwidth")} kHz`;
+      document.getElementById("pulseValue").textContent = `${value("pulses")}`;
+      document.getElementById("rangeValue").textContent = `${value("targetRange")} m`;
+      document.getElementById("velocityValue").textContent = `${value("targetVelocity")} m/s`;
+      document.getElementById("rcsValue").textContent = value("rcs").toFixed(1);
+      document.getElementById("clutterValue").textContent = value("clutter").toFixed(2);
+      document.getElementById("windValue").textContent = `${value("wind")} m/s`;
+      document.getElementById("noiseValue").textContent = value("noise").toFixed(2);
+      document.getElementById("platformValue").textContent = `${value("platformVelocity")} m/s`;
+      document.getElementById("compStatus").textContent = controls.motionComp.checked ? "Compensated" : "Uncompensated";
+    }
+
+    function applyPreset(name) {
+      const preset = presets[name];
+      Object.entries(preset).forEach(([id, next]) => setValue(id, next));
+      updateLabels();
+      runSimulation();
+    }
+
+    function hashNoise(row, col, seed) {
+      const x = Math.sin((row + 1) * 127.1 + (col + 1) * 311.7 + seed * 74.7) * 43758.5453;
+      return x - Math.floor(x);
+    }
+
+    function gaussian(x, center, spread) {
+      const z = (x - center) / spread;
+      return Math.exp(-0.5 * z * z);
+    }
+
+    function colorFor(t) {
+      const stops = [
+        [16, 24, 39],
+        [20, 81, 91],
+        [46, 166, 111],
+        [242, 201, 76],
+        [249, 115, 22]
+      ];
+      const scaled = Math.max(0, Math.min(0.999, t)) * (stops.length - 1);
+      const i = Math.floor(scaled);
+      const f = scaled - i;
+      const a = stops[i];
+      const b = stops[i + 1];
+      return [
+        Math.round(a[0] + (b[0] - a[0]) * f),
+        Math.round(a[1] + (b[1] - a[1]) * f),
+        Math.round(a[2] + (b[2] - a[2]) * f)
+      ];
+    }
+
+    function clutterValue(range, doppler, row, col, config) {
+      if (config.clutterType === "none") {
+        return 0;
+      }
+      const nearWeight = Math.pow(350 / Math.max(range, 350), config.clutterType === "sea" ? 1.4 : 2.0);
+      const wind = config.wind;
+      let center = 0;
+      let width = 3;
+      let texture = 0.7 + 0.6 * hashNoise(row, col, 11);
+
+      if (config.clutterType === "sea") {
+        center = 0.08 * wind;
+        width = 2.5 + 0.35 * wind;
+        texture = 0.5 + 0.9 * hashNoise(row, col, 17);
+      } else if (config.clutterType === "rain") {
+        center = -4 + 0.05 * wind;
+        width = 5.5;
+        texture = 0.6 + 0.8 * hashNoise(row, col, 23);
+      } else if (config.clutterType === "snow") {
+        center = -1 + 0.03 * wind;
+        width = 2.8;
+        texture = 0.7 + 0.45 * hashNoise(row, col, 31);
+      }
+
+      return config.clutter * nearWeight * gaussian(doppler, center, width) * texture;
+    }
+
+    function computeMap() {
+      const rangeCount = 128;
+      const dopplerCount = 112;
+      const rangeMax = 5000;
+      const dopplerMax = 70;
+      const config = {
+        power: value("power"),
+        gain: value("gain"),
+        bandwidth: value("bandwidth"),
+        pulses: value("pulses"),
+        targetRange: value("targetRange"),
+        targetVelocity: value("targetVelocity"),
+        rcs: value("rcs"),
+        clutterType: controls.clutterType.value,
+        clutter: value("clutter"),
+        wind: value("wind"),
+        noise: value("noise"),
+        platformVelocity: value("platformVelocity"),
+        motionComp: controls.motionComp.checked
+      };
+
+      const rangeSpread = Math.max(25, 220000 / config.bandwidth);
+      const dopplerSpread = Math.max(1.5, 34 / Math.sqrt(config.pulses));
+      const apparentVelocity = config.motionComp
+        ? config.targetVelocity
+        : config.targetVelocity - config.platformVelocity;
+      const powerScale = Math.sqrt(config.power / 1000) * Math.pow(10, config.gain / 40) * Math.sqrt(config.rcs);
+      const targetAmp = powerScale * Math.pow(1000 / Math.max(config.targetRange, 300), 2);
+      const map = [];
+      let peak = { value: -Infinity, range: 0, velocity: 0 };
+
+      for (let r = 0; r < rangeCount; r += 1) {
+        const range = (r / (rangeCount - 1)) * rangeMax;
+        const row = [];
+        for (let d = 0; d < dopplerCount; d += 1) {
+          const doppler = -dopplerMax + (d / (dopplerCount - 1)) * dopplerMax * 2;
+          const target = targetAmp * gaussian(range, config.targetRange, rangeSpread) * gaussian(doppler, apparentVelocity, dopplerSpread);
+          const clutter = clutterValue(range, doppler, r, d, config);
+          const noise = config.noise * hashNoise(r, d, 5);
+          const value = Math.log10(1 + target + clutter + noise);
+          row.push(value);
+          if (value > peak.value) {
+            peak = { value, range, velocity: doppler };
+          }
+        }
+        map.push(row);
+      }
+
+      return { map, peak, rangeMax, dopplerMax, config, targetAmp, apparentVelocity };
+    }
+
+    function drawAxes(plot, bounds, rangeMax, dopplerMax) {
+      ctx.strokeStyle = "rgba(255,255,255,0.64)";
+      ctx.fillStyle = "rgba(255,255,255,0.86)";
+      ctx.lineWidth = 1;
+      ctx.font = "12px system-ui, sans-serif";
+      ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h);
+
+      for (let i = 0; i <= 4; i += 1) {
+        const y = bounds.y + bounds.h - (i / 4) * bounds.h;
+        const range = Math.round((i / 4) * rangeMax);
+        ctx.beginPath();
+        ctx.moveTo(bounds.x - 5, y);
+        ctx.lineTo(bounds.x, y);
+        ctx.stroke();
+        ctx.fillText(String(range), 12, y + 4);
+      }
+
+      for (let i = 0; i <= 4; i += 1) {
+        const x = bounds.x + (i / 4) * bounds.w;
+        const velocity = Math.round(-dopplerMax + (i / 4) * dopplerMax * 2);
+        ctx.beginPath();
+        ctx.moveTo(x, bounds.y + bounds.h);
+        ctx.lineTo(x, bounds.y + bounds.h + 5);
+        ctx.stroke();
+        ctx.fillText(String(velocity), x - 12, bounds.y + bounds.h + 22);
+      }
+
+      ctx.fillText("Radial Doppler velocity (m/s)", bounds.x + bounds.w / 2 - 88, bounds.y + bounds.h + 44);
+      ctx.save();
+      ctx.translate(18, bounds.y + bounds.h / 2 + 70);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Slant range (m)", 0, 0);
+      ctx.restore();
+    }
+
+    function drawMap(result) {
+      const { map, rangeMax, dopplerMax } = result;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      const bounds = { x: 58, y: 24, w: rect.width - 88, h: rect.height - 92 };
+      const rows = map.length;
+      const cols = map[0].length;
+      const flat = map.flat();
+      const min = Math.min(...flat);
+      const max = Math.max(...flat);
+      const cellW = bounds.w / cols;
+      const cellH = bounds.h / rows;
+
+      for (let r = 0; r < rows; r += 1) {
+        for (let d = 0; d < cols; d += 1) {
+          const normalized = (map[r][d] - min) / Math.max(max - min, 1e-9);
+          const [red, green, blue] = colorFor(normalized);
+          ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+          const x = bounds.x + d * cellW;
+          const y = bounds.y + bounds.h - (r + 1) * cellH;
+          ctx.fillRect(x, y, Math.ceil(cellW), Math.ceil(cellH));
+        }
+      }
+
+      drawAxes(map, bounds, rangeMax, dopplerMax);
+
+      const targetX = bounds.x + ((result.apparentVelocity + dopplerMax) / (dopplerMax * 2)) * bounds.w;
+      const targetY = bounds.y + bounds.h - (result.config.targetRange / rangeMax) * bounds.h;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(targetX - 10, targetY);
+      ctx.lineTo(targetX + 10, targetY);
+      ctx.moveTo(targetX, targetY - 10);
+      ctx.lineTo(targetX, targetY + 10);
+      ctx.stroke();
+    }
+
+    function runSimulation() {
+      updateLabels();
+      const result = computeMap();
+      drawMap(result);
+      document.getElementById("peakRange").textContent = `${Math.round(result.peak.range)} m`;
+      document.getElementById("peakVelocity").textContent = `${result.peak.velocity.toFixed(1)} m/s`;
+      document.getElementById("peakAmp").textContent = result.targetAmp.toFixed(2);
+      const residual = result.config.motionComp ? 0 : -result.config.platformVelocity;
+      document.getElementById("motionResidual").textContent = `${residual.toFixed(1)} m/s`;
+    }
+
+    ids.forEach((id) => {
+      controls[id].addEventListener("input", updateLabels);
+      controls[id].addEventListener("change", () => {
+        if (id === "preset") {
+          applyPreset(controls.preset.value);
+        } else {
+          runSimulation();
+        }
+      });
+    });
+    document.getElementById("runButton").addEventListener("click", runSimulation);
+    document.getElementById("resetButton").addEventListener("click", () => applyPreset("closing"));
+    detailsToggle.addEventListener("click", () => {
+      const isOpen = detailsToggle.getAttribute("aria-expanded") === "true";
+      detailsToggle.setAttribute("aria-expanded", String(!isOpen));
+      dashboardHeader.classList.toggle("details-open", !isOpen);
+    });
+    window.addEventListener("resize", runSimulation);
+    applyPreset("closing");
+  </script>
+</body>
+</html>
