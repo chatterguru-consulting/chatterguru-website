@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radar DoE Visualization</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f3;
+      --surface: #ffffff;
+      --surface-soft: #eef4f1;
+      --ink: #17211f;
+      --muted: #60706b;
+      --line: #d5dfda;
+      --teal: #0f766e;
+      --green: #2f7d32;
+      --amber: #c46a1a;
+      --magenta: #b3316d;
+      --violet: #6457c9;
+      --shadow: 0 18px 44px rgba(23, 33, 31, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px clamp(16px, 3vw, 34px);
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(20px, 2.4vw, 32px);
+      line-height: 1.05;
+      font-weight: 780;
+      letter-spacing: 0;
+    }
+
+    .subhead {
+      margin-top: 7px;
+      color: var(--muted);
+      max-width: 860px;
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .control,
+    .icon-button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 40px;
+      box-shadow: 0 5px 16px rgba(23, 33, 31, 0.06);
+    }
+
+    .control {
+      padding: 0 12px;
+      min-width: 230px;
+    }
+
+    .icon-button {
+      width: 42px;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .icon-button:hover,
+    .control:hover {
+      border-color: #a7b7b1;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(420px, 1.4fr) minmax(300px, 0.9fr);
+      gap: 18px;
+      padding: 18px clamp(14px, 2.8vw, 30px) 24px;
+      min-height: 0;
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfb;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .metric {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .metric strong {
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      min-height: 310px;
+      background:
+        linear-gradient(90deg, rgba(15, 118, 110, 0.06), transparent 45%),
+        linear-gradient(0deg, rgba(196, 106, 26, 0.05), transparent 55%),
+        #f8faf7;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .summary {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-content: start;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfb;
+      min-width: 0;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .strip {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .sample-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 56px;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+      padding: 9px 10px;
+      cursor: pointer;
+    }
+
+    .sample-row.active {
+      border-color: rgba(15, 118, 110, 0.55);
+      background: #ecf6f3;
+      box-shadow: inset 3px 0 0 var(--teal);
+    }
+
+    .sample-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--teal);
+      font-weight: 760;
+      font-size: 12px;
+    }
+
+    .sample-main {
+      min-width: 0;
+    }
+
+    .sample-main strong,
+    .sample-main span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sample-main strong {
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .sample-main span {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pd-pill {
+      justify-self: end;
+      border-radius: 999px;
+      background: #f8efe7;
+      color: #8a3d07;
+      padding: 5px 8px;
+      font-weight: 760;
+      font-size: 12px;
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .sample-row.active .pd-pill {
+      background: #dff1ed;
+      color: var(--teal);
+    }
+
+    .wide-panel {
+      grid-column: span 1;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 0 16px 14px;
+      background: #fbfcfb;
+      border-top: 1px solid var(--line);
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--teal);
+    }
+
+    .swatch.amber {
+      background: var(--amber);
+    }
+
+    .swatch.magenta {
+      background: var(--magenta);
+    }
+
+    .swatch.green {
+      background: var(--green);
+    }
+
+    @media (max-width: 1180px) {
+      main {
+        grid-template-columns: minmax(300px, 1fr) minmax(360px, 1.2fr);
+      }
+
+      .right-column {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 780px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions {
+        justify-content: stretch;
+      }
+
+      .control {
+        min-width: 0;
+        flex: 1;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>Radar DoE Scenario Intelligence</h1>
+        <div class="subhead">Generic synthetic radar trade-study visual: Latin-hypercube samples, flypath geometry, range-Doppler image, and SNR/Pd proxy behavior.</div>
+      </div>
+      <div class="top-actions">
+        <select class="control" id="scenarioSelect" aria-label="Select synthetic design point"></select>
+        <button class="icon-button" id="playToggle" aria-label="Pause animation" title="Pause animation">||</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Design Sweep</h2>
+          <div class="metric"><strong id="sampleCount">16</strong> samples</div>
+        </div>
+        <div class="strip" id="sampleStrip"></div>
+      </section>
+
+      <section class="panel wide-panel">
+        <div class="panel-head">
+          <h2>Flypath + Radar Image</h2>
+          <div class="metric"><strong id="timeReadout">0.0</strong> s</div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="mainCanvas" width="1100" height="780" aria-label="Animated synthetic flypath and range-Doppler visualization"></canvas>
+        </div>
+        <div class="legend">
+          <span><i class="swatch"></i>Target track</span>
+          <span><i class="swatch amber"></i>Radar beam footprint</span>
+          <span><i class="swatch magenta"></i>Range-Doppler peak</span>
+        </div>
+      </section>
+
+      <section class="panel right-column">
+        <div class="panel-head">
+          <h2>Performance</h2>
+          <div class="metric">Pd proxy <strong id="pdReadout">0.00</strong></div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="curveCanvas" width="680" height="520" aria-label="SNR and probability of detection proxy curves"></canvas>
+        </div>
+        <div class="summary">
+          <div class="stat"><span>Frequency</span><strong id="frequencyValue">--</strong></div>
+          <div class="stat"><span>Bandwidth</span><strong id="bandwidthValue">--</strong></div>
+          <div class="stat"><span>Range</span><strong id="rangeValue">--</strong></div>
+          <div class="stat"><span>SNR</span><strong id="snrValue">--</strong></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const samples = [
+      { id: 0, scenario: "Missile-Seeker Style", target: "Ground Vehicle", role: "Compact forward sensor", f: 10.70, bw: 17.31, range: 3038, vr: 33.5, snr: -17.1, pd: 0.00, cross: -900, color: "#0f766e" },
+      { id: 1, scenario: "Ground-Based Search", target: "Ground Vehicle", role: "Fixed ground sensor", f: 7.42, bw: 15.02, range: 1570, vr: -22.0, snr: 26.5, pd: 1.00, cross: 4200, color: "#2f7d32" },
+      { id: 2, scenario: "Airborne Look-Down", target: "Ground Vehicle", role: "Airborne surveillance", f: 4.48, bw: 12.83, range: 28455, vr: -1.5, snr: -10.2, pd: 0.00, cross: -6200, color: "#6457c9" },
+      { id: 3, scenario: "Coastal Surveillance", target: "Ground Vehicle", role: "Shore-based sensor", f: 6.59, bw: 15.53, range: 10896, vr: -48.2, snr: 3.5, pd: 0.09, cross: 8000, color: "#c46a1a" },
+      { id: 4, scenario: "Missile-Seeker Style", target: "Aircraft", role: "Compact forward sensor", f: 2.79, bw: 19.03, range: 15598, vr: 192.3, snr: -5.3, pd: 0.00, cross: -1400, color: "#0f766e" },
+      { id: 5, scenario: "Ground-Based Search", target: "Aircraft", role: "Fixed ground sensor", f: 11.20, bw: 6.94, range: 12868, vr: 180.6, snr: -14.1, pd: 0.00, cross: 3900, color: "#2f7d32" },
+      { id: 6, scenario: "Airborne Look-Down", target: "Aircraft", role: "Airborne surveillance", f: 5.66, bw: 12.11, range: 19843, vr: 1.4, snr: -17.4, pd: 0.00, cross: -6000, color: "#6457c9" },
+      { id: 7, scenario: "Coastal Surveillance", target: "Aircraft", role: "Shore-based sensor", f: 3.50, bw: 3.12, range: 6284, vr: 63.0, snr: 31.0, pd: 1.00, cross: 8300, color: "#c46a1a" },
+      { id: 8, scenario: "Missile-Seeker Style", target: "Maritime Vessel", role: "Compact forward sensor", f: 5.85, bw: 18.67, range: 27897, vr: 19.9, snr: -25.9, pd: 0.00, cross: -1000, color: "#0f766e" },
+      { id: 9, scenario: "Ground-Based Search", target: "Maritime Vessel", role: "Fixed ground sensor", f: 8.85, bw: 1.44, range: 9476, vr: 44.2, snr: 28.6, pd: 1.00, cross: 4100, color: "#2f7d32" },
+      { id: 10, scenario: "Airborne Look-Down", target: "Maritime Vessel", role: "Airborne surveillance", f: 11.39, bw: 5.10, range: 15049, vr: 9.5, snr: -17.7, pd: 0.00, cross: -6400, color: "#6457c9" },
+      { id: 11, scenario: "Coastal Surveillance", target: "Maritime Vessel", role: "Shore-based sensor", f: 2.08, bw: 5.93, range: 24353, vr: -22.5, snr: -12.6, pd: 0.00, cross: 7600, color: "#c46a1a" },
+      { id: 12, scenario: "Missile-Seeker Style", target: "Small Fast Target", role: "Compact forward sensor", f: 10.09, bw: 2.07, range: 18925, vr: -207.6, snr: -6.2, pd: 0.00, cross: -1300, color: "#0f766e" },
+      { id: 13, scenario: "Ground-Based Search", target: "Small Fast Target", role: "Fixed ground sensor", f: 8.01, bw: 10.23, range: 24949, vr: -311.1, snr: -11.4, pd: 0.00, cross: 4400, color: "#2f7d32" },
+      { id: 14, scenario: "Airborne Look-Down", target: "Small Fast Target", role: "Airborne surveillance", f: 9.13, bw: 11.04, range: 21416, vr: -177.9, snr: -52.2, pd: 0.00, cross: -5900, color: "#6457c9" },
+      { id: 15, scenario: "Coastal Surveillance", target: "Small Fast Target", role: "Shore-based sensor", f: 4.60, bw: 8.07, range: 4542, vr: -60.3, snr: -8.9, pd: 0.00, cross: 7900, color: "#c46a1a" }
+    ];
+
+    const mainCanvas = document.getElementById("mainCanvas");
+    const mainCtx = mainCanvas.getContext("2d");
+    const curveCanvas = document.getElementById("curveCanvas");
+    const curveCtx = curveCanvas.getContext("2d");
+    const select = document.getElementById("scenarioSelect");
+    const strip = document.getElementById("sampleStrip");
+    const playToggle = document.getElementById("playToggle");
+
+    let activeIndex = 7;
+    let playing = true;
+    let phase = 0;
+    let lastTime = performance.now();
+
+    function init() {
+      samples.forEach((sample, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = `${String(sample.id).padStart(2, "0")} - ${sample.scenario} / ${sample.target}`;
+        select.appendChild(option);
+
+        const row = document.createElement("button");
+        row.className = "sample-row";
+        row.type = "button";
+        row.innerHTML = `
+          <span class="sample-index">${String(sample.id).padStart(2, "0")}</span>
+          <span class="sample-main"><strong>${sample.scenario}</strong><span>${sample.target} / ${sample.role}</span></span>
+          <span class="pd-pill">${Math.round(sample.pd * 100)}%</span>
+        `;
+        row.addEventListener("click", () => setActive(index));
+        strip.appendChild(row);
+      });
+      document.getElementById("sampleCount").textContent = String(samples.length);
+      select.addEventListener("change", () => setActive(Number(select.value)));
+      playToggle.addEventListener("click", () => {
+        playing = !playing;
+        playToggle.textContent = playing ? "||" : ">";
+        playToggle.title = playing ? "Pause animation" : "Play animation";
+        playToggle.setAttribute("aria-label", playToggle.title);
+      });
+      resizeCanvas(mainCanvas);
+      resizeCanvas(curveCanvas);
+      setActive(activeIndex);
+      requestAnimationFrame(loop);
+    }
+
+    function setActive(index) {
+      activeIndex = index;
+      select.value = String(index);
+      [...strip.children].forEach((child, childIndex) => child.classList.toggle("active", childIndex === index));
+      updateReadouts(samples[activeIndex]);
+    }
+
+    function updateReadouts(sample) {
+      document.getElementById("frequencyValue").textContent = `${sample.f.toFixed(2)} GHz`;
+      document.getElementById("bandwidthValue").textContent = `${sample.bw.toFixed(2)} MHz`;
+      document.getElementById("rangeValue").textContent = `${Math.round(sample.range).toLocaleString()} m`;
+      document.getElementById("snrValue").textContent = `${sample.snr.toFixed(1)} dB`;
+      document.getElementById("pdReadout").textContent = sample.pd.toFixed(2);
+    }
+
+    function resizeCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(320, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(260, Math.floor(rect.height * dpr));
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.dataset.cssWidth = String(rect.width);
+      canvas.dataset.cssHeight = String(rect.height);
+    }
+
+    function loop(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+      if (playing) phase = (phase + dt * 0.10) % 1;
+      const sample = samples[activeIndex];
+      const timeSeconds = phase * 24;
+      document.getElementById("timeReadout").textContent = timeSeconds.toFixed(1);
+      drawMain(sample, phase);
+      drawCurves(sample, phase);
+      requestAnimationFrame(loop);
+    }
+
+    function drawMain(sample, t) {
+      const width = Number(mainCanvas.dataset.cssWidth);
+      const height = Number(mainCanvas.dataset.cssHeight);
+      mainCtx.clearRect(0, 0, width, height);
+      const gap = 18;
+      const geometry = { x: 24, y: 24, w: Math.max(250, width * 0.36 - gap), h: height - 48 };
+      const rdm = { x: geometry.x + geometry.w + gap, y: 24, w: width - geometry.w - gap - 48, h: height - 48 };
+      drawGeometry(mainCtx, geometry, sample, t);
+      drawRdm(mainCtx, rdm, sample, t);
+    }
+
+    function drawGeometry(ctx, box, sample, t) {
+      panelLabel(ctx, box, "Geometry");
+      const inner = inset(box, 36, 38, 22, 42);
+      drawGrid(ctx, inner, 5, 5);
+      const maxRange = 32000;
+      const crossMin = -9000;
+      const crossMax = 10000;
+      const currentRange = Math.max(400, sample.range + sample.vr * 24 * t);
+      const x = map(sample.cross, crossMin, crossMax, inner.x, inner.x + inner.w);
+      const y = map(currentRange, 0, maxRange, inner.y + inner.h, inner.y);
+      const radarX = map(0, crossMin, crossMax, inner.x, inner.x + inner.w);
+      const radarY = inner.y + inner.h;
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(196, 106, 26, 0.35)";
+      ctx.fillStyle = "rgba(196, 106, 26, 0.10)";
+      ctx.beginPath();
+      ctx.moveTo(radarX, radarY);
+      ctx.lineTo(radarX + 70, radarY - 170);
+      ctx.lineTo(radarX - 70, radarY - 170);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = sample.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i <= 80; i++) {
+        const localT = i / 80 * t;
+        const range = Math.max(400, sample.range + sample.vr * 24 * localT);
+        const px = map(sample.cross, crossMin, crossMax, inner.x, inner.x + inner.w);
+        const py = map(range, 0, maxRange, inner.y + inner.h, inner.y);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "#17211f";
+      roundedRect(ctx, radarX - 9, radarY - 9, 18, 18, 4);
+      ctx.fill();
+
+      ctx.fillStyle = sample.color;
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.95)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.fillStyle = "#60706b";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText("Cross range", inner.x, box.y + box.h - 12);
+      ctx.save();
+      ctx.translate(box.x + 12, inner.y + inner.h);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Slant range", 0, 0);
+      ctx.restore();
+      ctx.restore();
+    }
+
+    function drawRdm(ctx, box, sample, t) {
+      panelLabel(ctx, box, "Range-Doppler");
+      const inner = inset(box, 38, 38, 20, 50);
+      const cols = 110;
+      const rows = 120;
+      const image = ctx.createImageData(cols, rows);
+      const rangeCenter = clamp((sample.range + sample.vr * 24 * t) / 32000, 0, 1);
+      const dopplerCenter = clamp((sample.vr + 330) / 660, 0, 1);
+      const spreadR = Math.max(0.018, 0.12 / Math.sqrt(sample.bw));
+      const spreadD = 0.028 + 0.018 * (20 / Math.max(2, sample.bw));
+      const strength = 0.18 + 0.82 * sample.pd;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const u = c / (cols - 1);
+          const v = 1 - r / (rows - 1);
+          const dr = (v - rangeCenter) / spreadR;
+          const dd = (u - dopplerCenter) / spreadD;
+          const target = strength * Math.exp(-0.5 * (dr * dr + dd * dd));
+          const ridge = 0.10 * Math.exp(-Math.pow((v - 0.18 - 0.04 * Math.sin(t * 6.28)) / 0.08, 2));
+          const texture = 0.035 * pseudoNoise(c, r, sample.id);
+          const value = clamp(target + ridge + texture, 0, 1);
+          const [red, green, blue] = heatColor(value);
+          const index = (r * cols + c) * 4;
+          image.data[index] = red;
+          image.data[index + 1] = green;
+          image.data[index + 2] = blue;
+          image.data[index + 3] = 255;
+        }
+      }
+      const offscreen = document.createElement("canvas");
+      offscreen.width = cols;
+      offscreen.height = rows;
+      offscreen.getContext("2d").putImageData(image, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(offscreen, inner.x, inner.y, inner.w, inner.h);
+      ctx.strokeStyle = "#17211f";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(inner.x, inner.y, inner.w, inner.h);
+
+      const peakX = map(dopplerCenter, 0, 1, inner.x, inner.x + inner.w);
+      const peakY = map(rangeCenter, 0, 1, inner.y + inner.h, inner.y);
+      ctx.strokeStyle = "#b3316d";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(peakX - 12, peakY);
+      ctx.lineTo(peakX + 12, peakY);
+      ctx.moveTo(peakX, peakY - 12);
+      ctx.lineTo(peakX, peakY + 12);
+      ctx.stroke();
+
+      ctx.fillStyle = "#60706b";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText("-330 m/s", inner.x, box.y + box.h - 14);
+      ctx.fillText("+330 m/s", inner.x + inner.w - 56, box.y + box.h - 14);
+      ctx.save();
+      ctx.translate(box.x + 14, inner.y + inner.h);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Range bins", 0, 0);
+      ctx.restore();
+    }
+
+    function drawCurves(sample, t) {
+      const width = Number(curveCanvas.dataset.cssWidth);
+      const height = Number(curveCanvas.dataset.cssHeight);
+      curveCtx.clearRect(0, 0, width, height);
+      const box = { x: 24, y: 24, w: width - 48, h: height - 48 };
+      panelLabel(curveCtx, box, "SNR / Pd Proxy");
+      const inner = inset(box, 34, 26, 24, 46);
+      drawGrid(curveCtx, inner, 5, 5);
+      const snrValues = [];
+      const pdValues = [];
+      for (let i = 0; i <= 80; i++) {
+        const u = i / 80;
+        const range = Math.max(400, sample.range + sample.vr * 24 * u);
+        const snr = sample.snr + 40 * Math.log10(sample.range / range);
+        const pd = 1 / (1 + Math.exp(-0.35 * (snr - 10)));
+        snrValues.push(snr);
+        pdValues.push(pd * 100);
+      }
+      drawLine(curveCtx, inner, snrValues, -60, 40, "#2f7d32", t);
+      drawLine(curveCtx, inner, pdValues, 0, 100, "#b3316d", t);
+      const cursorX = map(t, 0, 1, inner.x, inner.x + inner.w);
+      curveCtx.strokeStyle = "rgba(23, 33, 31, 0.55)";
+      curveCtx.setLineDash([5, 5]);
+      curveCtx.beginPath();
+      curveCtx.moveTo(cursorX, inner.y);
+      curveCtx.lineTo(cursorX, inner.y + inner.h);
+      curveCtx.stroke();
+      curveCtx.setLineDash([]);
+      const idx = Math.min(80, Math.max(0, Math.round(t * 80)));
+      document.getElementById("snrValue").textContent = `${snrValues[idx].toFixed(1)} dB`;
+      document.getElementById("pdReadout").textContent = (pdValues[idx] / 100).toFixed(2);
+
+      curveCtx.fillStyle = "#60706b";
+      curveCtx.font = "12px Inter, sans-serif";
+      curveCtx.fillText("Time", inner.x, box.y + box.h - 12);
+      curveCtx.fillStyle = "#2f7d32";
+      curveCtx.fillText("SNR dB", inner.x + 6, inner.y + 16);
+      curveCtx.fillStyle = "#b3316d";
+      curveCtx.fillText("Pd proxy x100", inner.x + 76, inner.y + 16);
+    }
+
+    function drawLine(ctx, box, values, minValue, maxValue, color, t) {
+      const count = Math.max(2, Math.floor(values.length * Math.max(0.02, t)));
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i < count; i++) {
+        const u = i / (values.length - 1);
+        const x = map(u, 0, 1, box.x, box.x + box.w);
+        const y = map(clamp(values[i], minValue, maxValue), minValue, maxValue, box.y + box.h, box.y);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function panelLabel(ctx, box, label) {
+      ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
+      roundedRect(ctx, box.x, box.y, box.w, box.h, 8);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(23, 33, 31, 0.10)";
+      ctx.stroke();
+      ctx.fillStyle = "#17211f";
+      ctx.font = "700 13px Inter, sans-serif";
+      ctx.fillText(label, box.x + 14, box.y + 24);
+    }
+
+    function drawGrid(ctx, box, xLines, yLines) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(96, 112, 107, 0.18)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= xLines; i++) {
+        const x = box.x + box.w * i / xLines;
+        ctx.beginPath();
+        ctx.moveTo(x, box.y);
+        ctx.lineTo(x, box.y + box.h);
+        ctx.stroke();
+      }
+      for (let j = 0; j <= yLines; j++) {
+        const y = box.y + box.h * j / yLines;
+        ctx.beginPath();
+        ctx.moveTo(box.x, y);
+        ctx.lineTo(box.x + box.w, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function heatColor(value) {
+      const stops = [
+        [0.00, 16, 33, 31],
+        [0.18, 15, 118, 110],
+        [0.45, 196, 106, 26],
+        [0.72, 179, 49, 109],
+        [1.00, 255, 241, 201]
+      ];
+      for (let i = 0; i < stops.length - 1; i++) {
+        const a = stops[i];
+        const b = stops[i + 1];
+        if (value >= a[0] && value <= b[0]) {
+          const local = (value - a[0]) / (b[0] - a[0]);
+          return [
+            Math.round(lerp(a[1], b[1], local)),
+            Math.round(lerp(a[2], b[2], local)),
+            Math.round(lerp(a[3], b[3], local))
+          ];
+        }
+      }
+      return [255, 241, 201];
+    }
+
+    function pseudoNoise(x, y, seed) {
+      const value = Math.sin(x * 12.9898 + y * 78.233 + seed * 37.719) * 43758.5453;
+      return value - Math.floor(value);
+    }
+
+    function inset(box, top, right, bottom, left) {
+      return { x: box.x + left, y: box.y + top, w: box.w - left - right, h: box.h - top - bottom };
+    }
+
+    function roundedRect(ctx, x, y, w, h, radius) {
+      const r = Math.min(radius, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function map(value, inMin, inMax, outMin, outMax) {
+      return outMin + (outMax - outMin) * ((value - inMin) / (inMax - inMin));
+    }
+
+    function clamp(value, low, high) {
+      return Math.max(low, Math.min(high, value));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas(mainCanvas);
+      resizeCanvas(curveCanvas);
+    });
+
+    init();
+  </script>
+</body>
+</html>
