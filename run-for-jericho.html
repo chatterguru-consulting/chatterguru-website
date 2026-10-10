@@ -91,6 +91,8 @@ h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.08;letter-spacing:-.035em;marg
 .encouragement-box p{max-width:740px;margin-bottom:0}
 .btn-outline{background:#fff;border:2px solid var(--red);color:var(--red2)}
 .btn-outline:hover{background:#fff8f4}
+.encouragement-actions{display:flex;flex-direction:column;gap:12px;min-width:230px}
+.encouragement-actions .btn{text-align:center}
 
 .medals{background:var(--soft)}
 .medal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
@@ -134,6 +136,7 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
     <div class="cta-row">
       <a class="btn primary" href="https://www.jerichocircle.org/donation" target="_blank" rel="noopener noreferrer">Donate to Jericho</a>
       <a class="btn ghost" href="#why">Why I'm Running</a>
+      <a class="btn ghost" href="#encouragement">Cheer Me On</a>
     </div>
   </div>
 </header>
@@ -233,9 +236,12 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
       <div>
         <div class="kicker">A Note Goes a Long Way</div>
         <h2>Cheering me on? I'd love to hear from you.</h2>
-        <p>Whether or not you're able to donate, a few words of encouragement mean a lot. Send me a private note—I’ll read it as I get ready for race day. Nothing is posted publicly.</p>
+        <p>Whether or not you're able to donate, a few words of encouragement mean a lot. Leave a comment or photo on my public Facebook marathon post, or send me a private note by email. I'll be glad to hear from you before and after race day!</p>
       </div>
-      <a class="btn btn-outline" href="mailto:chatterpaul.joseph@jerichocircle.org?subject=Cheering%20You%20On%20%E2%80%94%20Chicago%20Marathon%202026" aria-label="Email Chatterpaul a private note of encouragement">Send a Private Note</a>
+      <div class="encouragement-actions">
+        <a class="btn btn-outline" href="https://www.facebook.com/share/19qpytLjSr/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Leave a public comment on Chatterpaul's Facebook marathon post">Comment on Facebook</a>
+        <a class="btn btn-outline" href="mailto:chatterpaul.joseph@jerichocircle.org?subject=Cheering%20You%20On%20%E2%80%94%20Chicago%20Marathon%202026" aria-label="Email Chatterpaul a private note of encouragement">Send a Private Note</a>
+      </div>
     </div>
   </section>
 
