@@ -69,11 +69,7 @@ h1{font-size:clamp(2.8rem,7vw,5.4rem);line-height:.98;letter-spacing:-.055em;mar
 .giving-total{min-width:150px}
 .giving-total strong{display:block;font-size:clamp(2.4rem,6vw,3.4rem);line-height:1.15;font-variant-numeric:tabular-nums}
 .giving-total span{color:var(--muted);font-size:.94rem}
-.giving-days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0}
-.giving-day{padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:var(--soft)}
-.giving-day span,.giving-day small{display:block;color:var(--muted)}
-.giving-day strong{display:block;font-size:1.65rem;line-height:1.45;font-variant-numeric:tabular-nums}
-.giving-ratio{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.95rem;font-weight:750}
+.giving-ratio{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.95rem;font-weight:750;margin-top:24px}
 .giving-meter{height:12px;background:var(--cream);border-radius:999px;overflow:hidden;margin:8px 0 12px}
 .giving-meter span{display:block;width:45.2%;height:100%;border-radius:999px;background:var(--gold)}
 .giving-disclaimer{font-size:.92rem;margin:0}
@@ -161,7 +157,6 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
   .gallery{grid-template-columns:1fr}
   .gallery .tall,.gallery .small{min-height:360px}
   .stats{grid-template-columns:1fr}
-  .giving-days{grid-template-columns:1fr}
   .giving-report .card{padding:20px}
   .recap-numbers,.race-photos{grid-template-columns:1fr}
   section{padding:68px 0}
@@ -203,26 +198,21 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
   <div class="card">
     <div class="giving-header">
       <div>
-        <div class="kicker">Jericho Donation Report • October 10–12, 2026</div>
+        <div class="kicker">Jericho Giving Update</div>
         <h2 id="giving-heading">Thank you for the generosity!</h2>
-        <p>Jericho's October 12 report lists donations received during marathon weekend. We're grateful for each gift while we work with Jericho to confirm which contributions were inspired by this run.</p>
+        <p>Jericho recently reported 14 generous gifts totaling $565. Thank you to everyone who contributed! We're working with Jericho to confirm which gifts were inspired by my marathon.</p>
       </div>
       <div class="giving-total">
         <strong>$565</strong>
         <span>14 gifts reported</span>
       </div>
     </div>
-    <div class="giving-days" aria-label="Donations received by date">
-      <div class="giving-day"><span>Saturday, Oct 10</span><strong>$440</strong><small>9 gifts</small></div>
-      <div class="giving-day"><span>Sunday, Oct 11 — Race Day</span><strong>$100</strong><small>4 gifts</small></div>
-      <div class="giving-day"><span>Monday, Oct 12</span><strong>$25</strong><small>1 gift</small></div>
-    </div>
     <div class="giving-ratio">
       <span>Potential share of my $1,250 goal, if all 14 gifts qualify</span>
       <span>45.2%</span>
     </div>
-    <div class="giving-meter" role="img" aria-label="Illustrative 45.2 percent of the $1,250 goal if all reported October 10 to 12 gifts are attributed to this marathon"><span></span></div>
-    <p class="muted giving-disclaimer"><strong>Attribution pending:</strong> These are donations listed in Jericho's general giving report, not a verified marathon-specific total. Gifts from other dates are not included in this snapshot. I'll replace this illustrative figure with the confirmed fundraiser amount when Jericho provides it.</p>
+    <div class="giving-meter" role="img" aria-label="Illustrative 45.2 percent of the $1,250 goal if all 14 recently reported gifts are attributed to this marathon"><span></span></div>
+    <p class="muted giving-disclaimer"><strong>Attribution pending:</strong> These are donations listed in Jericho's general giving report, not a verified marathon-specific total. This is a snapshot of recently reported gifts, not a complete tally of fundraiser donations. I'll replace this illustrative figure with the confirmed fundraiser amount when Jericho provides it.</p>
   </div>
 </section>
 
