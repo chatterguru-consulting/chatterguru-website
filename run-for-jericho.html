@@ -61,6 +61,18 @@ h1{font-size:clamp(2.8rem,7vw,5.4rem);line-height:.98;letter-spacing:-.055em;mar
 .card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow)}
 .progress .card{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
 .amount{font-size:1.9rem;font-weight:900}
+.giving-report{padding:20px 0 0}
+.giving-report .card{box-shadow:0 10px 28px rgba(19,33,58,.08)}
+.giving-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.giving-header h2{font-size:clamp(1.5rem,3vw,2.1rem);margin:6px 0 10px}
+.giving-header p{max-width:750px;margin:0}
+.giving-total{min-width:150px}
+.giving-total strong{display:block;font-size:clamp(2.4rem,6vw,3.4rem);line-height:1.15;font-variant-numeric:tabular-nums}
+.giving-total span{color:var(--muted);font-size:.94rem}
+.giving-ratio{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.95rem;font-weight:750;margin-top:24px}
+.giving-meter{height:12px;background:var(--cream);border-radius:999px;overflow:hidden;margin:8px 0 12px}
+.giving-meter span{display:block;width:45.2%;height:100%;border-radius:999px;background:var(--gold)}
+.giving-disclaimer{font-size:.92rem;margin:0}
 .muted{color:var(--muted)}
 section{padding:88px 0}
 .kicker{font-size:.82rem;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--red)}
@@ -145,6 +157,7 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
   .gallery{grid-template-columns:1fr}
   .gallery .tall,.gallery .small{min-height:360px}
   .stats{grid-template-columns:1fr}
+  .giving-report .card{padding:20px}
   .recap-numbers,.race-photos{grid-template-columns:1fr}
   section{padding:68px 0}
 }
@@ -173,13 +186,35 @@ footer{background:#0b1527;color:#c7cfdb;padding:28px 0;font-size:.92rem}
     <div>
       <div class="kicker">My 2026 fundraising goal</div>
       <div class="amount">$1,250 for Jericho Circle Project</div>
-      <p class="muted">I'm keeping this simple: every gift goes directly to Jericho through its official donation page. This website does not collect payments or display an unverified running total.</p>
-      <p class="muted"><strong>Fundraising updates:</strong> I'll update this page throughout October as Jericho Circle Project shares confirmed donation totals for my marathon effort. Because gifts go directly to Jericho, updates may take a little time. Thank you for your continued support!</p>
+      <p class="muted">Every gift goes directly to Jericho through its donation page. This website does not collect payments.</p>
+      <p class="muted"><strong>Fundraising continues through November 30, 2026.</strong> I'll keep this page updated as more gifts come in. Thank you for your continued support!</p>
       <p class="muted"><strong>One small favor:</strong> In the donation form’s optional Comment field, please write <strong>“Chicago Marathon 2026 — Chatterpaul”</strong> so Jericho can identify gifts connected to this run.</p>
     </div>
     <a class="btn primary" href="https://www.jerichocircle.org/donation" target="_blank" rel="noopener noreferrer">Help Me Reach $1,250</a>
   </div>
 </div>
+
+<section class="wrap giving-report" id="donations" aria-labelledby="giving-heading">
+  <div class="card">
+    <div class="giving-header">
+      <div>
+        <div class="kicker">Run for Jericho • Fundraising Progress</div>
+        <h2 id="giving-heading">Thank you for your generosity!</h2>
+        <p>Together, we've raised <strong>$565</strong> through 14 generous donations toward my $1,250 goal. Thank you to everyone who has given, shared, and cheered me on. We're continuing to accept donations through <strong>November 30, 2026</strong>!</p>
+      </div>
+      <div class="giving-total">
+        <strong>$565</strong>
+        <span>14 donations so far</span>
+      </div>
+    </div>
+    <div class="giving-ratio">
+      <span>Raised toward my $1,250 goal</span>
+      <span>45.2%</span>
+    </div>
+    <div class="giving-meter" role="img" aria-label="45.2 percent of the $1,250 fundraising goal raised so far"><span></span></div>
+    <p class="muted giving-disclaimer">The fundraiser remains open through November 30. Every contribution helps support Jericho Circle Project's work in healing, connection, and personal growth.</p>
+  </div>
+</section>
 
   <section class="recap" id="recap" aria-labelledby="recap-heading">
     <div class="wrap">
