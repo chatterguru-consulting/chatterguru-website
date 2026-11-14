@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Recorded radar replay | Chatterguru S3</title>
+  <link rel="stylesheet" href="replay.css">
+  <script id="recording-frames" type="application/json">[{"id":"reference-0","time_s":2.5,"source_sha256":"e1b21d14b5a54d699949b1c176930f9d18674fecc6716a4d81a75d758c2292bc","observations":2,"tracks":2,"image":"cpi-1.png"},{"id":"reference-1","time_s":7.5,"source_sha256":"158e61df335a223facb77f3cb7ebc6def0d754b11e90d687e0c2d4b658748659","observations":2,"tracks":2,"image":"cpi-2.png"},{"id":"reference-2","time_s":12.5,"source_sha256":"26017634b5e94b356dca4ed7b055aa3a5d8735e9f1a2c06ccf33817ff0128e6d","observations":2,"tracks":2,"image":"cpi-3.png"},{"id":"reference-3","time_s":17.5,"source_sha256":"3ccc4b926234bfd3bb2a920c94df1157a6e8a7fa1e840189eae4ee38115bc5df","observations":2,"tracks":2,"image":"cpi-4.png"}]</script>
+  <script id="recording-source" type="application/json">{"kind":"recorded-workbench","source_head":"d808dbb2edda382be018e9d1c3f19bdea9896575","source_fingerprint":"3b9aeda78d4e41ad83c3ad5ee2a8d48d41a1289b44eeb2c9da1fb322477ecc40","session_manifest_sha256":"ab8bc999f016686a68c738913cedd218d25b530e99b22aeeddc01be3a1f30419","scientific_digest":"f49fc309bb399380f3cc00ff6e446cbd75e827806155f455788cd388a4438232"}</script>
+  <script src="replay.js" defer></script>
+</head>
+<body>
+  <main>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../../../index.html">Chatterguru</a>
+      <span aria-hidden="true">/</span>
+      <a href="../../../s3-studio.html">S3 Studio</a>
+      <span aria-hidden="true">/</span>
+      <a href="../../../radar-rf-ew.html">Radar/RF</a>
+    </nav>
+
+    <header>
+      <p class="eyebrow">SENSOR SCENARIO STUDIO · RECORDED WORKBENCH REPLAY</p>
+      <h1>Recorded radar replay</h1>
+      <p>Step through four captures from a completed 20-second Workbench HDF5 recording (2.5, 7.5, 12.5 and 17.5 seconds) of two fictional crossing targets. Compare scene truth, recorded radar observations and Kalman tracker estimates on the same clock.</p>
+    </header>
+
+    <section aria-labelledby="capture-title">
+      <div class="section-head">
+        <h2 id="capture-title">Capture time</h2>
+        <span class="evidence-badge">Recorded Workbench run</span>
+      </div>
+      <div class="pill-row" role="group" aria-label="Direct capture selection">
+        <button type="button" class="pill-btn" data-index="0" aria-pressed="true">Capture 1 (2.5 s)</button>
+          <button type="button" class="pill-btn" data-index="1" aria-pressed="false">Capture 2 (7.5 s)</button>
+          <button type="button" class="pill-btn" data-index="2" aria-pressed="false">Capture 3 (12.5 s)</button>
+          <button type="button" class="pill-btn" data-index="3" aria-pressed="false">Capture 4 (17.5 s)</button>
+      </div>
+      <form class="controls" aria-label="Frame controls">
+        <button type="button" id="prev" disabled>Previous</button>
+        <label for="frame" class="sr">Capture frame</label>
+        <input type="range" min="0" max="3" value="0" id="frame" disabled>
+        <button type="button" id="next" disabled>Next</button>
+      </form>
+      <p id="status" role="status">Loading recording…</p>
+      <a href="cpi-1.png" id="full">
+        <img src="cpi-1.png" id="plot" alt="Retained range-Doppler and top-down views at 2.5 seconds" width="1380" height="696">
+      </a>
+      <p class="muted">Left pane: retained Sum range-Doppler map (Doppler velocity across horizontal X, range increasing upward on Y). Right pane: registered East-North scene truth, CFAR observations and tracker estimates. Plots were rendered from retained HDF5 arrays at export time; select the plot to open full resolution.</p>
+    </section>
+
+    <details>
+      <summary>Recording provenance &amp; digests</summary>
+      <p>These displays come from a verified synthetic HDF5 recording (<code>website-fictional-crossing-v1</code>). Frame selection changes the retained capture being displayed.</p>
+      <dl class="provenance-grid">
+        <dt>Evidence kind</dt><dd><code>recorded-workbench</code></dd>
+        <dt>Radar source HEAD</dt><dd><code>d808dbb2edda382be018e9d1c3f19bdea9896575</code></dd>
+        <dt>Python source SHA-256</dt><dd><code>3b9aeda78d4e41ad83c3ad5ee2a8d48d41a1289b44eeb2c9da1fb322477ecc40</code></dd>
+        <dt>Session manifest SHA-256</dt><dd><code>ab8bc999f016686a68c738913cedd218d25b530e99b22aeeddc01be3a1f30419</code></dd>
+        <dt>Scientific digest</dt><dd><code>f49fc309bb399380f3cc00ff6e446cbd75e827806155f455788cd388a4438232</code></dd>
+        <dt>Active frame digest</dt><dd><code id="active-frame-sha">e1b21d14b5a54d699949b1c176930f9d18674fecc6716a4d81a75d758c2292bc</code></dd>
+      </dl>
+      <p class="artifact-links">
+        <a href="frames.json">Frame times and source digests</a> ·
+        <a href="source.json">Source receipt</a> ·
+        <a href="rights-and-sources.md">Rights &amp; sources ledger</a> ·
+        <a href="website-demo-manifest.json">Bundle manifest</a>
+      </p>
+    </details>
+  </main>
+</body>
+</html>

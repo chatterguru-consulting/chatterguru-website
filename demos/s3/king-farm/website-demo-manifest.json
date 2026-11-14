@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "evidence": {
+    "kind": "browser-preview",
+    "source_head": "d808dbb2edda382be018e9d1c3f19bdea9896575"
+  },
+  "files": {
+    "index.html": {
+      "bytes": 248331,
+      "sha256": "dd3163a00215c09614153d7e25ae293199bee631b99b7d6b45075ca2ceeb2ddd"
+    },
+    "mission.connect": {
+      "bytes": 6126,
+      "sha256": "d6328448ac8288cf4bbf43ead017c540d5e511b64051f2c8273a94907947bebc"
+    },
+    "mission.czml": {
+      "bytes": 6187555,
+      "sha256": "7e9a51fdcadcf58303f02e9cd124767201fe28dc14dda6ba8d1a68dbf3734532"
+    },
+    "preview.css": {
+      "bytes": 4869,
+      "sha256": "ea97f47575e86e81814b8962ce7b71563876568fb4f4895da2417a68f4fff9aa"
+    },
+    "preview.js": {
+      "bytes": 15699,
+      "sha256": "93a312b681372ebadb0b0aca8acedd3cc3d8160337c7c943fd454329fc331f73"
+    },
+    "rights-and-sources.md": {
+      "bytes": 3349,
+      "sha256": "ed53695222aa9c04467bb91cd818b5589ef3c1f7d6f0266776baf8fb5e3c025f"
+    },
+    "scene-data.json": {
+      "bytes": 242717,
+      "sha256": "6147e975ced9b941036bbbfc0accb785ea19bd821cda46eb733631286fedbbfe"
+    }
+  }
+}

@@ -35,7 +35,7 @@
         <p>Sensor Scenario Studio is Chatterguru’s Workbench for building scenes, simulating sensors and inspecting results such as range–Doppler maps and tracks.</p>
         <div class="hero-actions">
           <a class="button" href="s3-studio.html">Explore S³</a>
-          <a class="button secondary" href="radar-rf-ew.html#classic-demos">Try the browser demos</a>
+          <a class="button secondary" href="demos/s3/recorded-crossing/index.html">Open the recorded radar replay</a>
         </div>
       </div>
     </section>
@@ -45,18 +45,23 @@
         <div class="section-heading">
           <p class="mini-label">Try it in your browser</p>
           <h2>Each example says where its results come from.</h2>
-          <p>Try the original browser demos while the Workbench replay and King Farm preview are in review.</p>
+          <p>Some examples replay a recorded Workbench run; others render exported 3D scenes or browser illustrations. Every card is labelled with where its results come from.</p>
         </div>
         <div class="grid">
-          <article class="card demo-card is-pending">
-            <span class="badge pending">In review</span>
+          <article class="card demo-card">
+            <span class="badge recorded">Recorded Workbench run</span>
             <h3>Recorded radar replay</h3>
             <p>Step through four captures from a fictional two-target run: processed range–Doppler data beside scene truth, observations and tracker estimates on the same clock.</p>
+            <a class="button" href="demos/s3/recorded-crossing/index.html">Open replay</a>
           </article>
-          <article class="card demo-card is-pending">
-            <span class="badge pending">In review</span>
-            <h3>King Farm 3D scene</h3>
-            <p>A fictional airborne radar scenario over King Farm in Rockville, Maryland. The web preview is undergoing asset and attribution review.</p>
+          <article class="card demo-card">
+            <span class="badge preview">Browser preview</span>
+            <h3>King Farm &amp; Mountain Ridge 3D scenes</h3>
+            <p>Interactive 3D/2D browser previews exported from S³: airborne radar over King Farm (Rockville, MD) and terrain-masked ridge surveillance over South Mountain (Boonsboro, MD), with OpenStreetMap buildings, roads, 4/3-Earth line-of-sight rays and 61 precomputed 24×32 range–Doppler frames.</p>
+            <div class="hero-actions">
+              <a class="button" href="demos/s3/king-farm/index.html">King Farm 3D</a>
+              <a class="button secondary" href="demos/s3/mountain-ridge/index.html">Mountain Ridge 3D</a>
+            </div>
           </article>
           <article class="card demo-card">
             <span class="badge illustrative">Illustrative</span>
