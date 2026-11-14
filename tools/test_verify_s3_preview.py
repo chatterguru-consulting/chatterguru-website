@@ -81,6 +81,27 @@ class PreviewVerificationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate manifest field"):
             verify_bundle(self.root)
 
+    def test_studio_v2_requires_export_identity_and_rights(self):
+        self.data["schema"] = 2
+        self.data["evidence"] = {
+            "kind": "workbench-export", "source_head": "1" * 40, "scene_id": "mountain_ridge",
+            "exporter": "scripts/publish_website_viewer.py", "cesium": "1.119.0",
+        }
+        self.write_manifest()
+        with self.assertRaisesRegex(ValueError, "rights-and-sources"):
+            verify_bundle(self.root)
+        ledger = b"Credits"
+        (self.root / "rights-and-sources.md").write_bytes(ledger)
+        self.data["files"]["rights-and-sources.md"] = {"bytes": len(ledger), "sha256": hashlib.sha256(ledger).hexdigest()}
+        self.write_manifest()
+        self.assertEqual(verify_bundle(self.root, expected_schema=2)[0], 2)
+        with self.assertRaisesRegex(ValueError, "schema 1"):
+            verify_bundle(self.root, expected_schema=1)
+        self.data["evidence"]["source_head"] = "local checkout"
+        self.write_manifest()
+        with self.assertRaisesRegex(ValueError, "export identity"):
+            verify_bundle(self.root)
+
     def test_invalid_local_link_and_anchor(self):
         self.page.write_text('<a href="old.html">Old</a><img src="#miss"><a href="#miss">Missing</a>',
                              encoding="utf-8")

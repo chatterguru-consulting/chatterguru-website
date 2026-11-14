@@ -1,0 +1,264 @@
+"""Verify public S³ Studio packages, the pinned Cesium build, and browser playback."""
+
+from __future__ import annotations
+
+import argparse
+from functools import partial
+from hashlib import sha256
+from html import unescape
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import json
+from pathlib import Path
+import re
+import tarfile
+from threading import Thread
+from urllib.parse import unquote, urlsplit
+
+from verify_s3_preview import MANIFEST, _demo_file, file_sha256, verify_bundle
+
+CESIUM = "cesium-1.119.0"
+CESIUM_TARBALL_SHA256 = "2daa7203af810ddb320d7990ef26812309336f4559b3d9b2d1b1450f8110cd7d"
+USGS = "basemap.nationalmap.gov"
+SCENES = Path("demos/s3/studio")
+PRIVATE_TEXT = re.compile(
+    r"file:(?:/{1,3}|\\)|\b[a-z]:[\\/](?:users|documents|windows|temp|onedrive|"
+    r"program files(?: \(x86\))?|work(?:space)?|python\d+)(?:[\\/]|\b)|"
+    r"/(?:home|Users)/[^/\s<>]+/|"
+    r"(?<![\w.+-])[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+",
+    re.IGNORECASE,
+)
+TEXT_SUFFIXES = {".html", ".js", ".css", ".json", ".czml", ".md", ".txt", ".xml", ".svg", ".webmanifest"}
+
+
+def request_allowed(value: str, origin: str) -> bool:
+    """Match exact origins rather than hostname prefixes or URL substrings."""
+    try:
+        url = urlsplit(value)
+        if url.scheme in {"data", "blob"}:
+            # Embedded resources and workers stay inside the browser.
+            return url.scheme == "data" or value.startswith(f"blob:{origin}/")
+        if url.username is not None or url.password is not None:
+            return False
+        return (f"{url.scheme}://{url.netloc}" == origin
+                or (url.scheme == "https" and url.hostname == USGS and url.port in (None, 443)))
+    except ValueError:
+        return False
+
+
+def verify_scene(bundle: Path) -> dict:
+    count, size = verify_bundle(bundle, expected_schema=2)
+    page = bundle / "index.html"
+    markup = unescape(page.read_text(encoding="utf-8"))
+    ledger = (bundle / "rights-and-sources.md").read_text(encoding="utf-8")
+    credits = ("USGS", "OpenStreetMap")
+    if (bundle / "imagery/naip/extent.json").is_file():
+        credits += ("NAIP",)
+    if not all(credit in ledger and credit in markup for credit in credits):
+        raise ValueError("Scene is missing imagery or OpenStreetMap credits")
+    if f'../../vendor/{CESIUM}/Cesium.js' not in markup:
+        raise ValueError("Scene must use the pinned shared Cesium build")
+    if not re.search(r'<a\b[^>]*href=["\']rights-and-sources\.md["\']', markup, re.I):
+        raise ValueError("Scene is missing the data credits link")
+    if re.search(r"\bserviceWorker\s*\.\s*register\s*\(", markup):
+        raise ValueError("Public Studio must not register a service worker")
+
+    for path in sorted(bundle.rglob("*")):
+        if path.is_file() and path.suffix.lower() in TEXT_SUFFIXES:
+            content = unescape(unquote(path.read_text(encoding="utf-8-sig"))).replace("\\\\", "\\")
+            if PRIVATE_TEXT.search(content):
+                raise ValueError(f"Local path or email found in {path.relative_to(bundle).as_posix()}")
+        if path.suffix.lower() == ".glb" and (path.parent != bundle / "models" or not path.name.startswith("synth_")):
+            raise ValueError("Only local Studio synthetic models are permitted")
+    return {"scene": bundle.name, "verified_files": count, "bundle_bytes": size, "entry_bytes": page.stat().st_size,
+            "manifest_sha256": file_sha256(bundle / MANIFEST)}
+
+
+def verify_vendor(vendor: Path, archive: Path) -> int:
+    """Match every shipped build, license and notice file to the official archive."""
+    if file_sha256(archive) != CESIUM_TARBALL_SHA256:
+        raise ValueError("Cesium npm tarball does not match the pinned digest")
+    build = "package/Build/Cesium/"
+    notices = {"LICENSE.md", "ThirdParty.json"}
+    with tarfile.open(archive, mode="r:gz") as tar:
+        files = {}
+        for member in tar:
+            if not member.isfile():
+                continue
+            suffix = member.name.removeprefix(build)
+            if member.name.startswith(build):
+                files[suffix] = member
+            elif member.name.removeprefix("package/") in notices:
+                files[member.name.removeprefix("package/")] = member
+        actual = {path.relative_to(vendor).as_posix() for path in vendor.rglob("*") if _demo_file(path)}
+        if actual != {*files, "SOURCE.md"} or not notices <= files.keys():
+            raise ValueError(f"Cesium vendor inventory mismatch: {sorted(actual ^ {*files, 'SOURCE.md'})}")
+        for name, member in files.items():
+            with tar.extractfile(member) as source:
+                expected = sha256(source.read()).hexdigest()
+            if file_sha256(vendor / name) != expected:
+                raise ValueError(f"Cesium vendor file differs from npm: {name}")
+    return len(files)
+
+
+class PreviewServer(ThreadingHTTPServer):
+    # Chromium opens many concurrent tile and WebGL asset connections.
+    request_queue_size = 128
+
+
+class QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+    def do_GET(self):
+        try:
+            super().do_GET()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass  # Chromium cancels outstanding imagery requests when closing.
+
+
+def _network_location(url: str, origin: str) -> str:
+    parsed = urlsplit(url)
+    if parsed.scheme in {"data", "blob"}:
+        return parsed.scheme + ":"
+    return "self" if f"{parsed.scheme}://{parsed.netloc}" == origin else (parsed.hostname or parsed.scheme)
+
+
+def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -> dict:
+    """Capture and restrict page traffic during a real WebGL load and playback."""
+    context = browser.new_context(viewport={"width": width, "height": height},
+                                  has_touch=width < 500, is_mobile=width < 500, service_workers="block")
+    requests, denied, errors, responses, failed = [], [], [], [], []
+
+    def route_request(route):
+        address = route.request.url
+        if request_allowed(address, origin):
+            route.continue_()
+        else:
+            denied.append(address)
+            route.abort()
+
+    def watch_page(page):
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        page.on("console", lambda message: errors.append(message.text) if message.type == "error" else None)
+
+    try:
+        context.on("page", watch_page)
+        context.on("request", lambda request: requests.append(request.url))
+        context.on("response", lambda response: responses.append((response.url, response.status)))
+        context.on("requestfailed", lambda request: failed.append((request.url, request.failure)))
+        context.route("**/*", route_request)
+        context.route_web_socket("**/*", lambda ws: (denied.append(ws.url), ws.close()))
+        page = context.new_page()
+        page.set_default_timeout(45_000)
+        advanced = False
+        credit_text = ""
+        layout_ok = False
+        evidence_visible = False
+        subtitle = ""
+
+        try:
+            page.goto(f"{origin}/{SCENES.as_posix()}/{bundle.name}/index.html", wait_until="domcontentloaded")
+            page.wait_for_function("""() => typeof viewer !== 'undefined' && Boolean(viewer?.dataSources?.length)
+                && Boolean(document.querySelector('#cesiumContainer canvas'))""")
+            credit = page.locator(".cesium-credit-textContainer").filter(has_text="OpenStreetMap").first
+            credit.wait_for(state="visible")
+            credit_text = credit.inner_text()
+            page.locator(".s3-site-bar a[href='rights-and-sources.md']").wait_for(state="visible")
+            subtitle = page.locator("#studioSubTitle").inner_text()
+            evidence_visible = page.locator("#scenePreviewBadge").is_visible() or page.locator(".s3-evidence").is_visible()
+            layout_ok = page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+            before = page.evaluate("viewer.clock.currentTime.toString()")
+            page.locator("#btnRunSim").click()
+            page.wait_for_timeout(10_000)
+            advanced = page.evaluate("(before) => viewer.clock.currentTime.toString() !== before", before)
+        except Exception as error:
+            # Keep observations from the whole partial run in the report.
+            errors.append(str(error))
+
+        external = {address for address in requests if not request_allowed(address, origin)} | set(denied)
+        broken = {f"{status} {urlsplit(address).path}" for address, status in responses if status >= 400}
+        broken |= {f"{reason} {urlsplit(address).path}" for address, reason in failed
+                   if reason != "net::ERR_ABORTED" and request_allowed(address, origin)}
+        if not advanced:
+            errors.append("Scenario clock did not advance")
+        if not layout_ok:
+            errors.append("Layout did not fit the viewport")
+        if not evidence_visible:
+            errors.append("Scene evidence label was not visible")
+        has_naip = (bundle / "imagery/naip/extent.json").is_file()
+        required_credits = ("USGS", "OpenStreetMap", "NAIP") if has_naip else ("USGS", "OpenStreetMap")
+        if not all(label in credit_text for label in required_credits):
+            errors.append("Data credits were not visible")
+        paths = [urlsplit(address).path for address, status in responses if status == 200]
+        if has_naip and not any("/imagery/naip/" in path for path in paths):
+            errors.append("No local aerial tile loaded")
+        if not any("/models/synth_" in path for path in paths):
+            errors.append("No synthetic scene model loaded")
+        if "synthetic" in credit_text.lower() and "USGS 3DEP" in subtitle:
+            errors.append("Terrain subtitle disagrees with the synthetic terrain credit")
+        return {
+            "scene": bundle.name, "viewport": [width, height], "hosts": sorted({
+                _network_location(address, origin) for address in requests}),
+            "requests": len(requests), "external_requests": sorted(external),
+            "console_or_behavior_errors": sorted(set(errors)), "failed_assets": sorted(broken),
+            "playback_advanced": advanced, "credit_text": credit_text, "subtitle": subtitle,
+            "local_aerial_responses": len({path for path in paths if "/imagery/naip/" in path}),
+            "models_loaded": sorted({Path(path).name for path in paths if "/models/synth_" in path}),
+            "ok": not (external or errors or broken),
+        }
+    finally:
+        context.close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("site", type=Path)
+    parser.add_argument("--cesium-tarball", required=True, type=Path)
+    parser.add_argument("--browser", default="msedge", help="Playwright Chromium channel, e.g. chrome or msedge")
+    parser.add_argument("--report", type=Path, help="Write the detailed audit report outside the site")
+    args = parser.parse_args()
+    site = args.site.resolve(strict=True)
+    try:
+        from playwright.sync_api import sync_playwright
+
+        scenes = sorted((site / SCENES).iterdir())
+        if not scenes:
+            raise ValueError("No Studio scenes to verify")
+        packages = [verify_scene(scene) for scene in scenes]
+        vendor = verify_vendor(site / "demos/s3/vendor" / CESIUM, args.cesium_tarball)
+        replay_files, replay_bytes = verify_bundle(site / "demos/s3/recorded-crossing", expected_schema=1)
+
+        handler = partial(QuietHandler, directory=site)
+        with PreviewServer(("127.0.0.1", 0), handler) as server:
+            thread = Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                origin = f"http://127.0.0.1:{server.server_port}"
+                with sync_playwright() as playwright:
+                    browser = playwright.chromium.launch(channel=args.browser, args=[
+                        "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
+                    ])
+                    results = [browser_check(browser, origin, scene, w, h)
+                               for scene in scenes for w, h in ((1360, 900), (390, 844), (320, 568))]
+            finally:
+                server.shutdown()
+                thread.join()
+
+        payload = {"packages": packages, "cesium_files": vendor, "replay_files": replay_files,
+                   "replay_bytes": replay_bytes, "browser": results}
+        for result in results:
+            print(f"{result['scene']} {result['viewport']}: {'PASS' if result['ok'] else 'FAIL'}; "
+                  f"{result['requests']} requests; hosts = {', '.join(result['hosts'])}")
+        encoded = json.dumps(payload, indent=2, ensure_ascii=False)
+        if args.report:
+            args.report.write_text(encoded + "\n", encoding="utf-8")
+        else:
+            print(encoded)
+        if not all(result["ok"] for result in results):
+            parser.exit(1, "Studio verification failed. Review browser observations.\n")
+    except (OSError, ValueError, ImportError) as error:
+        parser.exit(1, f"{error}\n")
+
+
+if __name__ == "__main__":
+    main()
