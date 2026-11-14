@@ -361,10 +361,14 @@
       if (!t.vis) { badge = "TERRAIN OCCLUDED"; cls = "st-occ"; }
       else if (!t.beam) { badge = "OUT OF BEAM"; cls = "st-out"; }
       else if (t.cfar) { badge = "CFAR LOCK"; cls = "st-ok"; }
+      if (t.vis && t.beam && t.aliased) { badge += " · ALIASED"; }
+      const vrLabel = t.aliased
+        ? t.v_rad.toFixed(1) + " m/s (alias " + (t.v_alias >= 0 ? "+" : "") + t.v_alias.toFixed(1) + ")"
+        : t.v_rad.toFixed(1) + " m/s";
       rows.push(
         "<tr><td><code>" + tid + "</code></td>" +
         "<td>" + t.range_m.toFixed(0) + " m</td>" +
-        "<td>" + t.v_rad.toFixed(1) + " m/s</td>" +
+        "<td>" + vrLabel + "</td>" +
         "<td>" + (t.vis ? t.snr_db.toFixed(1) + " dB" : "--") + "</td>" +
         '<td class="' + cls + '">' + badge + "</td></tr>"
       );

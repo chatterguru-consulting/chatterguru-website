@@ -5,10 +5,10 @@
 - **Scenario ID**: `website-fictional-crossing-v1` (fictional 20 s crossing paths at 5 s CPI cadence; unclassified generic textbook waveforms and planar CV Kalman tracking).
 
 ## Exact Recording & Source Identities
-- `source_head`: `d808dbb2edda382be018e9d1c3f19bdea9896575`
+- `source_head`: `ccf3d2898bbf5f04747945d13189e9151c252d6b`
 - `source_fingerprint`: `3b9aeda78d4e41ad83c3ad5ee2a8d48d41a1289b44eeb2c9da1fb322477ecc40`
-- `session_manifest_sha256`: `ab8bc999f016686a68c738913cedd218d25b530e99b22aeeddc01be3a1f30419`
-- `scientific_digest`: `f49fc309bb399380f3cc00ff6e446cbd75e827806155f455788cd388a4438232`
+- `session_manifest_sha256`: `bac31a507a41eb0526637fcc0910e72357f3836194156bdae57ef6bbb5f4f470`
+- `scientific_digest`: `884928460cae4b5e7ed3eb2abed77c4a106ae8c223f500fe90d554eb5e943733`
 
 ## Retained Captures & Rendering
 - Each PNG image (`1380 x 696`, rendered at 11.5 x 5.8 in @ 120 DPI) was rendered deterministically with `eccm_sandbox.recording.tactical_view.draw_tactical` directly from the reopened HDF5 `SessionReader` frames (`bounds_m=(800, 1250, -150, 150)`, `rdm_bounds=(0, 2200, -24, 24)`).

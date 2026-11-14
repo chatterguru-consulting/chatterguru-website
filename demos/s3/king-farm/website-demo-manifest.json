@@ -2,36 +2,36 @@
   "schema": 1,
   "evidence": {
     "kind": "browser-preview",
-    "source_head": "d808dbb2edda382be018e9d1c3f19bdea9896575"
+    "source_head": "ccf3d2898bbf5f04747945d13189e9151c252d6b"
   },
   "files": {
     "index.html": {
-      "bytes": 248541,
-      "sha256": "05e3e0ffc8541a8b99b0aa6f675ef4c1713fe196e470b7a52354f05733cb46cf"
+      "bytes": 263603,
+      "sha256": "d291569816e0c6a5226d68c3371dbbb6c02b90ede41fc3f74b2460567035bcf7"
     },
     "mission.connect": {
       "bytes": 6126,
       "sha256": "d6328448ac8288cf4bbf43ead017c540d5e511b64051f2c8273a94907947bebc"
     },
     "mission.czml": {
-      "bytes": 6187555,
-      "sha256": "7e9a51fdcadcf58303f02e9cd124767201fe28dc14dda6ba8d1a68dbf3734532"
+      "bytes": 6188514,
+      "sha256": "29053c3a1d228c1030dd1404ebfd0fa8079c262b99fcdd94a7ab0ebfba542cdf"
     },
     "preview.css": {
       "bytes": 4937,
       "sha256": "7eca4e28bc9dc60f8a3ceefa6f330527a3c19661a4c27962e180f6d86dbee316"
     },
     "preview.js": {
-      "bytes": 15699,
-      "sha256": "93a312b681372ebadb0b0aca8acedd3cc3d8160337c7c943fd454329fc331f73"
+      "bytes": 15928,
+      "sha256": "dddd961434cd9028cf2a0c25a73762efc4f4ac6cbb2c95295586d20d5a2ec883"
     },
     "rights-and-sources.md": {
       "bytes": 3342,
-      "sha256": "a953e775c933f0a097f5b5e6a4b2e8dcff8ed68fed7e57b7989c76957b93aa6c"
+      "sha256": "b65c6c192204b90eeeb78fc79f719cf5794a77867b629d1871e105055109db3b"
     },
     "scene-data.json": {
-      "bytes": 242710,
-      "sha256": "c083683c0f7a3f34457e90ef3bd6dc80f87a045f4c293292b733f993f74490f7"
+      "bytes": 257589,
+      "sha256": "62fa379834c7015c9c3fdc74c29a44a7182978b3e4861e589afa19289fbf3d21"
     }
   }
 }

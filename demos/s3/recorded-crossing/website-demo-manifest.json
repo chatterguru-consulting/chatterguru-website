@@ -2,10 +2,10 @@
   "schema": 1,
   "evidence": {
     "kind": "recorded-workbench",
-    "source_head": "d808dbb2edda382be018e9d1c3f19bdea9896575",
+    "source_head": "ccf3d2898bbf5f04747945d13189e9151c252d6b",
     "source_fingerprint": "3b9aeda78d4e41ad83c3ad5ee2a8d48d41a1289b44eeb2c9da1fb322477ecc40",
-    "session_manifest_sha256": "ab8bc999f016686a68c738913cedd218d25b530e99b22aeeddc01be3a1f30419",
-    "scientific_digest": "f49fc309bb399380f3cc00ff6e446cbd75e827806155f455788cd388a4438232"
+    "session_manifest_sha256": "bac31a507a41eb0526637fcc0910e72357f3836194156bdae57ef6bbb5f4f470",
+    "scientific_digest": "884928460cae4b5e7ed3eb2abed77c4a106ae8c223f500fe90d554eb5e943733"
   },
   "files": {
     "cpi-1.png": {
@@ -30,7 +30,7 @@
     },
     "index.html": {
       "bytes": 5329,
-      "sha256": "6b894ce5ca09026467e609e35940303009f0894b6688209eb6f30df3d59e8e49"
+      "sha256": "40d4351c0ccbbc7c2a0bef5fe24ba9d3a613a532eef14165e8feb6afe831bf6a"
     },
     "replay.css": {
       "bytes": 3274,
@@ -42,11 +42,11 @@
     },
     "rights-and-sources.md": {
       "bytes": 1995,
-      "sha256": "fcae3ec6e4b57f504961cdad70f6dd28e80ffe2c277b105ed2501726ef407e7d"
+      "sha256": "bba706a9e6ba62d1c860a1d91f6a3d7c1ca4c3df503d6dc3e3dfb83bf81f3ccf"
     },
     "source.json": {
       "bytes": 376,
-      "sha256": "b507082b1212fbd9cf56bcf5de25ebb91845ea9a4d26727fffad2b8f4cdbbcd5"
+      "sha256": "23041cb95ea4798261ac8851214e02094dcfbe3a78a67074a2e2ee86092a3f65"
     }
   }
 }

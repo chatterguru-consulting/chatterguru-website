@@ -1,7 +1,7 @@
 # S3 Website Export Handoff (W3 / W5)
 
 **Producer**: Gemini (`chatterguru-radar-eccm-sandbox` branch `feat/w3-website-scenario-export`, `chatterguru-website` branches `gemini/s3-workbench-exports` and integrated PR #13 `claude/s3-site-preview`)
-**Radar Source Commit (`source_head`)**: `d808dbb2edda382be018e9d1c3f19bdea9896575`
+**Radar Source Commit (`source_head`)**: `ccf3d2898bbf5f04747945d13189e9151c252d6b`
 
 This handoff delivers the W3 Workbench exporter (`scripts/export_website_scenarios.py`, `tests/test_website_export.py`), the three verified static S3 preview bundles under `demos/s3/`, `.gitattributes` (`demos/s3/** -text` so LF byte digests are preserved across Windows/macOS/Linux checkouts), the retained HDF5 recording receipt for independent pixel/digest re-verification, and the dependency/rights/tile-policy ledger.
 
@@ -16,10 +16,10 @@ All three bundles conform to `website-demo-manifest.json` (`schema: 1`), enforce
 - **Scenario**: `website-fictional-crossing-v1` (`duration_s=20.0`, `cadence_s=5.0`, 4 CPI frames)
 - **Evidence Identity (`source.json` & `website-demo-manifest.json`)**:
   - `kind`: `"recorded-workbench"`
-  - `source_head`: `d808dbb2edda382be018e9d1c3f19bdea9896575`
+  - `source_head`: `ccf3d2898bbf5f04747945d13189e9151c252d6b`
   - `source_fingerprint`: `3b9aeda78d4e41ad83c3ad5ee2a8d48d41a1289b44eeb2c9da1fb322477ecc40`
-  - `session_manifest_sha256`: `ab8bc999f016686a68c738913cedd218d25b530e99b22aeeddc01be3a1f30419`
-  - `scientific_digest`: `f49fc309bb399380f3cc00ff6e446cbd75e827806155f455788cd388a4438232`
+  - `session_manifest_sha256`: `bac31a507a41eb0526637fcc0910e72357f3836194156bdae57ef6bbb5f4f470`
+  - `scientific_digest`: `884928460cae4b5e7ed3eb2abed77c4a106ae8c223f500fe90d554eb5e943733`
 - **Frame Digests (`frames.json`)**:
   - `reference-0` (`2.5 s`, `cpi-1.png`): `obs=2`, `tracks=2`, `source_sha256=e1b21d14b5a54d699949b1c176930f9d18674fecc6716a4d81a75d758c2292bc`
   - `reference-1` (`7.5 s`, `cpi-2.png`): `obs=2`, `tracks=2`, `source_sha256=158e61df335a223facb77f3cb7ebc6def0d754b11e90d687e0c2d4b658748659`
@@ -28,21 +28,22 @@ All three bundles conform to `website-demo-manifest.json` (`schema: 1`), enforce
 - **Retained HDF5 Receipt (Radar repo local output)**: `<radar-checkout>\outputs\website_export_receipts\s3-fictional-crossing-recording`
 
 ### 1.2 `demos/s3/king-farm/` (`browser-preview`)
-- **Bundle Size**: `6,709,744` bytes (`7` files verified including `website-demo-manifest.json`)
-- **Evidence Identity**: `kind = "browser-preview"`, `source_head = "d808dbb2edda382be018e9d1c3f19bdea9896575"`
+- **Bundle Size**: `6,741,137` bytes (`7` files verified including `website-demo-manifest.json`)
+- **Evidence Identity**: `kind = "browser-preview"`, `source_head = "ccf3d2898bbf5f04747945d13189e9151c252d6b"`
 - **Bundled Scene Geometry & Precomputed Telemetry**:
+  - Title: `King Farm Airborne Radar Scene (Rockville, MD)`
   - `320` of `453` OSM building footprints, `55` of `55` road polylines, `120` corner dihedral glint markers
-  - `61` frames (`0..60 s` @ `1 Hz`) with 24x32 uint8 Range-Doppler matrices, target SNR, and visibility
-  - Self-contained downloadable `scene-data.json`, `mission.czml`, `mission.connect`, and per-bundle `rights-and-sources.md`
+  - `61` frames (`0..60 s` @ `1 Hz`) with 24x32 uint8 Range-Doppler matrices, target SNR, visibility, and explicit Doppler alias folding beyond the unambiguous PRF span
+  - Visible OpenStreetMap (ODbL) and synthetic terrain credits (`.data-credit`), mobile `minmax(0, 1fr)` grid, plus downloadable `scene-data.json`, `mission.czml`, `mission.connect`, and per-bundle `rights-and-sources.md`
 
 ### 1.3 `demos/s3/mountain-ridge/` (`browser-preview`)
-- **Bundle Size**: `5,606,993` bytes (`7` files verified including `website-demo-manifest.json`)
-- **Evidence Identity**: `kind = "browser-preview"`, `source_head = "d808dbb2edda382be018e9d1c3f19bdea9896575"`
+- **Bundle Size**: `5,630,037` bytes (`7` files verified including `website-demo-manifest.json`)
+- **Evidence Identity**: `kind = "browser-preview"`, `source_head = "ccf3d2898bbf5f04747945d13189e9151c252d6b"`
 - **Bundled Scene Geometry & Precomputed Telemetry**:
   - South Mountain Ridge (Boonsboro, MD) 3DEP ridge site
   - `260` of `483` building footprints, `220` of `404` road polylines, `115` corner dihedral glint markers
-  - `61` frames (`0..60 s` @ `1 Hz`) with 24x32 uint8 Range-Doppler matrices, target SNR, and visibility
-  - Self-contained downloadable `scene-data.json`, `mission.czml`, `mission.connect`, and per-bundle `rights-and-sources.md`
+  - `61` frames (`0..60 s` @ `1 Hz`) with 24x32 uint8 Range-Doppler matrices, target SNR, visibility, and explicit Doppler alias folding (`v_alias` / `aliased`) when radial speed exceeds `±15.8 m/s`
+  - Visible OpenStreetMap (ODbL) and USGS 3DEP credits (`.data-credit`), mobile `minmax(0, 1fr)` grid, plus downloadable `scene-data.json`, `mission.czml`, `mission.connect`, and per-bundle `rights-and-sources.md`
 
 ---
 
@@ -75,7 +76,7 @@ $env:PYTHONPATH="src"
 python -m pytest --basetemp=outputs/pytest_tmp_web tests/test_website_export.py -v
 ```
 - `ruff check`: `All checks passed!`
-- `pytest`: `3 passed in 10.81s`
+- `pytest`: `3 passed in 17.12s`
 
 ### Production Bundle Export
 ```powershell
