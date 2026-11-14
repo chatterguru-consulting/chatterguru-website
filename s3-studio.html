@@ -69,18 +69,17 @@
       <div class="section-inner">
         <div class="grid">
           <article class="card demo-card">
-            <span class="badge preview">Browser preview</span>
-            <h3>King Farm 3D scene</h3>
-            <p>An airborne radar circles King Farm in Rockville, Maryland, watching cars, a bus, a drone and an airliner among the neighbourhood's buildings. Orbit the 3D scene, ride along with the sensor or switch to a map view, and see which targets the radar picks up, which are lost in ground clutter and which are outside the beam.</p>
-            <p class="meta">The browser draws the buildings, roads, beam and lines of sight. The range–Doppler maps and target status were computed by S³ for each second of the 60-second run. Buildings and roads come from OpenStreetMap; the terrain is a synthetic stand-in.</p>
-            <a class="button" href="demos/s3/king-farm/index.html">Open King Farm preview</a>
+            <span class="badge preview">Workbench export</span>
+            <h3>King Farm in 3D</h3>
+            <p>The S³ Workbench's 3D studio, running in your browser. An airborne radar circles King Farm in Rockville, Maryland, over USGS aerial imagery and OpenStreetMap buildings. It watches cars, trucks, a drone and an airliner among the neighbourhood's buildings. Play the scenario, orbit the scene, switch between visual, infrared, radar and tactical lenses, and open the radar display.</p>
+            <p class="meta">This is the same Cesium studio the Workbench serves, with self-hosted CesiumJS, USGS and USDA NAIP imagery, OpenStreetMap buildings and S³ synthetic models. The terrain under King Farm is a synthetic stand-in, and the lenses are display representations, not calibrated sensor imagery.</p>
+            <a class="button" href="demos/s3/studio/king-farm/index.html">Open the 3D studio</a>
           </article>
           <article class="card demo-card">
-            <span class="badge preview">Browser preview</span>
+            <span class="badge pending">Coming next</span>
             <h3>South Mountain I-70 ridge crossing</h3>
-            <p>An airborne radar watches I-70 traffic, a drone and low aircraft cross South Mountain near Boonsboro, Maryland, where the ridge hides some of them. The preview marks which targets are in view, which are lost in clutter and which the terrain blocks.</p>
-            <p class="meta">The browser draws the scene and lines of sight. The range–Doppler maps and target status were computed by S³ for each second of the 60-second run. Terrain comes from USGS 3D Elevation Program data; buildings and roads from OpenStreetMap.</p>
-            <a class="button" href="demos/s3/mountain-ridge/index.html">Open South Mountain preview</a>
+            <p>An airborne radar watches I-70 traffic cross South Mountain near Boonsboro, Maryland, on USGS elevation data, where the ridge hides some targets. It is being exported for the web.</p>
+            <span class="button" aria-disabled="true">Coming next</span>
           </article>
           <article class="card demo-card" id="classic-demos">
             <span class="badge illustrative">Illustrative</span>
@@ -108,8 +107,8 @@
               <p>The plots are rendered from products retained by a completed Workbench run. Capture times and displayed counts come from the recording. The bundle manifest identifies the source revision and file digests.</p>
             </div>
             <div class="card">
-              <span class="badge preview">Browser preview</span>
-              <p>The browser renders exported scene geometry and motion. Each sensor view identifies where its data comes from.</p>
+              <span class="badge preview">Workbench export</span>
+              <p>The scene, target motion and sensor overlays were exported from the S³ Workbench, and your browser draws them with CesiumJS. It is not a saved processing run, and its lenses are display representations rather than calibrated sensor imagery.</p>
             </div>
             <div class="card">
               <span class="badge illustrative">Illustrative</span>
