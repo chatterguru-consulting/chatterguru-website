@@ -2,7 +2,7 @@
   "schema": 2,
   "evidence": {
     "kind": "workbench-export",
-    "source_head": "f149196683f28299afe18435b82f3201d70f63f8",
+    "source_head": "0f06af195daf5bf6a1466cbe232d63dae48d55c5",
     "scene_id": "king_farm",
     "exporter": "scripts/publish_website_viewer.py",
     "cesium": "1.119.0"
@@ -11,94 +11,6 @@
     "icons/icon-192.png": {
       "bytes": 2952,
       "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
-    },
-    "imagery/naip/13/2339/3126.jpg": {
-      "bytes": 17160,
-      "sha256": "201ef559d59e676d0f8ff11a1c75f23e2f96195388a5c65f5d0a96394b6625ba"
-    },
-    "imagery/naip/13/2339/3127.jpg": {
-      "bytes": 18683,
-      "sha256": "4ec9cd775bb5efb23601d59aa0f2ab52803c327da4b48598e0ccedb850556e0a"
-    },
-    "imagery/naip/13/2339/3128.jpg": {
-      "bytes": 16376,
-      "sha256": "a01f4afb985aa15dc6e473d503bcbc527b805d67ebd1e39cdbc06279cca71625"
-    },
-    "imagery/naip/13/2340/3126.jpg": {
-      "bytes": 14498,
-      "sha256": "c26537ac1411480e70c5ffd2a6100dcf44b688c77af3fb3b7ae6f7f5f4016661"
-    },
-    "imagery/naip/13/2340/3127.jpg": {
-      "bytes": 15614,
-      "sha256": "21671b1f32ad0fe50a6325b1edffa95608ae80b8b4b8a1177565c61c672eefb7"
-    },
-    "imagery/naip/13/2340/3128.jpg": {
-      "bytes": 17987,
-      "sha256": "c7d0d1555da728cbdf2bc68065889510c75a31f2cb089b1db69bd6de809cc29c"
-    },
-    "imagery/naip/14/4678/6253.jpg": {
-      "bytes": 18389,
-      "sha256": "293bf53aa39d7b2f2b73858c7a60ca55d636e31cff80e9cab1f4fa16bc4d3cb6"
-    },
-    "imagery/naip/14/4678/6254.jpg": {
-      "bytes": 17720,
-      "sha256": "b49b0d541b5405b5cb9dfefe0bf2fd3b714331f153a5bb8f5a04d964f72ea345"
-    },
-    "imagery/naip/14/4678/6255.jpg": {
-      "bytes": 18935,
-      "sha256": "d52b7086a070eac28833cdb99978beb8235a8c6f3262ade0cf47e0cf077ee087"
-    },
-    "imagery/naip/14/4678/6256.jpg": {
-      "bytes": 17189,
-      "sha256": "c862bb12c8127fa862453caf01d367eeef89ff3efb148b6f95b4418150b397dc"
-    },
-    "imagery/naip/14/4679/6253.jpg": {
-      "bytes": 15785,
-      "sha256": "3a956404d4a0ab02ab4b10e36426233c70fc0274c0a095ec487121f7cd02247a"
-    },
-    "imagery/naip/14/4679/6254.jpg": {
-      "bytes": 17578,
-      "sha256": "227adbaf9d28039f89c700041bd8899b4f9ef47b332caa447a72375dcce3be83"
-    },
-    "imagery/naip/14/4679/6255.jpg": {
-      "bytes": 16424,
-      "sha256": "03f3eeb041a8665dbc0144e71a8883445ae42d33016ba28e065a427bc98b5a9a"
-    },
-    "imagery/naip/14/4679/6256.jpg": {
-      "bytes": 15767,
-      "sha256": "d6c41106344b0a1ea83165e611ed2e690fd47bc189b013087f82861d02b6def3"
-    },
-    "imagery/naip/14/4680/6253.jpg": {
-      "bytes": 16001,
-      "sha256": "73ad9ec04705e2c9bbe912116ffeb349e2a7aa3c692b1884c6bec19e16fe992b"
-    },
-    "imagery/naip/14/4680/6254.jpg": {
-      "bytes": 17531,
-      "sha256": "ba9154d26445d2cadf85cedd33cab56bb3b0ff255426f342f4230caaa22f873f"
-    },
-    "imagery/naip/14/4680/6255.jpg": {
-      "bytes": 17255,
-      "sha256": "c80d87e844812a650ed2cf8a7486cd8cc10f3f109a2405365dc8fdb410fd356d"
-    },
-    "imagery/naip/14/4680/6256.jpg": {
-      "bytes": 18548,
-      "sha256": "90e6ede60479cb0e58b97cd0fb100ba82ef76793e0ed5f4952fe7064b9d0a846"
-    },
-    "imagery/naip/14/4681/6253.jpg": {
-      "bytes": 13403,
-      "sha256": "dcd6362c04ba52c552d51ba89dfc918964f91d6cc08aa3b8d9787d7b4c916c79"
-    },
-    "imagery/naip/14/4681/6254.jpg": {
-      "bytes": 12488,
-      "sha256": "7c17ec8f939b307e8c940fc73f163beed8e3a3d88900d6f1ab2fe6745038367f"
-    },
-    "imagery/naip/14/4681/6255.jpg": {
-      "bytes": 14252,
-      "sha256": "1fc83ce8804f221bacfbd4603bc39621730b073297a3aad4bce6524720000c9b"
-    },
-    "imagery/naip/14/4681/6256.jpg": {
-      "bytes": 16975,
-      "sha256": "3700b23235e23dc94f241c292541ae6fc0a1c0950fbb5cc02f87f0bd2602f009"
     },
     "imagery/naip/15/9356/12506.jpg": {
       "bytes": 18729,
@@ -4506,15 +4418,19 @@
     },
     "imagery/naip/extent.json": {
       "bytes": 229,
-      "sha256": "0eb20870f019f19b1ce19679c9ff8ac207e51591ff7251a519b535dcb261c032"
+      "sha256": "8cb868b5939c1dd98848d4d87456017c578c846e58b9f23a0678e6de1d97d1df"
     },
     "index.html": {
-      "bytes": 12989304,
-      "sha256": "ab2ddfd706b3963465475ed414ba88fc46cfbf7152b241512616db705c7a4d2f"
+      "bytes": 12989642,
+      "sha256": "c39888bb540057079d203d48ad9c38ece4d052386221345dd4f9a879477f7ac5"
     },
     "models/synth_airliner.glb": {
       "bytes": 35884,
       "sha256": "a98724199239279b9dd7819f904c424d468423f5b757d74c6ff14bbd33739bcf"
+    },
+    "models/synth_car.glb": {
+      "bytes": 21512,
+      "sha256": "c0baaa26a10eb759b39133b2710a357dbd371b7dbf1564398ba8ab3750206446"
     },
     "models/synth_light_aircraft.glb": {
       "bytes": 22928,
@@ -4538,7 +4454,7 @@
     },
     "rights-and-sources.md": {
       "bytes": 1647,
-      "sha256": "eaa2614cc101e142112a38056b44e6a408b4856367068e53eb47ac18ccc006d1"
+      "sha256": "6f5d089bda06adc68ea9ce42f0f882f7f4c96c390315fc784077fe860c9fac57"
     }
   }
 }

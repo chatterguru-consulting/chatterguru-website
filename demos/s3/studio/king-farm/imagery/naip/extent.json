@@ -3,7 +3,7 @@
   "east": -77.132396,
   "south": 39.080106,
   "north": 39.139494,
-  "min_level": 13,
+  "min_level": 15,
   "max_level": 17,
   "source": "USDA NAIP via USGS The National Map (USGSNAIPImagery ImageServer)",
   "scheme": "xyz"
