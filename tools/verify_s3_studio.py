@@ -57,7 +57,7 @@ def verify_scene(bundle: Path) -> dict:
         raise ValueError("Scene is missing imagery or OpenStreetMap credits")
     if f'../../vendor/{CESIUM}/Cesium.js' not in markup:
         raise ValueError("Scene must use the pinned shared Cesium build")
-    if not re.search(r'<a\b[^>]*href=["\']rights-and-sources\.md["\']', markup, re.I):
+    if not re.search(r'<a\b[^>]*href=["\'](?:credits\.html|rights-and-sources\.md)["\']', markup, re.I):
         raise ValueError("Scene is missing the data credits link")
     if re.search(r"\bserviceWorker\s*\.\s*register\s*\(", markup):
         raise ValueError("Public Studio must not register a service worker")
@@ -163,7 +163,8 @@ def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -
             credit = page.locator(".cesium-credit-textContainer").filter(has_text="OpenStreetMap").first
             credit.wait_for(state="visible")
             credit_text = credit.inner_text()
-            page.locator(".s3-site-bar a[href='rights-and-sources.md']").wait_for(state="visible")
+            page.locator(".s3-site-bar a[href='credits.html'], .s3-site-bar a[href='rights-and-sources.md']"
+                         ).first.wait_for(state="visible")
             subtitle = page.locator("#studioSubTitle").inner_text()
             evidence_visible = page.locator("#scenePreviewBadge").is_visible() or page.locator(".s3-evidence").is_visible()
             layout_ok = page.evaluate("document.documentElement.scrollWidth <= innerWidth")

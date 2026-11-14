@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>King Farm, Rockville, Maryland: data credits | Chatterguru S³</title>
+  <style>
+    :root { color-scheme: light dark; --ink: #0f172a; --muted: #475569; --line: #e2e8f0; --bg: #ffffff; --link: #0e7490; }
+    @media (prefers-color-scheme: dark) { :root { --ink: #e2e8f0; --muted: #94a3b8; --line: #334155; --bg: #0b1220; --link: #67e8f9; } }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, Segoe UI, sans-serif; }
+    main { max-width: 920px; margin: 0 auto; padding: 32px 16px 48px; }
+    a { color: var(--link); }
+    h1 { font-size: 1.6rem; line-height: 1.2; }
+    p.lead { color: var(--muted); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+    th, td { text-align: left; vertical-align: top; padding: 10px 8px; border-top: 1px solid var(--line); }
+    thead th { color: var(--muted); font-weight: 600; }
+    tbody th { font-weight: 600; min-width: 9rem; }
+    code { font-size: .9em; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="index.html">&larr; Back to the 3D studio</a></p>
+    <h1>King Farm, Rockville, Maryland: data sources and credits</h1>
+    <p class="lead">This is the S³ Workbench Cesium Scenario Studio exported for the public website. The scene,
+    target motion and sensor overlays come from the Workbench export at source revision <code>f853e8961db6</code>,
+    and your browser draws them. The sensors are simulated with generic, educational models, and the targets
+    and missions are fictional.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Item</th><th scope="col">Source</th><th scope="col">Terms</th></tr></thead>
+      <tbody>
+      <tr><th scope="row">3D globe library</th><td>CesiumJS 1.119.0, self-hosted, unmodified</td><td>Apache License 2.0</td></tr>
+      <tr><th scope="row">Basemap “Satellite” (loaded from USGS while you view)</th><td>USGS The National Map: Orthoimagery: the live <code>USGSImageryOnly</code> tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources.</td><td>Public domain U.S. Government data; credit USGS</td></tr>
+      <tr><th scope="row">Basemap “Topo” (loaded from USGS while you view)</th><td>USGS The National Map: Imagery Topo: the live <code>USGSImageryTopo</code> tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources.</td><td>Public domain U.S. Government data; credit USGS</td></tr>
+      <tr><th scope="row">Basemap “Map” (loaded from USGS while you view)</th><td>USGS The National Map: Topo: the live <code>USGSTopo</code> tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources.</td><td>Public domain U.S. Government data; credit USGS</td></tr>
+      <tr><th scope="row">Basemap “Relief” (loaded from USGS while you view)</th><td>USGS The National Map: Shaded Relief: the live <code>USGSShadedReliefOnly</code> tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources.</td><td>Public domain U.S. Government data; credit USGS</td></tr>
+      <tr><th scope="row">Close-up aerial photography over the scene</th><td>USDA National Agriculture Imagery Program (NAIP) from the USGS NAIP Imagery service (service metadata dated January 2025; nominal resolution about 0.6 m, which varies by acquisition). 1101 tiles baked at zoom 15–17; they fade in as the camera comes down.</td><td>Public domain; credit USDA NAIP / USGS</td></tr>
+      <tr><th scope="row">Buildings, roads and other map features</th><td>OpenStreetMap (453 buildings, 55 roads). Download the extract used here: <a href="osm-derived-data.geojson">osm-derived-data.geojson</a></td><td>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>; extract offered under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License 1.0</a></td></tr>
+      <tr><th scope="row">Terrain</th><td>synthetic rolling hills for illustration</td><td>See source</td></tr>
+      <tr><th scope="row">Vehicle and aircraft models</th><td>S³ Workbench synthetic models</td><td>Chatterguru Consulting LLC</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h2>Left out of the public page</h2>
+    <ul>
+      <li>Cesium ion, Cesium World Terrain and Google or Bing tiles: no keys or paid services are used.</li>
+      <li>Esri basemaps and the OpenStreetMap tile servers used by the private Workbench.</li>
+      <li>Cesium sample models and third-party car and bus meshes, replaced with S³ synthetic models.</li>
+      <li>The Workbench service worker and install manifest.</li>
+    </ul>
+  </main>
+</body>
+</html>

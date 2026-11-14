@@ -1,24 +1,27 @@
 # King Farm, Rockville, Maryland: data sources and credits
 
 This page is the S³ Workbench Cesium Scenario Studio exported for the public website.
-The scene, target motion and sensor products come from the Workbench export at source
-revision `0f06af195daf5bf6a1466cbe232d63dae48d55c5`. Your browser draws them. Targets and missions are fictional and the
-sensor models are generic and educational.
+The scene, target motion and sensor overlays come from the Workbench export at source revision `f853e8961db60a44101aa707463eab1666e4c072`.
+Your browser draws them. The sensors are simulated with generic, educational models, and the
+targets and missions are fictional.
 
 ## Included
 
 | Item | Source | Terms |
 | --- | --- | --- |
-| 3D globe library | CesiumJS 1.119.0 (self-hosted under `demos/s3/vendor/`) | Apache License 2.0 |
-| Basemap tiles (loaded at view time) | USGS The National Map: Imagery Only, Imagery Topo, Topo, Shaded Relief (`basemap.nationalmap.gov`) | Public domain (U.S. Government work); credit USGS |
-| Aerial photography over the scene | USDA National Agriculture Imagery Program (NAIP), 0.6 m, via the USGS NAIP Imagery service; 1101 tiles baked at zoom 15–17 | Public domain; credit USDA NAIP / USGS |
-| Buildings and roads | OpenStreetMap | © OpenStreetMap contributors, Open Database License (ODbL) 1.0 – https://www.openstreetmap.org/copyright |
-| Terrain | Terrain: synthetic rolling hills for illustration | See left |
-| Vehicle and aircraft models | S³ Workbench synthetic models (`synth_*.glb`) | Chatterguru Consulting LLC |
+| 3D globe library | CesiumJS 1.119.0, self-hosted, unmodified | Apache License 2.0 |
+| Basemap “Satellite” (loaded from USGS while you view) | USGS The National Map: Orthoimagery: the live `USGSImageryOnly` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
+| Basemap “Topo” (loaded from USGS while you view) | USGS The National Map: Imagery Topo: the live `USGSImageryTopo` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
+| Basemap “Map” (loaded from USGS while you view) | USGS The National Map: Topo: the live `USGSTopo` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
+| Basemap “Relief” (loaded from USGS while you view) | USGS The National Map: Shaded Relief: the live `USGSShadedReliefOnly` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
+| Close-up aerial photography over the scene | USDA National Agriculture Imagery Program (NAIP) from the USGS NAIP Imagery service (service metadata dated January 2025; nominal resolution about 0.6 m, which varies by acquisition). 1101 tiles baked at zoom 15–17; they fade in as the camera comes down. | Public domain; credit USDA NAIP / USGS |
+| Buildings, roads and other map features | OpenStreetMap (453 buildings, 55 roads). Download the extract used here: osm-derived-data.geojson (osm-derived-data.geojson) | © OpenStreetMap contributors (https://www.openstreetmap.org/copyright); extract offered under the Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/) |
+| Terrain | synthetic rolling hills for illustration | See source |
+| Vehicle and aircraft models | S³ Workbench synthetic models | Chatterguru Consulting LLC |
 
 ## Left out of the public page
 
-- Cesium ion, Cesium World Terrain and Google/Bing tiles: no keys or paid services are used.
+- Cesium ion, Cesium World Terrain and Google or Bing tiles: no keys or paid services are used.
 - Esri basemaps and the OpenStreetMap tile servers used by the private Workbench.
-- Cesium sample models and third-party car and bus meshes: replaced with S³ synthetic models.
+- Cesium sample models and third-party car and bus meshes, replaced with S³ synthetic models.
 - The Workbench service worker and install manifest.
