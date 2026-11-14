@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sensor Scenario Studio (S³) | Chatterguru Consulting LLC</title>
-  <meta name="description" content="Sensor Scenario Studio (S³): build a scenario on a 3D globe, run radar and infrared sensors over it, and inspect each stage of the processing. Educational, unclassified, built on public data.">
+  <meta name="description" content="Sensor Scenario Studio (S³) is a Workbench for building scenes, running synthetic sensor simulations and inspecting recorded results.">
   <link rel="stylesheet" href="assets/site.css?v=s3-preview">
   <script src="assets/site.js?v=s3-preview" defer></script>
 </head>
@@ -32,7 +32,7 @@
       <div class="hero-content">
         <p class="eyebrow">Sensor Scenario Studio · S³</p>
         <h1>From a scene on the globe to a track on the screen.</h1>
-        <p>S³ is Chatterguru's scenario studio for radar and multi-spectral sensing. You place a sensor and moving targets in a real place, run the sensors over them, and inspect every stage: the signal, the detections, the tracks and the picture each sensor would see.</p>
+        <p>S³ is Chatterguru’s Workbench for radar and multispectral simulation. Build a fictional scene, run a supported sensor model and inspect the products saved by that run.</p>
         <div class="hero-actions">
           <a class="button" href="#examples">Try an example</a>
           <a class="button secondary" href="#evidence">How to read the labels</a>
@@ -45,21 +45,20 @@
         <div class="section-heading">
           <p class="mini-label">Examples</p>
           <h2>Open an example.</h2>
-          <p>All scenarios are fictional and unclassified. They use public geographic data and textbook sensor models, not any real radar, customer or threat system.</p>
+          <p>The examples use fictional scenes and generic sensor models. Geographic context, where shown, comes from public sources.</p>
         </div>
 
         <div class="featured-demo">
-          <article class="card demo-card">
-            <span class="badge recorded">Recorded Workbench run</span>
+          <article class="card demo-card is-pending">
+            <span class="badge pending">In review</span>
             <h3>Recorded radar replay</h3>
-            <p>Four captures from a completed 20-second Workbench recording of two fictional targets, at 2.5, 7.5, 12.5 and 17.5 seconds. The left pane shows the processed range–Doppler map (Doppler across, range increasing upward); the right pane shows scene truth, the radar's observations and the tracker's estimates on the same clock.</p>
-            <p class="meta">Images and times are retained from the recording; the page shows the source revision and file digests.</p>
-            <a class="button" href="demos/s3/recorded-crossing/index.html">Open recorded replay</a>
+            <p>Four captures from a completed 20-second Workbench run with two fictional targets. Range–Doppler, scene truth, radar observations and track estimates share the same capture time.</p>
+            <p class="meta">The plots were rendered from retained Workbench arrays. The replay bundle is in review.</p>
           </article>
           <div class="step-list compact" aria-label="What the replay lets you do">
-            <div class="step"><b>Step</b><span>Move between the four captures with Previous and Next.</span></div>
-            <div class="step"><b>Compare</b><span>Match each detection in the map to the target that caused it.</span></div>
-            <div class="step"><b>Check</b><span>Open the provenance panel for frame times and source digests.</span></div>
+            <div class="step"><b>Step</b><span>Step through captures at 2.5, 7.5, 12.5 and 17.5 seconds.</span></div>
+            <div class="step"><b>Compare</b><span>Compare scene truth, radar observations and track estimates at the same capture time.</span></div>
+            <div class="step"><b>Check</b><span>Find the source revision and file digests in the replay’s bundle manifest.</span></div>
           </div>
         </div>
       </div>
@@ -71,9 +70,8 @@
           <article class="card demo-card is-pending">
             <span class="badge pending">In review</span>
             <h3>King Farm 3D scene</h3>
-            <p>An airborne X-band radar flies a racetrack over King Farm in Rockville, Maryland, watching road traffic, a park drone and an airliner among the neighbourhood's buildings. Radar and infrared views are co-registered with the 3D globe.</p>
-            <p class="meta">It will be published once its exported files, map sources and attributions pass review, with each view labelled as replayed or drawn in the browser.</p>
-            <span class="button" aria-disabled="true">Coming after review</span>
+            <p>A fictional airborne radar scenario over King Farm in Rockville, Maryland, with roads, buildings and simulated traffic.</p>
+            <p class="meta">The web preview’s assets, attribution and sensor displays are under review.</p>
           </article>
           <article class="card demo-card" id="classic-demos">
             <span class="badge illustrative">Illustrative</span>
@@ -94,16 +92,15 @@
           <div class="section-heading">
             <p class="mini-label">Evidence labels</p>
             <h2>What each label means.</h2>
-            <p>A simulation can be convincing whether or not it ran. These labels say how each example's results were produced.</p>
           </div>
           <div class="legend">
             <div class="card">
               <span class="badge recorded">Recorded Workbench run</span>
-              <p>The pictures and numbers were saved from a completed S³ Workbench run and are replayed unchanged. The page lists the source revision and file digests so they can be checked. The scenario itself can still be fictional.</p>
+              <p>The plots are rendered from products retained by a completed Workbench run. Capture times and displayed counts come from the recording. The bundle manifest identifies the source revision and file digests.</p>
             </div>
             <div class="card">
               <span class="badge preview">Browser preview</span>
-              <p>The browser draws the scene and computes what it shows while you watch, from data exported by S³. It is a faithful preview of the scene, not a saved processing result.</p>
+              <p>The browser renders exported scene geometry and motion. Each sensor view identifies where its data comes from.</p>
             </div>
             <div class="card">
               <span class="badge illustrative">Illustrative</span>
@@ -113,7 +110,7 @@
         </div>
         <aside class="callout">
           <h3>Public and educational</h3>
-          <p>S³ examples use public map and terrain data and generic, textbook sensor models. They do not describe the performance of any real system.</p>
+          <p>S³ examples explore generic sensor models for education. Operational performance requires separate validation.</p>
           <p>For a private technical briefing on the Workbench itself, <a href="contact.html">get in touch</a>.</p>
         </aside>
       </div>
@@ -123,13 +120,13 @@
       <div class="section-inner">
         <div class="section-heading">
           <p class="mini-label">Inside S³</p>
-          <h2>One chain, every stage visible.</h2>
-          <p>Each stage keeps its inputs and outputs, so a result can be traced back to the scene that produced it.</p>
+          <h2>From scene to track</h2>
+          <p>Workflows retain different products for inspection. The recorded radar example shows the range–Doppler result, observations and tracker states.</p>
         </div>
         <ol class="pipeline">
-          <li><strong>Scene</strong><span>A real place: terrain, roads, buildings and land cover from public data, with moving vehicles, drones and aircraft.</span></li>
-          <li><strong>Targets</strong><span>3D models of each target, with the scattering points that dominate its radar return.</span></li>
-          <li><strong>Sensors</strong><span>Airborne or ground radar, including a four-face phased array, and an infrared camera on the same platform.</span></li>
+          <li><strong>Scene</strong><span>Fictional motion in a synthetic scene or a scene with public geographic context.</span></li>
+          <li><strong>Targets</strong><span>Selected target models include 3D geometry and modeled scattering points.</span></li>
+          <li><strong>Sensors</strong><span>Selected scenarios simulate airborne radar, ground radar or infrared sensing.</span></li>
           <li><strong>Signal chain</strong><span>Pulse compression, range–Doppler processing, clutter suppression and CFAR detection.</span></li>
           <li><strong>Tracks</strong><span>Detections become tracks; truth, observations and estimates stay side by side for checking.</span></li>
         </ol>
@@ -140,11 +137,11 @@
       <div class="section-inner grid">
         <article class="card">
           <h3>Real places, public data</h3>
-          <p>Scenes are built on public terrain and map data, so line of sight, terrain masking and clutter come from the ground itself.</p>
+          <p>Some scenes use public terrain and maps as context. Terrain masking and clutter depend on the selected model.</p>
         </article>
         <article class="card">
           <h3>Radar and infrared together</h3>
-          <p>The radar's range–Doppler view and an infrared camera look at the same scene from the same platform, at the same moment.</p>
+          <p>Selected scenarios explore synchronized radar and infrared views of the same scene.</p>
         </article>
         <article class="card">
           <h3>Requirements to evidence</h3>
