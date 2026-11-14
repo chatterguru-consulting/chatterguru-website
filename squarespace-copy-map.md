@@ -130,9 +130,6 @@ Multidisciplinary leadership for defense and technology work.
 
 Profiles:
 - Chatterpaul Joseph: Founder and senior systems engineer with 20+ years in defense, space, radar systems, MBSE, satellite communications, RF systems, and algorithm development.
-- Daniel Noyes: Advanced software engineer specializing in DevSecOps, embedded software, cybersecurity, containerized microservices, secure deployment, and automation.
-- Michael Thomas, PhD: Senior data scientist experienced in advanced analytics, optimization algorithms, data mining, energy systems, and cost-saving data-driven solutions.
-- Alec Earp: Systems engineer skilled in integration and testing, requirements management, automation scripting, aerospace programs, and regulatory compliance.
 
 ## Contact
 

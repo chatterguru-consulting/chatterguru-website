@@ -25,7 +25,7 @@ All three bundles conform to `website-demo-manifest.json` (`schema: 1`), enforce
   - `reference-1` (`7.5 s`, `cpi-2.png`): `obs=2`, `tracks=2`, `source_sha256=158e61df335a223facb77f3cb7ebc6def0d754b11e90d687e0c2d4b658748659`
   - `reference-2` (`12.5 s`, `cpi-3.png`): `obs=2`, `tracks=2`, `source_sha256=26017634b5e94b356dca4ed7b055aa3a5d8735e9f1a2c06ccf33817ff0128e6d`
   - `reference-3` (`17.5 s`, `cpi-4.png`): `obs=2`, `tracks=2`, `source_sha256=3ccc4b926234bfd3bb2a920c94df1157a6e8a7fa1e840189eae4ee38115bc5df`
-- **Retained HDF5 Receipt (Radar repo local output)**: `C:\Users\chatt\Documents\Antigravity\chatterguru-radar-eccm-sandbox\outputs\website_export_receipts\s3-fictional-crossing-recording`
+- **Retained HDF5 Receipt (Radar repo local output)**: `<radar-checkout>\outputs\website_export_receipts\s3-fictional-crossing-recording`
 
 ### 1.2 `demos/s3/king-farm/` (`browser-preview`)
 - **Bundle Size**: `6,709,744` bytes (`7` files verified including `website-demo-manifest.json`)
@@ -69,7 +69,7 @@ The desktop Cesium Workbench (`export_cesium_studio`) references external tile s
 
 ### Radar Exporter & Unit Tests
 ```powershell
-cd C:\Users\chatt\Documents\Antigravity\chatterguru-radar-eccm-sandbox
+cd <radar-checkout>
 python -m ruff check scripts/export_website_scenarios.py tests/test_website_export.py
 $env:PYTHONPATH="src"
 python -m pytest --basetemp=outputs/pytest_tmp_web tests/test_website_export.py -v
@@ -79,7 +79,7 @@ python -m pytest --basetemp=outputs/pytest_tmp_web tests/test_website_export.py 
 
 ### Production Bundle Export
 ```powershell
-cd C:\Users\chatt\Documents\Antigravity\chatterguru-radar-eccm-sandbox
+cd <radar-checkout>
 $env:PYTHONPATH="src"
 python -B scripts/export_website_scenarios.py `
   --output-root outputs/website_bundles/demos/s3 `
@@ -88,11 +88,11 @@ python -B scripts/export_website_scenarios.py `
 
 ### Site & Bundle Verifiers (`tools/`)
 ```powershell
-cd C:\Users\chatt\Documents\Antigravity\chatterguru-website
-$env:PYTHONPATH="C:\Users\chatt\Documents\Antigravity\chatterguru-radar-eccm-sandbox\src;C:\Users\chatt\Documents\Antigravity\chatterguru-website\tools"
+cd <website-checkout>
+$env:PYTHONPATH="<radar-checkout>\src;<website-checkout>\tools"
 python -B tools\verify_s3_preview.py . --bundle demos\s3\recorded-crossing
 python -B tools\verify_s3_preview.py --bundle demos\s3\king-farm
 python -B tools\verify_s3_preview.py --bundle demos\s3\mountain-ridge
-python -B tools\verify_recorded_crossing.py demos\s3\recorded-crossing C:\Users\chatt\Documents\Antigravity\chatterguru-radar-eccm-sandbox\outputs\website_export_receipts\s3-fictional-crossing-recording
+python -B tools\verify_recorded_crossing.py demos\s3\recorded-crossing <radar-checkout>\outputs\website_export_receipts\s3-fictional-crossing-recording
 python -B -m unittest discover -s tools -v
 ```

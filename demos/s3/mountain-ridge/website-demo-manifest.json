@@ -6,8 +6,8 @@
   },
   "files": {
     "index.html": {
-      "bytes": 235074,
-      "sha256": "c849888daf361c13e2796f30c329366b9dc8536e84419424c5386ded117447d7"
+      "bytes": 235306,
+      "sha256": "ec31775a6293d09af4683fb5f024b1fc4a07e7e3cb4147e1ea0cbc595c22a583"
     },
     "mission.connect": {
       "bytes": 7269,
@@ -18,8 +18,8 @@
       "sha256": "acbfb7d9847786d4641fa8b080c9d22ee225ffcba9676e2d1d95c1bb02c56fde"
     },
     "preview.css": {
-      "bytes": 4869,
-      "sha256": "ea97f47575e86e81814b8962ce7b71563876568fb4f4895da2417a68f4fff9aa"
+      "bytes": 4937,
+      "sha256": "7eca4e28bc9dc60f8a3ceefa6f330527a3c19661a4c27962e180f6d86dbee316"
     },
     "preview.js": {
       "bytes": 15699,

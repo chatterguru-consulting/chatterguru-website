@@ -1,4 +1,4 @@
-# King Farm Multi-Spectral Digital Twin (Rockville, MD) — Dependency, Attribution & Rights Ledger
+# King Farm Airborne Radar Scene (Rockville, MD) — Dependency, Attribution & Rights Ledger
 
 ## Evidence Classification (`browser-preview`)
 - **Source repository HEAD**: `d808dbb2edda382be018e9d1c3f19bdea9896575`
