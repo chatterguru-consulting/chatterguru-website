@@ -4,32 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Radar, RF, EW, and Space | Chatterguru Consulting LLC</title>
-  <link rel="stylesheet" href="assets/site.css?v=mobile-nav-toggle">
-  <script src="assets/site.js?v=mobile-nav-toggle" defer></script>
+  <link rel="stylesheet" href="assets/site.css?v=s3-preview">
+  <script src="assets/site.js?v=s3-preview" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="index.html"><img src="assets/brochure-image.png" alt="Chatterguru Consulting LLC mark"><span>Chatterguru<small>Consulting LLC</small></span></a>
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
     <nav class="nav" id="primary-nav" aria-label="Primary navigation">
       <a href="index.html">Home</a>
-      <a href="capabilities.html">Capabilities</a>
-      <a href="systems-engineering.html">Systems and MBSE</a>
+      <a href="s3-studio.html">S³ Studio</a>
       <a aria-current="page" href="radar-rf-ew.html">Radar/RF</a>
-      <a href="software-cyber.html">Software and Cyber</a>
-      <a href="ai-data-science.html">AI and Data</a>
-      <a href="team.html">Team</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
       <a class="nav-contact" href="contact.html">Contact</a>
     </nav>
     <a class="button" href="contact.html">Contact</a>
   </header>
 
-  <main>
+  <main id="main">
     <section class="hero page-hero">
       <div class="hero-content">
-        <p class="eyebrow">Radar, RF, EW, and space systems</p>
-        <h1>Technical support for advanced sensing and assessment workflows.</h1>
-        <p>A dedicated page for RF systems, satellite intelligence concepts, radar and electronic warfare support, real-time visualization, and complex system assessment tools.</p>
+        <p class="eyebrow">Radar, RF, EW and space systems</p>
+        <h1>Sensing systems you can inspect, stage by stage.</h1>
+        <p>Radar and RF analysis, modeling and visualization, and the assessment workflows that turn them into decisions. Sensor Scenario Studio shows the approach in public, unclassified examples.</p>
+        <div class="hero-actions">
+          <a class="button" href="s3-studio.html">Explore Sensor Scenario Studio</a>
+          <a class="button secondary" href="contact.html">Request a private discussion</a>
+        </div>
       </div>
     </section>
 
@@ -37,16 +43,16 @@
       <div class="section-inner">
         <div class="grid">
           <article class="card">
-            <h3>RF and IR Satellite Systems</h3>
-            <p>Architecture and analysis support for synthetic intelligence system concepts, integration concerns, and technical trade studies.</p>
+            <h3>Radar and EW analysis</h3>
+            <p>Waveform, detection and tracking trade studies, clutter and electronic-protection concepts, and the models behind them.</p>
           </article>
           <article class="card">
-            <h3>Radar and EW Solutions</h3>
-            <p>Generic radar/RF modeling, electronic warfare support, visualization tools, and assessment workflows for technical teams.</p>
+            <h3>RF and IR space systems</h3>
+            <p>Architecture and analysis support for RF and infrared sensing concepts, integration questions and technical trade studies.</p>
           </article>
           <article class="card">
-            <h3>Real-Time Visualization</h3>
-            <p>Interactive tools that help teams inspect complex system behavior, compare scenarios, and communicate results clearly.</p>
+            <h3>Visualization and assessment</h3>
+            <p>Interactive tools that let teams inspect complex system behavior, compare scenarios and communicate results clearly.</p>
           </article>
         </div>
       </div>
@@ -55,19 +61,45 @@
     <section class="section">
       <div class="section-inner">
         <div class="section-heading">
-          <p class="mini-label">Portfolio demos</p>
-          <h2>Interactive Radar/ECCM Sandbox Demos</h2>
-          <p>These public browser demos show Chatterguru's approach to radar/RF trade-study visualization, model-based thinking, and software prototyping. All values are generic, synthetic, educational, and unclassified. The demos do not represent any real radar system, customer system, threat system, classified capability, or operational radar performance.</p>
+          <p class="mini-label">Browser demos</p>
+          <h2>Interactive radar examples</h2>
+          <p>All values are generic, synthetic, educational and unclassified. The demos do not represent any real radar, customer system, threat system or operational performance. Each one is labelled with where its results come from; <a href="s3-studio.html#evidence">see what the labels mean</a>.</p>
         </div>
         <div class="demo-grid">
           <article class="card demo-card">
+            <span class="badge recorded">Recorded Workbench run</span>
+            <h3>Sensor Scenario Studio · Recorded radar replay</h3>
+            <p>Four synchronized range–Doppler and top-down captures from a fictional two-target Workbench run, with truth, observations and track estimates side by side.</p>
+            <a class="button" href="demos/s3/recorded-crossing/index.html">Open recorded replay</a>
+          </article>
+          <article class="card demo-card is-pending">
+            <span class="badge pending">In review</span>
+            <h3>King Farm 3D scene</h3>
+            <p>An airborne radar over King Farm in Rockville, Maryland, with co-registered radar and infrared views. Published once its exported files and attributions pass review.</p>
+            <span class="button" aria-disabled="true">Coming after review</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="classic-demos">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Classic concept explorers</p>
+          <h2>The original browser demos</h2>
+          <p>These two demos draw their values in the browser to illustrate ideas. They are kept here, at their original addresses.</p>
+        </div>
+        <div class="demo-grid">
+          <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
             <h3>Radar DoE Scenario Intelligence</h3>
-            <p>A synthetic design-of-experiments visualization showing sample selection, flypath geometry, a range-Doppler image, and SNR/Pd proxy behavior.</p>
+            <p>A synthetic design-of-experiments visualization showing sample selection, flypath geometry, a range-Doppler image and SNR/Pd proxy behavior.</p>
             <a class="button" href="demos/radar_doe_website_visualization.html">Open demo</a>
           </article>
           <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
             <h3>ECCM Sandbox Scenario Dashboard</h3>
-            <p>A browser-based synthetic scenario dashboard with controls for radar/waveform settings, target motion, clutter/noise, motion compensation, and range-Doppler visualization.</p>
+            <p>A browser-based synthetic scenario dashboard with controls for radar/waveform settings, target motion, clutter/noise, motion compensation and range-Doppler visualization.</p>
             <a class="button" href="demos/radar_sim_ui.html">Open demo</a>
           </article>
         </div>
@@ -76,21 +108,31 @@
 
     <section class="section">
       <div class="section-inner two-col">
-        <div>
+        <div class="text-block">
           <div class="section-heading">
-            <h2>Position this page carefully.</h2>
+            <h2>Public examples, private depth.</h2>
           </div>
-          <p>The language here stays high-level and generic. It should signal credibility without disclosing sensitive implementation detail, real system assumptions, or restricted technical data.</p>
+          <p>The public pages stay generic and unclassified. Detailed technical work, program-specific assumptions and anything sensitive belong in a private conversation.</p>
         </div>
         <aside class="callout">
-          <h3>Suggested CTA</h3>
-          <p>Ask visitors to request a private technical conversation rather than publishing deep technical claims directly on the public site.</p>
+          <h3>Discuss a sensing problem</h3>
+          <p>Trade studies, modeling, signal processing or assessment tooling.</p>
           <a class="button" href="contact.html">Request a private discussion</a>
         </aside>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner"><span>Chatterguru Consulting LLC</span><span><a href="contact.html">Discuss advanced sensing support</a></span></div></footer>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="run-for-jericho.html">Run for Jericho</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>

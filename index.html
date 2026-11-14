@@ -3,39 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chatterguru Consulting LLC | Defense and Technology Solutions</title>
-  <link rel="stylesheet" href="assets/site.css?v=mobile-nav-toggle">
-  <script src="assets/site.js?v=mobile-nav-toggle" defer></script>
+  <title>Chatterguru Consulting LLC | Sensor Scenario Studio and Systems Engineering</title>
+  <meta name="description" content="Chatterguru Consulting builds Sensor Scenario Studio (S³), a radar and multi-spectral scenario studio, and supports defense and technology teams with systems engineering, radar/RF and software work.">
+  <link rel="stylesheet" href="assets/site.css?v=s3-preview">
+  <script src="assets/site.js?v=s3-preview" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="index.html">
-      <img src="assets/brochure-image.png" alt="Chatterguru Consulting LLC mark">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
       <span>Chatterguru<small>Consulting LLC</small></span>
     </a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
     <nav class="nav" id="primary-nav" aria-label="Primary navigation">
       <a aria-current="page" href="index.html">Home</a>
-      <a href="capabilities.html">Capabilities</a>
-      <a href="systems-engineering.html">Systems and MBSE</a>
+      <a href="s3-studio.html">S³ Studio</a>
       <a href="radar-rf-ew.html">Radar/RF</a>
-      <a href="software-cyber.html">Software and Cyber</a>
-      <a href="ai-data-science.html">AI and Data</a>
-      <a href="team.html">Team</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
       <a class="nav-contact" href="contact.html">Contact</a>
     </nav>
     <a class="button" href="contact.html">Contact</a>
   </header>
 
-  <main>
+  <main id="main">
     <section class="hero">
       <div class="hero-content">
-        <p class="eyebrow">Defense, aerospace, software, and analytics consulting</p>
-        <h1>Chatterguru Consulting LLC</h1>
-        <p>Empowering innovative solutions for defense and technology teams that need systems thinking, secure software, advanced analytics, and practical technical leadership.</p>
+        <p class="eyebrow">Founder-led systems engineering and sensor simulation</p>
+        <h1>Sensor Scenario Studio</h1>
+        <p>S³ builds a scenario on a 3D globe, flies radar and infrared sensors over it, and shows every stage of the processing, from range–Doppler maps to tracks. Chatterguru Consulting builds it, and brings the same engineering to defense and technology teams.</p>
         <div class="hero-actions">
-          <a class="button" href="capabilities.html">Explore capabilities</a>
-          <a class="button secondary" href="contact.html">Start a conversation</a>
+          <a class="button" href="s3-studio.html">Explore S³</a>
+          <a class="button secondary" href="demos/s3/recorded-crossing/index.html">Open the recorded radar replay</a>
         </div>
       </div>
     </section>
@@ -43,44 +43,71 @@
     <section class="section alt">
       <div class="section-inner">
         <div class="section-heading">
-          <h2>Built for complex missions where engineering judgment matters.</h2>
-          <p>Chatterguru combines multidisciplinary experience across defense, aerospace, software engineering, data science, cybersecurity, and systems integration.</p>
+          <p class="mini-label">Try it in your browser</p>
+          <h2>Each example says where its results come from.</h2>
+          <p>Some examples replay a recorded Workbench run; others are drawn in the browser. Every card is labelled, so you can tell retained results from illustrations.</p>
         </div>
         <div class="grid">
-          <article class="card">
-            <h3>Systems Engineering and MBSE</h3>
-            <p>Requirements, architecture, integration, test planning, and model-based workflows for complex technical programs.</p>
+          <article class="card demo-card">
+            <span class="badge recorded">Recorded Workbench run</span>
+            <h3>Recorded radar replay</h3>
+            <p>Step through four captures from a fictional two-target run: processed range–Doppler data beside scene truth, observations and tracker estimates on the same clock.</p>
+            <a class="button" href="demos/s3/recorded-crossing/index.html">Open replay</a>
           </article>
-          <article class="card">
-            <h3>Radar, RF, EW, and Space</h3>
-            <p>Generic technical leadership for RF systems, satellite intelligence concepts, radar assessment tools, and electronic warfare support. <a href="radar-rf-ew.html">View page</a>.</p>
+          <article class="card demo-card is-pending">
+            <span class="badge pending">In review</span>
+            <h3>King Farm 3D scene</h3>
+            <p>An airborne radar over a neighbourhood in Rockville, Maryland, with road traffic, buildings and co-registered radar and infrared views. It joins the site once its exported assets and attributions pass review.</p>
+            <span class="button" aria-disabled="true">Coming after review</span>
           </article>
-          <article class="card">
-            <h3>Secure Software and DevSecOps</h3>
-            <p>Embedded software, containerized services, microservices architecture, automation, and accreditation-aware delivery.</p>
+          <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
+            <h3>Classic concept explorers</h3>
+            <p>The two original browser demos: a design-of-experiments view and a scenario dashboard. Their values are drawn in the browser to illustrate ideas, not taken from a run.</p>
+            <a class="button secondary" href="radar-rf-ew.html#classic-demos">See the explorers</a>
           </article>
         </div>
       </div>
     </section>
 
     <section class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Consulting</p>
+          <h2>Engineering for programs where judgment matters.</h2>
+          <p>Chatterguru supports defense and technology teams with systems thinking, sensor and signal-processing experience, and working software.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Systems engineering and MBSE</h3>
+            <p>Requirements, architecture, integration, verification planning and model-based workflows for complex programs. <a href="systems-engineering.html">More</a></p>
+          </article>
+          <article class="card">
+            <h3>Radar, RF, EW and space</h3>
+            <p>Radar and RF analysis, modeling and visualization tools, and assessment workflows. <a href="radar-rf-ew.html">More</a></p>
+          </article>
+          <article class="card">
+            <h3>Software and analytics</h3>
+            <p>Simulation, visualization and analysis software built to be tested, traced and maintained. <a href="capabilities.html">All capabilities</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
       <div class="section-inner two-col">
         <div class="text-block">
           <div class="section-heading">
-            <h2>A focused partner for proposal, prototype, integration, and delivery work.</h2>
+            <p class="mini-label">Founder &amp; Lab</p>
+            <h2>Chatterpaul Joseph</h2>
           </div>
-          <p>Use the site to present Chatterguru as a high-trust technical partner: experienced enough for defense and aerospace complexity, practical enough to ship working software and decision tools, and clear enough to support executive conversations.</p>
-          <ul>
-            <li>Capability statement and technical proposal support.</li>
-            <li>Architecture, integration, and verification planning.</li>
-            <li>AI, analytics, and visualization prototypes.</li>
-            <li>Cybersecurity and DevSecOps implementation guidance.</li>
-          </ul>
-          <p><a href="engagement-models.html">Compare engagement models</a> or <a href="case-study-templates.html">review public-safe case study templates</a>.</p>
+          <p>Founder and senior systems engineer with 20+ years in defense, space, radar systems, MBSE, satellite communications, RF systems and algorithm development.</p>
+          <p><a href="about.html">About the founder and the lab</a></p>
         </div>
         <aside class="callout">
-          <h3>Suggested site path</h3>
-          <p>Home, Capabilities, Systems and MBSE, Software and Cyber, AI and Data, Engagement Models, Team, Contact. This mirrors the brochure while giving each audience a clear landing page.</p>
+          <h3>Talk about a problem</h3>
+          <p>Proposal support, a technical review, an architecture question or a prototype: start with the problem you need to solve.</p>
+          <a class="button" href="contact.html">Contact Chatterguru</a>
         </aside>
       </div>
     </section>
@@ -89,8 +116,12 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span>Chatterguru Consulting LLC</span>
-      <span><a href="run-for-jericho.html">Run for Jericho — Chicago Marathon 2026</a></span>
-      <span><a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a></span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="run-for-jericho.html">Run for Jericho</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
     </div>
   </footer>
 </body>

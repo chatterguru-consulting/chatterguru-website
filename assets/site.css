@@ -616,3 +616,236 @@ h1 {
     display: block;
   }
 }
+
+/* ---- S³ site preview additions --------------------------------------------- */
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 200;
+  padding: 8px 12px;
+  border-radius: 7px;
+  background: var(--teal-dark);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  left: 12px;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* Evidence badges: what a demo's numbers and pictures actually come from. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge.recorded {
+  color: #0b6d50;
+  background: #e7f6ef;
+}
+
+.badge.preview {
+  color: var(--teal-dark);
+  background: #e8f6f8;
+}
+
+.badge.illustrative {
+  color: #8a5a00;
+  background: #fbf3e2;
+}
+
+.badge.pending {
+  color: var(--muted);
+  background: var(--wash);
+}
+
+.demo-card .meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.demo-card.is-pending {
+  background: var(--wash);
+  box-shadow: none;
+}
+
+.button[aria-disabled="true"] {
+  background: #ffffff;
+  border-color: var(--line);
+  color: var(--muted);
+  cursor: default;
+}
+
+.featured-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.featured-demo .card {
+  min-height: 0;
+}
+
+/* The S³ processing chain, drawn as plain HTML. */
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: stage;
+}
+
+.pipeline li {
+  position: relative;
+  padding: 16px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  counter-increment: stage;
+}
+
+.pipeline li::before {
+  content: counter(stage);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 10px;
+  border-radius: 7px;
+  background: var(--navy);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.pipeline strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pipeline span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.legend {
+  display: grid;
+  gap: 12px;
+}
+
+.legend p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.founder {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.founder .avatar {
+  width: 120px;
+  height: 120px;
+  font-size: 34px;
+}
+
+.founder h2 {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 36px);
+  line-height: 1.1;
+}
+
+.founder .role {
+  margin: 6px 0 14px;
+  color: var(--teal-dark);
+  font-weight: 800;
+}
+
+.founder p {
+  color: var(--muted);
+}
+
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.community-card {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.community-card img {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.moved {
+  max-width: 640px;
+}
+
+.footer-inner nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+@media (max-width: 980px) {
+  .featured-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .pipeline,
+  .founder,
+  .community-card {
+    grid-template-columns: 1fr;
+  }
+
+  .community-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}

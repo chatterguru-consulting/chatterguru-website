@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensor Scenario Studio (S³) | Chatterguru Consulting LLC</title>
+  <meta name="description" content="Sensor Scenario Studio (S³): build a scenario on a 3D globe, run radar and infrared sensors over it, and inspect each stage of the processing. Educational, unclassified, built on public data.">
+  <link rel="stylesheet" href="assets/site.css?v=s3-preview">
+  <script src="assets/site.js?v=s3-preview" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a aria-current="page" href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+
+  <main id="main">
+    <section class="hero page-hero">
+      <div class="hero-content">
+        <p class="eyebrow">Sensor Scenario Studio · S³</p>
+        <h1>From a scene on the globe to a track on the screen.</h1>
+        <p>S³ is Chatterguru's scenario studio for radar and multi-spectral sensing. You place a sensor and moving targets in a real place, run the sensors over them, and inspect every stage: the signal, the detections, the tracks and the picture each sensor would see.</p>
+        <div class="hero-actions">
+          <a class="button" href="#examples">Try an example</a>
+          <a class="button secondary" href="#evidence">How to read the labels</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="examples">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Examples</p>
+          <h2>Open an example.</h2>
+          <p>All scenarios are fictional and unclassified. They use public geographic data and textbook sensor models, not any real radar, customer or threat system.</p>
+        </div>
+
+        <div class="featured-demo">
+          <article class="card demo-card">
+            <span class="badge recorded">Recorded Workbench run</span>
+            <h3>Recorded radar replay</h3>
+            <p>Four captures from a completed 20-second Workbench recording of two fictional targets, at 2.5, 7.5, 12.5 and 17.5 seconds. The left pane shows the processed range–Doppler map (Doppler across, range increasing upward); the right pane shows scene truth, the radar's observations and the tracker's estimates on the same clock.</p>
+            <p class="meta">Images and times are retained from the recording; the page shows the source revision and file digests.</p>
+            <a class="button" href="demos/s3/recorded-crossing/index.html">Open recorded replay</a>
+          </article>
+          <div class="step-list compact" aria-label="What the replay lets you do">
+            <div class="step"><b>Step</b><span>Move between the four captures with Previous and Next.</span></div>
+            <div class="step"><b>Compare</b><span>Match each detection in the map to the target that caused it.</span></div>
+            <div class="step"><b>Check</b><span>Open the provenance panel for frame times and source digests.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner">
+        <div class="demo-grid">
+          <article class="card demo-card is-pending">
+            <span class="badge pending">In review</span>
+            <h3>King Farm 3D scene</h3>
+            <p>An airborne X-band radar flies a racetrack over King Farm in Rockville, Maryland, watching road traffic, a park drone and an airliner among the neighbourhood's buildings. Radar and infrared views are co-registered with the 3D globe.</p>
+            <p class="meta">It will be published once its exported files, map sources and attributions pass review, with each view labelled as replayed or drawn in the browser.</p>
+            <span class="button" aria-disabled="true">Coming after review</span>
+          </article>
+          <article class="card demo-card" id="classic-demos">
+            <span class="badge illustrative">Illustrative</span>
+            <h3>Classic concept explorers</h3>
+            <p>The site's two original browser demos, kept at their original addresses. They draw synthetic values in the browser to illustrate design-of-experiments thinking and a scenario dashboard.</p>
+            <div class="hero-actions">
+              <a class="button secondary" href="demos/radar_doe_website_visualization.html">Radar DoE explorer</a>
+              <a class="button secondary" href="demos/radar_sim_ui.html">Scenario dashboard</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="evidence">
+      <div class="section-inner two-col">
+        <div>
+          <div class="section-heading">
+            <p class="mini-label">Evidence labels</p>
+            <h2>What each label means.</h2>
+            <p>A simulation can be convincing whether or not it ran. These labels say how each example's results were produced.</p>
+          </div>
+          <div class="legend">
+            <div class="card">
+              <span class="badge recorded">Recorded Workbench run</span>
+              <p>The pictures and numbers were saved from a completed S³ Workbench run and are replayed unchanged. The page lists the source revision and file digests so they can be checked. The scenario itself can still be fictional.</p>
+            </div>
+            <div class="card">
+              <span class="badge preview">Browser preview</span>
+              <p>The browser draws the scene and computes what it shows while you watch, from data exported by S³. It is a faithful preview of the scene, not a saved processing result.</p>
+            </div>
+            <div class="card">
+              <span class="badge illustrative">Illustrative</span>
+              <p>Values are drawn in the browser to explain an idea. They are not produced by the S³ processing chain.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="callout">
+          <h3>Public and educational</h3>
+          <p>S³ examples use public map and terrain data and generic, textbook sensor models. They do not describe the performance of any real system.</p>
+          <p>For a private technical briefing on the Workbench itself, <a href="contact.html">get in touch</a>.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Inside S³</p>
+          <h2>One chain, every stage visible.</h2>
+          <p>Each stage keeps its inputs and outputs, so a result can be traced back to the scene that produced it.</p>
+        </div>
+        <ol class="pipeline">
+          <li><strong>Scene</strong><span>A real place: terrain, roads, buildings and land cover from public data, with moving vehicles, drones and aircraft.</span></li>
+          <li><strong>Targets</strong><span>3D models of each target, with the scattering points that dominate its radar return.</span></li>
+          <li><strong>Sensors</strong><span>Airborne or ground radar, including a four-face phased array, and an infrared camera on the same platform.</span></li>
+          <li><strong>Signal chain</strong><span>Pulse compression, range–Doppler processing, clutter suppression and CFAR detection.</span></li>
+          <li><strong>Tracks</strong><span>Detections become tracks; truth, observations and estimates stay side by side for checking.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-inner grid">
+        <article class="card">
+          <h3>Real places, public data</h3>
+          <p>Scenes are built on public terrain and map data, so line of sight, terrain masking and clutter come from the ground itself.</p>
+        </article>
+        <article class="card">
+          <h3>Radar and infrared together</h3>
+          <p>The radar's range–Doppler view and an infrared camera look at the same scene from the same platform, at the same moment.</p>
+        </article>
+        <article class="card">
+          <h3>Requirements to evidence</h3>
+          <p>Features are tied to written requirements and automated tests, in the spirit of model-based systems engineering.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="run-for-jericho.html">Run for Jericho</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
