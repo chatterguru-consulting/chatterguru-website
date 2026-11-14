@@ -1233,8 +1233,27 @@
     .s3-site-bar .s3-short { display: none; }
     @media (max-width: 760px) { .s3-site-bar { top: 172px; } .s3-site-bar .s3-long { display: none; }
       .s3-site-bar .s3-short { display: inline; padding: 0; border: 0; background: none; } }
+    #s3FileNotice { display: none; position: fixed; inset: 0; z-index: 2147483000; overflow: auto;
+      align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+      background: #0b1220; color: #e2e8f0; font: 16px/1.55 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .s3-file-mode #s3FileNotice { display: flex; }
+    #s3FileNotice div { max-width: 640px; }
+    #s3FileNotice h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 12px; color: #fff; }
+    #s3FileNotice code { display: block; margin: 8px 0 16px; padding: 10px 12px; border-radius: 8px;
+      background: #1e293b; color: #7dd3fc; font: 14px/1.4 ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+    #s3FileNotice a { color: #7dd3fc; }
   </style>
   <script>
+    // Website profile: a page opened straight from disk cannot load map tiles or models into
+    // WebGL (the browser treats them as cross-origin). Show how to preview it instead of
+    // starting the studio and failing with a rendering error.
+    if (location.protocol === 'file:') {
+      document.documentElement.classList.add('s3-file-mode');
+      try {
+        Object.defineProperty(window, 'onload', { configurable: true,
+          get: function() { return null; }, set: function() {} });
+      } catch (e) { /* the notice still covers the page */ }
+    }
     // Website profile: browsers reject vibration before the visitor's first tap; skip it until then.
     (function() {
       if (!navigator.vibrate) return;
@@ -1253,6 +1272,17 @@
     <span class="s3-evidence" title="Scene, motion and sensor overlays exported from the S³ Workbench and drawn by your browser. Simulated sensors, fictional targets.">Workbench export<span class="s3-long"> &middot; simulated, fictional scenario</span><span class="s3-short"> &middot; simulated</span></span>
     <a href="credits.html">Data credits</a>
   </nav>
+  <section id="s3FileNotice" role="alert" aria-labelledby="s3FileNoticeTitle"><div>
+    <h1 id="s3FileNoticeTitle">Open this 3D scene through a web server</h1>
+    <p>This page was opened straight from a file on your computer. Browsers block map imagery and 3D
+    models for pages opened that way, so the scene cannot draw. On the website it works as it is.</p>
+    <p>To preview it on your computer, open a terminal in the website folder (the one that holds
+    <b>index.html</b> and <b>demos</b>) and run:</p>
+    <code>python -m http.server 8000 --bind 127.0.0.1</code>
+    <p>Leave that running, then open:</p>
+    <code><a href="http://127.0.0.1:8000/demos/s3/studio/south-mountain/">http://127.0.0.1:8000/demos/s3/studio/south-mountain/</a></code>
+    <p><a href="../../../../s3-studio.html">&larr; Back to S&sup3; Studio</a></p>
+  </div></section>
   <div id="cesiumContainer"></div>
 
   <!-- Top Mission Bar -->

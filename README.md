@@ -2,6 +2,16 @@
 
 This folder contains static HTML mockups for replacing the current Squarespace placeholder at `https://chatterguru.com`.
 
+## Preview locally
+
+The 3D studio scenes under `demos/s3/studio/` need a web server. Opened by double-clicking (a `file:` address), the browser blocks their map imagery and models, and the page shows a notice instead of the scene. From this folder run:
+
+```bash
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+Then open `http://127.0.0.1:8000/`. The other pages also work when opened directly.
+
 ## Source Inputs
 
 - Live site check: the current site resolves to a Squarespace "Coming Soon" placeholder.
