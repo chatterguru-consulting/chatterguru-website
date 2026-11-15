@@ -18,6 +18,8 @@ Open [the local homepage](http://127.0.0.1:8000/). Use the server for the 3D sce
 - [S³ Studio](s3-studio.html) is the demo gallery. It links to the King Farm and South Mountain Workbench exports, a recorded radar replay, and the original browser explorers. The evidence labels explain what produced each view.
 - [Founder & Lab](about.html) covers Chatterpaul Joseph’s career, the lab, and community service. [Run for Jericho](run-for-jericho.html) has its own public address.
 - [Contact](contact.html) lists ways to get in touch about a briefing or a technical question.
+- `team.html` and `case-study-templates.html` are forwarding pages. Nothing links to them on purpose: they send visitors who still have the old addresses to Founder & Lab and S³ Studio.
+- `favicon.ico` is the browser tab icon, and `assets/og-s3-studio.jpg` is the picture shown when a page is shared.
 
 ## Validate before publishing
 
