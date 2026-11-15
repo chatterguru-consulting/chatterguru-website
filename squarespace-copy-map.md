@@ -143,7 +143,7 @@ Contact:
 - Chatterpaul Joseph, Founder
 - chatterpaul@chatterguru.com
 - Phone: Available by appointment
-- linkedin.com/in/chatterpaul-joseph
+- linkedin.com/in/chatterpaul-joseph-300068104
 
 Good first-contact topics:
 - Proposal or capability statement support
