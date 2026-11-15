@@ -342,42 +342,6 @@ h1 {
   font-weight: 700;
 }
 
-.signal-map {
-  display: grid;
-  gap: 10px;
-}
-
-.signal-row {
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  gap: 10px;
-  align-items: center;
-}
-
-.signal-row span {
-  color: var(--muted);
-  font-weight: 800;
-  font-size: 13px;
-}
-
-.bar {
-  height: 14px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--teal), var(--gold), var(--red));
-}
-
-.bar.short {
-  width: 68%;
-}
-
-.bar.mid {
-  width: 82%;
-}
-
-.bar.long {
-  width: 100%;
-}
-
 .team-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -406,6 +370,11 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.card .contact-note {
+  margin-top: 14px;
+  font-size: 14px;
 }
 
 .site-footer {
@@ -560,7 +529,6 @@ h1 {
     padding: 56px 16px 42px;
   }
 
-  .signal-row,
   .profile,
   .step {
     grid-template-columns: 1fr;
@@ -773,10 +741,19 @@ button:focus-visible {
   align-items: start;
 }
 
-.founder .avatar {
+.founder .avatar,
+.founder-portrait {
   width: 120px;
   height: 120px;
   font-size: 34px;
+}
+
+.founder-portrait {
+  display: block;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(23, 32, 42, 0.08);
 }
 
 .founder h2 {
@@ -921,7 +898,7 @@ button:focus-visible {
 
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 16px;
 }
