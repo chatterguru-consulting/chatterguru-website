@@ -50,9 +50,19 @@ labels for simulated data and display representations.
 | Terrain | South Mountain's source terrain and feature files match its radar site manifest at `0f06af1`. Its 3DEP elevation samples are represented on a 40 m scene grid. King Farm's page credits describe synthetic hills while the runtime subtitle claims a 1 m USGS 3DEP DEM. Align both displayed labels with the terrain each viewer actually loads. [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) |
 | Synthetic models | All seven GLBs in each scene match the Chatterguru radar source at the manifest revision, identify the repository’s synthetic CAD generator and contain their mesh data without external buffers or textures. |
 
-The earlier wireframe export handoff documents a superseded preview. Use the
-schema 2 manifests for the Cesium scenes and the schema 1 manifest for the
-recorded crossing.
+Use the schema 2 manifests for the Cesium scenes and the schema 1 manifest for
+the recorded crossing. The original wireframe previews have been retired.
+
+To independently verify the recorded-crossing plots against the matching
+Workbench archive, put the recording's radar checkout `src` directory on
+`PYTHONPATH` and run:
+
+```bash
+python -B tools/verify_recorded_crossing.py demos/s3/recorded-crossing "<studio-run-directory>"
+```
+
+Match the radar revision and source fingerprint in the [recorded replay receipt](../demos/s3/recorded-crossing/source.json).
+Use the rendering dependencies and fonts from the export environment for pixel parity.
 
 ## iPhone Safari acceptance
 
@@ -61,7 +71,7 @@ URL. Loopback on the development PC is only usable from that PC. Record the iPho
 model, iOS version, browser, website revision and whether the phone is on Wi-Fi
 or cellular. For both King Farm and South Mountain, start with a fresh tab.
 
-1. From Home, open each scene. Time the first visible globe and first sharper
+1. From the S³ Studio gallery, open each scene. Time the first visible globe and first sharper
    local aerial imagery. Verify that building geometry and model motion appear.
 2. Tap Play, watch the clock advance for ten seconds, then pause and scrub to
    a different time. Pinch and pan the globe. Switch basemap and return to

@@ -1,9 +1,6 @@
 # GitHub Pages (Jekyll) build settings.
-# Internal planning notes, review docs and verification tools stay in the
-# repository but are not published to www.chatterguru.com.
+# Keep development docs and verification tools outside the public site.
 exclude:
   - README.md
-  - page-plan.md
-  - squarespace-copy-map.md
   - docs/
   - tools/

@@ -342,30 +342,6 @@ h1 {
   font-weight: 700;
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.profile {
-  display: grid;
-  grid-template-columns: 68px 1fr;
-  gap: 14px;
-  align-items: start;
-}
-
-.avatar {
-  width: 68px;
-  height: 68px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
-  background: var(--navy);
-  font-weight: 900;
-}
-
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -414,7 +390,6 @@ h1 {
   .grid,
   .demo-grid,
   .two-col,
-  .team-grid,
   .contact-grid {
     grid-template-columns: 1fr;
   }
@@ -529,7 +504,6 @@ h1 {
     padding: 56px 16px 42px;
   }
 
-  .profile,
   .step {
     grid-template-columns: 1fr;
   }
@@ -741,15 +715,10 @@ button:focus-visible {
   align-items: start;
 }
 
-.founder .avatar,
-.founder-portrait {
-  width: 120px;
-  height: 120px;
-  font-size: 34px;
-}
-
 .founder-portrait {
   display: block;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid var(--line);
@@ -777,6 +746,22 @@ button:focus-visible {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 18px;
+}
+
+.lab-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lab-identity img {
+  flex: 0 0 auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lab-identity h3 {
+  margin: 0;
 }
 
 .community-card {
