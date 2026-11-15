@@ -27,7 +27,18 @@ PRIVATE_TEXT = re.compile(
     r"(?<![\w.+-])[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+",
     re.IGNORECASE,
 )
-TEXT_SUFFIXES = {".html", ".js", ".css", ".json", ".czml", ".md", ".txt", ".xml", ".svg", ".webmanifest"}
+# A public scene must not point at a particular home: no house-numbered street
+# address, no building labelled with a house number, no house-numbered building id.
+_STREET_TYPE = (r"(?:Alley|Avenue|Ave|Boulevard|Blvd|Circle|Close|Court|Ct|Crescent|Drive|Dr|Highway|Hwy|Lane|Ln|"
+                r"Loop|Mews|Parkway|Pike|Place|Pl|Plaza|Road|Rd|Row|Square|Street|St|Terrace|Trail|Turnpike|Way)")
+HOUSE_LABEL = re.compile(
+    r"(?<![\w.#-])\d{1,5}(?:\s*-\s*\d{1,5})?[A-Z]?\s+(?:[A-Z][A-Za-z']+\s+){1,3}" + _STREET_TYPE + r"\b|"
+    r"\bbldg_\d+_[a-z]|"
+    r'(?:3D Building: |"display_?[nN]ame": ")\d{1,5}(?:\s*-\s*\d{1,5})?[A-Z]?(?=[ "<\\])|'
+    r"(?<![\w.#-])\d{1,5} (?:[A-Z][a-z]+ ){1,3}\((?:Townhouse|House|Home|Residence)\)"
+)
+JSON_ESCAPE = re.compile(r"\\u[0-9a-fA-F]{4}")
+TEXT_SUFFIXES = {".html", ".js", ".css", ".json", ".geojson", ".czml", ".md", ".txt", ".xml", ".svg", ".webmanifest"}
 
 
 def request_allowed(value: str, origin: str) -> bool:
@@ -67,6 +78,9 @@ def verify_scene(bundle: Path) -> dict:
             content = unescape(unquote(path.read_text(encoding="utf-8-sig"))).replace("\\\\", "\\")
             if PRIVATE_TEXT.search(content):
                 raise ValueError(f"Local path or email found in {path.relative_to(bundle).as_posix()}")
+            # Markup held inside JSON is escaped, so a house number can follow an escape.
+            if HOUSE_LABEL.search(JSON_ESCAPE.sub(" ", content)):
+                raise ValueError(f"House-numbered label found in {path.relative_to(bundle).as_posix()}")
         if path.suffix.lower() == ".glb" and (path.parent != bundle / "models" or not path.name.startswith("synth_")):
             raise ValueError("Only local Studio synthetic models are permitted")
     return {"scene": bundle.name, "verified_files": count, "bundle_bytes": size, "entry_bytes": page.stat().st_size,
