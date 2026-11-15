@@ -45,9 +45,32 @@
         <div class="section-heading">
           <p class="mini-label">Examples</p>
           <h2>Open an example.</h2>
-          <p>The examples use fictional scenes and generic sensor models. Geographic context, where shown, comes from public sources.</p>
+          <p>Every example uses fictional scenes and generic sensor models. None represents a real radar, customer system, threat system or operational performance. Geographic context, where shown, comes from public sources.</p>
         </div>
+        <div class="demo-grid">
+          <article class="card demo-card">
+            <span class="badge preview">Workbench export</span>
+            <h3>King Farm in 3D</h3>
+            <p>The S³ Workbench's 3D studio, running in your browser. An airborne radar circles King Farm in Rockville, Maryland, over USGS aerial imagery and OpenStreetMap buildings. It watches cars, trucks, a drone and an airliner among the neighbourhood's buildings. Play the scenario, orbit the scene, switch between visual, infrared, radar and tactical lenses, and open the radar display.</p>
+            <p class="meta">This is the same Cesium studio the Workbench serves, with self-hosted CesiumJS, USGS and USDA NAIP imagery, OpenStreetMap buildings and S³ synthetic models. The terrain under King Farm is a synthetic stand-in, and the lenses are display representations, not calibrated sensor imagery.</p>
+            <a class="button" href="demos/s3/studio/king-farm/index.html">Open the 3D studio</a>
+          </article>
+          <article class="card demo-card">
+            <span class="badge preview">Workbench export</span>
+            <h3>South Mountain I-70 ridge crossing</h3>
+            <p>An airborne radar watches I-70 traffic, a drone, a helicopter and a light aircraft cross South Mountain near Boonsboro, Maryland. The terrain is USGS 3D Elevation Program data, so the ridge really hides some targets from the radar.</p>
+            <a class="button" href="demos/s3/studio/south-mountain/index.html">Open the 3D studio</a>
+          </article>
+        </div>
+      </div>
+    </section>
 
+    <section class="section" id="recorded-run">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Recorded run</p>
+          <h2>Step through a recorded radar run.</h2>
+        </div>
         <div class="featured-demo">
           <article class="card demo-card">
             <span class="badge recorded">Recorded Workbench run</span>
@@ -65,36 +88,31 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section alt" id="classic-demos">
       <div class="section-inner">
-        <div class="grid">
+        <div class="section-heading">
+          <p class="mini-label">Classic concept explorers</p>
+          <h2>The original browser demos.</h2>
+          <p>These two demos draw their values in the browser to illustrate ideas. They are kept at their original addresses.</p>
+        </div>
+        <div class="demo-grid">
           <article class="card demo-card">
-            <span class="badge preview">Workbench export</span>
-            <h3>King Farm in 3D</h3>
-            <p>The S³ Workbench's 3D studio, running in your browser. An airborne radar circles King Farm in Rockville, Maryland, over USGS aerial imagery and OpenStreetMap buildings. It watches cars, trucks, a drone and an airliner among the neighbourhood's buildings. Play the scenario, orbit the scene, switch between visual, infrared, radar and tactical lenses, and open the radar display.</p>
-            <p class="meta">This is the same Cesium studio the Workbench serves, with self-hosted CesiumJS, USGS and USDA NAIP imagery, OpenStreetMap buildings and S³ synthetic models. The terrain under King Farm is a synthetic stand-in, and the lenses are display representations, not calibrated sensor imagery.</p>
-            <a class="button" href="demos/s3/studio/king-farm/index.html">Open the 3D studio</a>
-          </article>
-          <article class="card demo-card">
-            <span class="badge preview">Workbench export</span>
-            <h3>South Mountain I-70 ridge crossing</h3>
-            <p>An airborne radar watches I-70 traffic, a drone, a helicopter and a light aircraft cross South Mountain near Boonsboro, Maryland. The terrain is USGS 3D Elevation Program data, so the ridge really hides some targets from the radar.</p>
-            <a class="button" href="demos/s3/studio/south-mountain/index.html">Open the 3D studio</a>
-          </article>
-          <article class="card demo-card" id="classic-demos">
             <span class="badge illustrative">Illustrative</span>
-            <h3>Classic concept explorers</h3>
-            <p>The site's two original browser demos, kept at their original addresses. They draw synthetic values in the browser to illustrate design-of-experiments thinking and a scenario dashboard.</p>
-            <div class="hero-actions">
-              <a class="button secondary" href="demos/radar_doe_website_visualization.html">Radar DoE explorer</a>
-              <a class="button secondary" href="demos/radar_sim_ui.html">Scenario dashboard</a>
-            </div>
+            <h3>Radar DoE Scenario Intelligence</h3>
+            <p>A synthetic design-of-experiments visualization showing sample selection, flypath geometry, a range-Doppler image and SNR/Pd proxy behavior.</p>
+            <a class="button secondary" href="demos/radar_doe_website_visualization.html">Open the DoE explorer</a>
+          </article>
+          <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
+            <h3>ECCM Sandbox Scenario Dashboard</h3>
+            <p>A browser-based synthetic scenario dashboard with controls for radar/waveform settings, target motion, clutter/noise, motion compensation and range-Doppler visualization.</p>
+            <a class="button secondary" href="demos/radar_sim_ui.html">Open the dashboard</a>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section alt" id="evidence">
+    <section class="section" id="evidence">
       <div class="section-inner two-col">
         <div>
           <div class="section-heading">
@@ -124,7 +142,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section alt">
       <div class="section-inner">
         <div class="section-heading">
           <p class="mini-label">Inside S³</p>
@@ -141,7 +159,7 @@
       </div>
     </section>
 
-    <section class="section alt">
+    <section class="section">
       <div class="section-inner grid">
         <article class="card">
           <h3>Real places, public data</h3>
