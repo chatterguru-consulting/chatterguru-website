@@ -24,7 +24,7 @@
   });
 
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && header.classList.contains("nav-open")) {
       setMenuOpen(false);
       toggle.focus();
     }

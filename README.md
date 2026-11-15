@@ -1,29 +1,31 @@
-# Chatterguru Website Concept Pages
+# Chatterguru Consulting website
 
-This folder contains static HTML mockups for replacing the current Squarespace placeholder at `https://chatterguru.com`.
+This is the source for [chatterguru.com](https://www.chatterguru.com/), a static site about Chatterguru Consulting and Sensor Scenario Studio (S³).
 
-## Source Inputs
+## Preview locally
 
-- Live site check: the current site resolves to a Squarespace "Coming Soon" placeholder.
-- Brochure text source: `Chatterguru Brochure Text.docx`.
-- Brand image source: extracted from the brochure Word file as `assets/brochure-image.png`.
+From the repository root, start a loopback web server.
 
-## Proposed Page Set
+```bash
+python -m http.server 8000 --bind 127.0.0.1
+```
 
-- `index.html`: homepage and company positioning.
-- `capabilities.html`: overview of service lines.
-- `systems-engineering.html`: systems engineering, integration, MBSE, and visualization.
-- `radar-rf-ew.html`: RF, IR, satellite, radar, EW, and advanced sensing support.
-- `software-cyber.html`: secure software, DevSecOps, embedded software, and cybersecurity.
-- `ai-data-science.html`: AI, machine learning, analytics, optimization, and simulation.
-- `engagement-models.html`: practical ways to start reviews, prototypes, and delivery-support work.
-- `case-study-templates.html`: public-safe structures for future cleared case studies.
-- `team.html`: expert team profiles.
-- `contact.html`: founder contact information and inquiry topics.
+Open [the local homepage](http://127.0.0.1:8000/). Use the server for the 3D scenes so the browser can load the imagery and models.
 
-## Squarespace Build Notes
+## Find your way around
 
-- Use these as page copy and layout direction rather than a final Squarespace export.
-- Keep the public radar/RF/EW language high-level and non-sensitive.
-- Use the case study template page before publishing any client example, and only add cleared public content.
-- Consider replacing the extracted brochure image with a polished brand/logo asset when available.
+- [Home](index.html) introduces the practice and links to the [capabilities](capabilities.html).
+- [S³ Studio](s3-studio.html) is the demo gallery. It links to the King Farm and South Mountain Workbench exports, a recorded radar replay, and the original browser explorers. The evidence labels explain what produced each view.
+- [Founder & Lab](about.html) covers Chatterpaul Joseph’s career, the lab, and community service. [Run for Jericho](run-for-jericho.html) has its own public address.
+- [Contact](contact.html) lists ways to get in touch about a briefing or a technical question.
+- `team.html` and `case-study-templates.html` are forwarding pages. Nothing links to them on purpose: they send visitors who still have the old addresses to Founder & Lab and S³ Studio.
+- `favicon.ico` is the browser tab icon, and `assets/og-s3-studio.jpg` is the picture shown when a page is shared.
+
+## Validate before publishing
+
+```bash
+python -B -m unittest discover -s tools
+python -B tools/verify_s3_preview.py . --bundle demos/s3/recorded-crossing
+```
+
+See [S³ viewer verification](docs/S3_VIEWER_VERIFICATION.md) for the scene and Cesium integrity checks, browser tests, attribution, and the iPhone Safari checklist. GitHub Pages serves the live site from `main`. Review changes on the open website PR before merging.

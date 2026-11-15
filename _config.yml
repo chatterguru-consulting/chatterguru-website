@@ -1,0 +1,6 @@
+# GitHub Pages (Jekyll) build settings.
+# Keep development docs and verification tools outside the public site.
+exclude:
+  - README.md
+  - docs/
+  - tools/

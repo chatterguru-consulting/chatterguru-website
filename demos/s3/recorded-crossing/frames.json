@@ -1,0 +1,34 @@
+[
+  {
+    "id": "reference-0",
+    "time_s": 2.5,
+    "source_sha256": "e1b21d14b5a54d699949b1c176930f9d18674fecc6716a4d81a75d758c2292bc",
+    "observations": 2,
+    "tracks": 2,
+    "image": "cpi-1.png"
+  },
+  {
+    "id": "reference-1",
+    "time_s": 7.5,
+    "source_sha256": "158e61df335a223facb77f3cb7ebc6def0d754b11e90d687e0c2d4b658748659",
+    "observations": 2,
+    "tracks": 2,
+    "image": "cpi-2.png"
+  },
+  {
+    "id": "reference-2",
+    "time_s": 12.5,
+    "source_sha256": "26017634b5e94b356dca4ed7b055aa3a5d8735e9f1a2c06ccf33817ff0128e6d",
+    "observations": 2,
+    "tracks": 2,
+    "image": "cpi-3.png"
+  },
+  {
+    "id": "reference-3",
+    "time_s": 17.5,
+    "source_sha256": "3ccc4b926234bfd3bb2a920c94df1157a6e8a7fa1e840189eae4ee38115bc5df",
+    "observations": 2,
+    "tracks": 2,
+    "image": "cpi-4.png"
+  }
+]

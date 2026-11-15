@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensor Scenario Studio (S³) | Chatterguru Consulting LLC</title>
+  <meta name="description" content="Sensor Scenario Studio (S³) is a Workbench for building scenes, running synthetic sensor simulations and inspecting recorded results.">
+  <link rel="canonical" href="https://www.chatterguru.com/s3-studio.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chatterguru Consulting LLC">
+  <meta property="og:title" content="Sensor Scenario Studio (S³) | Chatterguru Consulting LLC">
+  <meta property="og:description" content="Sensor Scenario Studio (S³) is a Workbench for building scenes, running synthetic sensor simulations and inspecting recorded results.">
+  <meta property="og:url" content="https://www.chatterguru.com/s3-studio.html">
+  <meta property="og:image" content="https://www.chatterguru.com/assets/og-s3-studio.jpg">
+  <meta property="og:image:alt" content="A radar beam footprint over King Farm in the Sensor Scenario Studio 3D scene">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15">
+  <script src="assets/site.js?v=2026-11-15" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a aria-current="page" href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+
+  <main id="main">
+    <section class="hero page-hero">
+      <div class="hero-content">
+        <p class="eyebrow">Sensor Scenario Studio · S³</p>
+        <h1>From a scene on the globe to a track on the screen.</h1>
+        <p>S³ is Chatterguru’s Workbench for radar and multispectral simulation. Build a fictional scene, run a supported sensor model and inspect the products saved by that run.</p>
+        <div class="hero-actions">
+          <a class="button" href="#examples">Try an example</a>
+          <a class="button secondary" href="#evidence">How to read the labels</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="examples">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Examples</p>
+          <h2>Open an example.</h2>
+          <p>Every example uses fictional scenes and generic sensor models. None represents a real radar, customer system, threat system or operational performance. Geographic context, where shown, comes from public sources.</p>
+        </div>
+        <div class="demo-grid">
+          <article class="card demo-card">
+            <span class="badge preview">Workbench export</span>
+            <h3>King Farm in 3D</h3>
+            <p>The S³ Workbench's 3D studio, running in your browser. An airborne radar circles King Farm in Rockville, Maryland, over USGS aerial imagery and OpenStreetMap buildings. It watches cars, trucks, a drone and an airliner among the neighbourhood's buildings. Play the scenario, orbit the scene, switch between visual, infrared, radar and tactical lenses, and open the radar display.</p>
+            <p class="meta">This is the same Cesium studio the Workbench serves, with self-hosted CesiumJS, USGS and USDA NAIP imagery, OpenStreetMap buildings and S³ synthetic models. The terrain under King Farm is a synthetic stand-in, and the lenses are display representations, not calibrated sensor imagery.</p>
+            <a class="button" href="demos/s3/studio/king-farm/index.html">Open the 3D studio</a>
+          </article>
+          <article class="card demo-card">
+            <span class="badge preview">Workbench export</span>
+            <h3>South Mountain I-70 ridge crossing</h3>
+            <p>An airborne radar watches I-70 traffic, a drone, a helicopter and a light aircraft cross South Mountain near Boonsboro, Maryland. The terrain is USGS 3D Elevation Program data, so the ridge really hides some targets from the radar.</p>
+            <a class="button" href="demos/s3/studio/south-mountain/index.html">Open the 3D studio</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="recorded-run">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Recorded run</p>
+          <h2>Step through a recorded radar run.</h2>
+        </div>
+        <div class="featured-demo">
+          <article class="card demo-card">
+            <span class="badge recorded">Recorded Workbench run</span>
+            <h3>Recorded radar replay</h3>
+            <p>Four captures from a completed 20-second Workbench run with two fictional targets. Range–Doppler, scene truth, radar observations and track estimates share the same capture time.</p>
+            <p class="meta">The plots were rendered from retained Workbench arrays; capture times, counts, source revision and file digests are in the bundle manifest.</p>
+            <a class="button" href="demos/s3/recorded-crossing/index.html">Open recorded replay</a>
+          </article>
+          <div class="step-list compact" aria-label="What the replay lets you do">
+            <div class="step"><b>Step</b><span>Step through captures at 2.5, 7.5, 12.5 and 17.5 seconds.</span></div>
+            <div class="step"><b>Compare</b><span>Compare scene truth, radar observations and track estimates at the same capture time.</span></div>
+            <div class="step"><b>Check</b><span>Find the source revision and file digests in the replay’s bundle manifest.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="classic-demos">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Classic concept explorers</p>
+          <h2>The original browser demos.</h2>
+          <p>These two demos draw their values in the browser to illustrate ideas. They are kept at their original addresses.</p>
+        </div>
+        <div class="demo-grid">
+          <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
+            <h3>Radar DoE Scenario Intelligence</h3>
+            <p>A synthetic design-of-experiments visualization showing sample selection, flypath geometry, a range-Doppler image and SNR/Pd proxy behavior.</p>
+            <a class="button secondary" href="demos/radar_doe_website_visualization.html">Open the DoE explorer</a>
+          </article>
+          <article class="card demo-card">
+            <span class="badge illustrative">Illustrative</span>
+            <h3>ECCM Sandbox Scenario Dashboard</h3>
+            <p>A browser-based synthetic scenario dashboard with controls for radar/waveform settings, target motion, clutter/noise, motion compensation and range-Doppler visualization.</p>
+            <a class="button secondary" href="demos/radar_sim_ui.html">Open the dashboard</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="evidence">
+      <div class="section-inner two-col">
+        <div>
+          <div class="section-heading">
+            <p class="mini-label">Evidence labels</p>
+            <h2>What each label means.</h2>
+          </div>
+          <div class="legend">
+            <div class="card">
+              <span class="badge recorded">Recorded Workbench run</span>
+              <p>The plots are rendered from products retained by a completed Workbench run. Capture times and displayed counts come from the recording. The bundle manifest identifies the source revision and file digests.</p>
+            </div>
+            <div class="card">
+              <span class="badge preview">Workbench export</span>
+              <p>The scene, target motion and sensor overlays were exported from the S³ Workbench, and your browser draws them with CesiumJS. It is not a saved processing run, and its lenses are display representations rather than calibrated sensor imagery.</p>
+            </div>
+            <div class="card">
+              <span class="badge illustrative">Illustrative</span>
+              <p>Values are drawn in the browser to explain an idea. They are not produced by the S³ processing chain.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="callout">
+          <h3>Public and educational</h3>
+          <p>S³ examples explore generic sensor models for education. Operational performance requires separate validation.</p>
+          <p>Additional open scripts comparing IR/laser-designator and RF interceptor seekers are in <a href="https://github.com/chatterpaul/SeekerTradeStudy" rel="noopener noreferrer">SeekerTradeStudy on GitHub</a>.</p>
+          <p>For a private technical briefing on the Workbench itself, <a href="contact.html">get in touch</a>.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Inside S³</p>
+          <h2>From scene to track</h2>
+          <p>Workflows retain different products for inspection. The recorded radar example shows the range–Doppler result, observations and tracker states.</p>
+        </div>
+        <ol class="pipeline">
+          <li><strong>Scene</strong><span>Fictional motion in a synthetic scene or a scene with public geographic context.</span></li>
+          <li><strong>Targets</strong><span>Selected target models include 3D geometry and modeled scattering points.</span></li>
+          <li><strong>Sensors</strong><span>Selected scenarios simulate airborne radar, ground radar or infrared sensing.</span></li>
+          <li><strong>Signal chain</strong><span>Pulse compression, range–Doppler processing, clutter suppression and CFAR detection.</span></li>
+          <li><strong>Tracks</strong><span>Detections become tracks; truth, observations and estimates stay side by side for checking.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner grid">
+        <article class="card">
+          <h3>Real places, public data</h3>
+          <p>Some scenes use public terrain and maps as context. Terrain masking and clutter depend on the selected model.</p>
+        </article>
+        <article class="card">
+          <h3>Radar and infrared together</h3>
+          <p>Selected scenarios explore synchronized radar and infrared views of the same scene.</p>
+        </article>
+        <article class="card">
+          <h3>Requirements to evidence</h3>
+          <p>Features are tied to written requirements and automated tests, in the spirit of model-based systems engineering.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="run-for-jericho.html">Run for Jericho</a>
+        <a href="contact.html">Contact</a>
+        <a href="https://www.linkedin.com/in/chatterpaul-joseph-300068104" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
