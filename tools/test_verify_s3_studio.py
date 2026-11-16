@@ -60,3 +60,18 @@ class ScenePackageTest(unittest.TestCase):
                     write_manifest()
                     with self.assertRaisesRegex(ValueError, "Local path or email"):
                         verify_scene(bundle)
+            # A public scene must not point at a particular home (made-up examples).
+            for unsafe in ("12 Example Hill Lane", '{"featureId": "bldg_12_example"}',
+                           '{"displayName": "40-46"}', "3D Building: 12 Example",
+                           "\\u003e12 Example (Townhouse)\\u003c", "8 Sample Crescent"):
+                with self.subTest(unsafe=unsafe):
+                    ledger.write_text("USGS OpenStreetMap " + unsafe, encoding="utf-8")
+                    write_manifest()
+                    with self.assertRaisesRegex(ValueError, "House-numbered label"):
+                        verify_scene(bundle)
+            # Street names, numbered roads and labels that merely contain a number are fine.
+            ledger.write_text("USGS OpenStreetMap Example Hill Lane; I-70 Ridge Crossing; "
+                              "Face 4 Radar Beam Frustum; 1st Sidelobe Footprint; Fixture road 2 Corridor (Paved Street)",
+                              encoding="utf-8")
+            write_manifest()
+            self.assertEqual(verify_scene(bundle)["verified_files"], 2)
