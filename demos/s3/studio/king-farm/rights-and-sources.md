@@ -1,7 +1,7 @@
 # King Farm, Rockville, Maryland: data sources and credits
 
 This page is the S³ Workbench Cesium Scenario Studio exported for the public website.
-The scene, target motion and sensor overlays come from the Workbench export at source revision `ed1a9c6a7610e3103541680762baf833552bc449`.
+The scene, target motion and sensor overlays come from the Workbench export at source revision `1fbe66375fdb6580bb5ff4c28f0ce2b0fca8e205`.
 Your browser draws them. The sensors are simulated with generic, educational models, and the
 targets and missions are fictional.
 
