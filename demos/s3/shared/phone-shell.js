@@ -1,41 +1,49 @@
 /*
- * Phone layout for every published 3D scene on chatterguru.com (written by
- * scripts/publish_website_viewer.py into demos/s3/shared/; styles in phone-shell.css).
+ * Phone layout for the Workbench 3D exports (Studio and AESA; styles in
+ * studio_phone_shell.css). Inlined by the builders; the website publisher copies it
+ * to demos/s3/shared/ for pages published before it was inlined (#1419).
  *
  * Adds one Menu button to the scene's top bar. The menu sheet lists only the controls
  * this page has: actions click the page's own buttons, and panels (radar console, step
  * controls, map key, camera feed) open one at a time as a bottom sheet. While a panel is
- * open the Menu button closes it. Nothing changes above 760 px.
+ * open the Menu button closes it. Nothing changes above 760 x 500 px.
  */
 (function () {
   'use strict';
-  var PHONE = window.matchMedia('(max-width: 760px)');
+  var PHONE = window.matchMedia('(max-width: 760px), (max-height: 500px)');
   var byId = function (id) { return document.getElementById(id); };
 
   // label, icon, and what it does: click an existing button, open a panel, or follow a link.
   var ACTIONS = [
     { group: 'Scene', label: 'Restart', icon: '↺', click: 'btnResetSim' },
     { group: 'Scene', label: 'Map controls', icon: '\u{1F5FA}', click: 'workspaceView' },
-    { group: 'Scene', label: 'Inspect', icon: '\u{1F50E}', click: 'workspaceTelemetry' },
+    // Inspect opens the radar console as a sheet (on a phone it stays hidden until opened).
+    { group: 'Scene', label: 'Inspect', icon: '\u{1F50E}', panel: ['radarHud', 'swtHud'] },
     { group: 'Scene', label: 'Statistics', icon: '\u{1F4C8}', click: 'btnSwtStats' },
     { group: 'Scene', label: 'Build scene', icon: '\u{1F9F1}', click: 'workspaceBuild' },
-    { group: 'Panels', label: 'Radar console', icon: '\u{1F4E1}', panel: ['radarHud', 'swtHud'] },
     { group: 'Panels', label: 'Step controls', icon: '⏯', panel: ['touchReplayBar'] },
     { group: 'Panels', label: 'Camera feed', icon: '\u{1F321}', panel: ['swtEoirCue'] },
     { group: 'Panels', label: 'Map key', icon: '\u{1F511}', panel: ['studioMapKey'] },
+    { group: 'Panels', label: 'Colour scale', icon: '\u{1F3A8}', panel: ['floatingColorbarScale'] },
+    { group: 'Panels', label: 'Legend', icon: '\u{1F4CB}', panel: ['tacticalLegend', 'cesiumLegendBox'] },
     { group: 'Panels', label: 'About the model', icon: 'ℹ', panel: ['swtModelNote'] },
     { group: 'More', label: 'Help', icon: '?', click: 'workspaceHelp' },
-    { group: 'More', label: 'Data credits', icon: '©', href: 'credits.html' },
-    { group: 'More', label: 'All 3D scenes', icon: '←', href: 'gallery' },
+    // Website pages only (a local Workbench export has no credits page or gallery).
+    { group: 'More', label: 'Data credits', icon: '©', href: 'credits.html', site: true },
+    { group: 'More', label: 'All 3D scenes', icon: '←', href: 'gallery', site: true },
   ];
 
   var state = { panel: null, panelEl: null, wasCollapsed: false };
 
   function present(a) {
+    if (a.site && !document.querySelector('.s3-site-bar')) return false;
     if (a.click) { var b = byId(a.click); return !!b && !b.hidden; }
-    if (a.panel) return a.panel.some(byId);
+    // A panel the workspace already moved into its Map controls drawer is reached there.
+    if (a.panel) return a.panel.some(function (id) { var el = byId(id); return !!el && !inDrawer(el); });
     return true;
   }
+
+  function inDrawer(el) { return !!(el.closest && el.closest('#workspacePanel')); }
 
   function galleryHref() {
     var back = document.querySelector('.s3-site-bar a[href$="s3-studio.html"]');
@@ -61,7 +69,7 @@
 
   function openPanel(a) {
     closePanel();
-    var el = a.panel.map(byId).filter(Boolean)[0];
+    var el = a.panel.map(byId).filter(function (e) { return e && !inDrawer(e); })[0];
     if (!el) return;
     state.wasCollapsed = el.classList.contains('collapsed');
     el.classList.remove('collapsed');
@@ -105,7 +113,26 @@
       });
       html += '</div>';
     });
+    // The Workbench Studio's scene switcher sits in the top bar, which a phone hides; offer
+    // it here when the page shows one (the website hides it on purpose).
+    var scene = byId('selSceneMode');
+    if (scene && getComputedStyle(scene).display !== 'none' && scene.options && scene.options.length > 1) {
+      html += '<h3>Switch scene</h3><select id="psSceneSelect" class="ps-item" aria-label="Scene">';
+      for (var i = 0; i < scene.options.length; i++) {
+        var o = scene.options[i];
+        html += '<option value="' + esc(o.value) + '"' + (o.selected ? ' selected' : '') + '>' + esc(o.textContent) + '</option>';
+      }
+      html += '</select>';
+    }
     sheet.innerHTML = html;
+    var mirror = sheet.querySelector ? sheet.querySelector('#psSceneSelect') : null;
+    if (mirror) {
+      mirror.addEventListener('change', function () {
+        scene.value = mirror.value;
+        scene.dispatchEvent(new Event('change', { bubbles: true }));
+        closeSheet();
+      });
+    }
     sheet.addEventListener('click', function (ev) {
       var t = ev.target.closest('[data-ps]');
       if (!t) return;

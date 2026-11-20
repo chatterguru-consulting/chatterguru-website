@@ -254,7 +254,8 @@ def browser_check(browser, origin: str, bundle: Path, width: int, height: int, *
             errors.append("Layout did not fit the viewport")
         if not evidence_visible:
             errors.append("Scene evidence label was not visible")
-        if width < 500 and not phone_menu:
+        # A phone is up to 760 px wide or 500 px tall (landscape), as in the phone layout.
+        if (width <= 760 or height <= 500) and not phone_menu:
             errors.append("Phone layout has no scene menu")
         if covered is not None and covered > PHONE_MAX_COVERED:
             errors.append(f"Floating controls cover {covered:.0%} of the phone screen")
@@ -319,7 +320,7 @@ def main():
                         "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
                     ])
                     results = [browser_check(browser, origin, scene, w, h, site=site, shots=args.screenshots)
-                               for scene in scenes for w, h in ((1360, 900), (390, 844), (320, 568))]
+                               for scene in scenes for w, h in ((1360, 900), (390, 844), (844, 390), (320, 568))]
             finally:
                 server.shutdown()
                 thread.join()
