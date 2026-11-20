@@ -1,0 +1,53 @@
+{
+  "schema": 2,
+  "evidence": {
+    "kind": "aesa-export",
+    "source_head": "9853635cdc913cc076eb8c20f4c344e32d43c8bf",
+    "scene_id": "maritime",
+    "osm": false,
+    "exporter": "scripts/publish_website_viewer.py",
+    "cesium": "1.119.0"
+  },
+  "files": {
+    "credits.html": {
+      "bytes": 4279,
+      "sha256": "e47f947d4e0cbd21952795182a3ec82df58dabea3bf7e1d73048e3f120888900"
+    },
+    "icons/icon-192.png": {
+      "bytes": 2952,
+      "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
+    },
+    "index.html": {
+      "bytes": 1238411,
+      "sha256": "0d14e60f6dfe618aed8a8ee42e9a66b24bbd43e45377e42360cf51660e70e88c"
+    },
+    "models/synth_bird_flock.glb": {
+      "bytes": 53440,
+      "sha256": "691cb8c96924aceb7e7071f6417af3700381fd9949ba9067867aed3618b18b2e"
+    },
+    "models/synth_helicopter.glb": {
+      "bytes": 55160,
+      "sha256": "d960e4905b92b3a3dc68ec5d60fe34e3e5642adac84e1c47645cc860ef060575"
+    },
+    "models/synth_large_ship.glb": {
+      "bytes": 31756,
+      "sha256": "ce70de6ce1bab998eabdd108137334ebda6bd7bb6a1b42c9bffc89bf7866c306"
+    },
+    "models/synth_light_aircraft.glb": {
+      "bytes": 22928,
+      "sha256": "5735e1e5e5d3e8c49f26dd8f076028d13dbcba01fc9b1b839c754269dcd8229b"
+    },
+    "models/synth_quadcopter.glb": {
+      "bytes": 38036,
+      "sha256": "48132f2ee4f3e3470bcee22f795539453cb08422c38fd8a8bcadfe3540b5f5df"
+    },
+    "models/synth_small_boat.glb": {
+      "bytes": 10088,
+      "sha256": "c974d979288cef51dfc2a9d35c90254e1de3f95c9d22535bc27b3d3abcfa8974"
+    },
+    "rights-and-sources.md": {
+      "bytes": 2324,
+      "sha256": "c06a7b7f0b021ccda9bbe34f7f969b6af9330d04d05c66c4b613dba1d52a077c"
+    }
+  }
+}

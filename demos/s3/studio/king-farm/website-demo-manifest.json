@@ -4425,8 +4425,8 @@
       "sha256": "8cb868b5939c1dd98848d4d87456017c578c846e58b9f23a0678e6de1d97d1df"
     },
     "index.html": {
-      "bytes": 11769224,
-      "sha256": "bd6597721e9c40b6b5f21d273bae8ed503e116129cf953594d1c39831fdf3dff"
+      "bytes": 11769346,
+      "sha256": "bfa8009e2b5385eb9c17e1bcdd2339f78a57d60f0cd94f3f82953650d7669cbf"
     },
     "models/synth_airliner.glb": {
       "bytes": 35884,

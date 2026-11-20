@@ -20,6 +20,11 @@ CESIUM = "cesium-1.119.0"
 CESIUM_TARBALL_SHA256 = "2daa7203af810ddb320d7990ef26812309336f4559b3d9b2d1b1450f8110cd7d"
 USGS = "basemap.nationalmap.gov"
 SCENES = Path("demos/s3/studio")
+# AESA search-while-track scenes (published by the same exporter, kind "aesa-export").
+AESA_SCENES = Path("demos/s3/aesa")
+# On a phone, floating controls may cover at most this share of the screen once the
+# scene has loaded (the map should get the screen; everything else waits in the menu).
+PHONE_MAX_COVERED = 0.15
 PRIVATE_TEXT = re.compile(
     r"file:(?:/{1,3}|\\)|\b[a-z]:[\\/](?:users|documents|windows|temp|onedrive|"
     r"program files(?: \(x86\))?|work(?:space)?|python\d+)(?:[\\/]|\b)|"
@@ -61,7 +66,9 @@ def verify_scene(bundle: Path) -> dict:
     page = bundle / "index.html"
     markup = unescape(page.read_text(encoding="utf-8"))
     ledger = (bundle / "rights-and-sources.md").read_text(encoding="utf-8")
-    credits = ("USGS", "OpenStreetMap")
+    evidence = json.loads((bundle / MANIFEST).read_text(encoding="utf-8")).get("evidence", {})
+    uses_osm = evidence.get("kind") != "aesa-export" or bool(evidence.get("osm"))
+    credits = ("USGS", "OpenStreetMap") if uses_osm else ("USGS",)
     if (bundle / "imagery/naip/extent.json").is_file():
         credits += ("NAIP",)
     if not all(credit in ledger and credit in markup for credit in credits):
@@ -137,7 +144,33 @@ def _network_location(url: str, origin: str) -> str:
     return "self" if f"{parsed.scheme}://{parsed.netloc}" == origin else (parsed.hostname or parsed.scheme)
 
 
-def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -> dict:
+def _bundle_uses_osm(bundle: Path) -> bool:
+    evidence = json.loads((bundle / MANIFEST).read_text(encoding="utf-8")).get("evidence", {})
+    return evidence.get("kind") != "aesa-export" or bool(evidence.get("osm"))
+
+
+# Share of the screen covered by floating page controls (not the map, its credits or
+# the timeline), as a union on a coarse grid.
+COVERED_JS = """() => {
+  const W = innerWidth, H = innerHeight, step = 8, cols = Math.ceil(W / step), rows = Math.ceil(H / step);
+  const grid = new Uint8Array(cols * rows);
+  const skip = el => el.closest('#cesiumContainer .cesium-widget, .cesium-viewer-bottom, .cesium-viewer-timelineContainer, .cesium-viewer-fullscreenContainer, .cesium-credit-lightbox-overlay');
+  document.querySelectorAll('body *').forEach(el => {
+    const cs = getComputedStyle(el);
+    if (!(cs.position === 'fixed' || cs.position === 'absolute') || cs.display === 'none' || cs.visibility === 'hidden') return;
+    if (el.id === 'cesiumContainer' || skip(el) || parseFloat(cs.opacity) === 0) return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4 || r.width * r.height > 0.95 * W * H) return;
+    for (let y = Math.max(0, Math.floor(r.top / step)); y < Math.min(rows, Math.ceil(r.bottom / step)); y++)
+      for (let x = Math.max(0, Math.floor(r.left / step)); x < Math.min(cols, Math.ceil(r.right / step)); x++) grid[y * cols + x] = 1;
+  });
+  let n = 0; for (const v of grid) n += v;
+  return n / grid.length;
+}"""
+
+
+def browser_check(browser, origin: str, bundle: Path, width: int, height: int, *, site: Path | None = None,
+                  shots: Path | None = None) -> dict:
     """Capture and restrict page traffic during a real WebGL load and playback."""
     context = browser.new_context(viewport={"width": width, "height": height},
                                   has_touch=width < 500, is_mobile=width < 500, service_workers="block")
@@ -165,23 +198,44 @@ def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -
         page = context.new_page()
         page.set_default_timeout(45_000)
         advanced = False
+        covered = None
+        phone_menu = False
         credit_text = ""
         layout_ok = False
         evidence_visible = False
         subtitle = ""
 
         try:
-            page.goto(f"{origin}/{SCENES.as_posix()}/{bundle.name}/index.html", wait_until="domcontentloaded")
+            rel = bundle.relative_to(site).as_posix() if site else f"{SCENES.as_posix()}/{bundle.name}"
+            page.goto(f"{origin}/{rel}/index.html", wait_until="domcontentloaded")
             page.wait_for_function("""() => typeof viewer !== 'undefined' && Boolean(viewer?.dataSources?.length)
                 && Boolean(document.querySelector('#cesiumContainer canvas'))""")
-            credit = page.locator(".cesium-credit-textContainer").filter(has_text="OpenStreetMap").first
+            credit = page.locator(".cesium-credit-textContainer").filter(
+                has_text="OpenStreetMap" if _bundle_uses_osm(bundle) else "USGS").first
             credit.wait_for(state="visible")
             credit_text = credit.inner_text()
-            page.locator(".s3-site-bar a[href='credits.html'], .s3-site-bar a[href='rights-and-sources.md']"
-                         ).first.wait_for(state="visible")
-            subtitle = page.locator("#studioSubTitle").inner_text()
-            evidence_visible = page.locator("#scenePreviewBadge").is_visible() or page.locator(".s3-evidence").is_visible()
+            if page.locator("#studioSubTitle").count():
+                subtitle = page.locator("#studioSubTitle").inner_text()
+            page.wait_for_timeout(1500)
             layout_ok = page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+            if shots:
+                page.screenshot(path=str(shots / f"{bundle.parent.name}-{bundle.name}-{width}x{height}.png"))
+            menu = page.locator("#psMenuBtn")
+            if menu.count() and menu.is_visible():
+                # Phone layout: controls live in the menu.
+                phone_menu = True
+                covered = page.evaluate(COVERED_JS)
+                menu.click()
+                page.locator("#psSheet a[href='credits.html']").wait_for(state="visible")
+                evidence_visible = page.locator("#psSheet .s3-evidence").is_visible()
+                if shots:
+                    page.screenshot(path=str(shots / f"{bundle.parent.name}-{bundle.name}-{width}x{height}-menu.png"))
+                page.keyboard.press("Escape")
+            else:
+                page.locator(".s3-site-bar a[href='credits.html'], .s3-site-bar a[href='rights-and-sources.md']"
+                             ).first.wait_for(state="visible")
+                evidence_visible = (page.locator("#scenePreviewBadge").is_visible()
+                                    or page.locator(".s3-evidence").first.is_visible())
             before = page.evaluate("viewer.clock.currentTime.toString()")
             page.locator("#btnRunSim").click()
             page.wait_for_timeout(10_000)
@@ -200,8 +254,13 @@ def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -
             errors.append("Layout did not fit the viewport")
         if not evidence_visible:
             errors.append("Scene evidence label was not visible")
+        if width < 500 and not phone_menu:
+            errors.append("Phone layout has no scene menu")
+        if covered is not None and covered > PHONE_MAX_COVERED:
+            errors.append(f"Floating controls cover {covered:.0%} of the phone screen")
         has_naip = (bundle / "imagery/naip/extent.json").is_file()
-        required_credits = ("USGS", "OpenStreetMap", "NAIP") if has_naip else ("USGS", "OpenStreetMap")
+        required_credits = ("USGS",) + (("OpenStreetMap",) if _bundle_uses_osm(bundle) else ()) + (
+            ("NAIP",) if has_naip else ())
         if not all(label in credit_text for label in required_credits):
             errors.append("Data credits were not visible")
         paths = [urlsplit(address).path for address, status in responses if status == 200]
@@ -219,6 +278,7 @@ def browser_check(browser, origin: str, bundle: Path, width: int, height: int) -
             "playback_advanced": advanced, "credit_text": credit_text, "subtitle": subtitle,
             "local_aerial_responses": len({path for path in paths if "/imagery/naip/" in path}),
             "models_loaded": sorted({Path(path).name for path in paths if "/models/synth_" in path}),
+            "phone_menu": phone_menu, "phone_covered_share": covered,
             "ok": not (external or errors or broken),
         }
     finally:
@@ -231,12 +291,17 @@ def main():
     parser.add_argument("--cesium-tarball", required=True, type=Path)
     parser.add_argument("--browser", default="msedge", help="Playwright Chromium channel, e.g. chrome or msedge")
     parser.add_argument("--report", type=Path, help="Write the detailed audit report outside the site")
+    parser.add_argument("--screenshots", type=Path, help="Save a screenshot per scene and viewport here")
     args = parser.parse_args()
     site = args.site.resolve(strict=True)
     try:
         from playwright.sync_api import sync_playwright
 
         scenes = sorted((site / SCENES).iterdir())
+        if (site / AESA_SCENES).is_dir():
+            scenes += sorted(p for p in (site / AESA_SCENES).iterdir() if p.is_dir())
+        if args.screenshots:
+            args.screenshots.mkdir(parents=True, exist_ok=True)
         if not scenes:
             raise ValueError("No Studio scenes to verify")
         packages = [verify_scene(scene) for scene in scenes]
@@ -253,7 +318,7 @@ def main():
                     browser = playwright.chromium.launch(channel=args.browser, args=[
                         "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
                     ])
-                    results = [browser_check(browser, origin, scene, w, h)
+                    results = [browser_check(browser, origin, scene, w, h, site=site, shots=args.screenshots)
                                for scene in scenes for w, h in ((1360, 900), (390, 844), (320, 568))]
             finally:
                 server.shutdown()

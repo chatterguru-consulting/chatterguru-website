@@ -1,0 +1,76 @@
+/*
+ * Phone layout for every published 3D scene on chatterguru.com (written by
+ * scripts/publish_website_viewer.py into demos/s3/shared/).
+ *
+ * On a phone the map gets the screen. One compact bar holds the scene name, Play and
+ * Menu; every other control lives in the Menu sheet, and a panel opens one at a time as
+ * a bottom sheet. Wider screens are untouched.
+ */
+@media (max-width: 760px) {
+  /* Top bar: name | Play | Menu, one row. */
+  .ps-phone .top-bar {
+    grid-template-columns: minmax(0, 1fr) auto auto !important; align-items: center !important;
+    gap: 8px !important; padding: 6px 8px 6px 12px !important; border-radius: 12px !important;
+  }
+  .ps-phone .top-bar > *:not(.ps-title):not(.transport-controls):not(#psMenuBtn),
+  .ps-phone .top-bar .workspace-scene,
+  .ps-phone .top-bar .transport-controls > *:not(#btnRunSim) { display: none !important; }
+  .ps-phone .top-bar .top-title { font-size: 13px !important; }
+  .ps-phone .top-bar .workspace-preview-note { font-size: 10.5px !important; margin-top: 1px !important; }
+  .ps-phone #btnRunSim { min-width: 64px !important; min-height: 40px !important; padding: 6px 10px !important; }
+  #psMenuBtn {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 12px;
+    border-radius: 10px; border: 1px solid #4b6480; background: #11243a; color: #e2e8f0;
+    font: 700 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer;
+  }
+  #psMenuBtn[aria-expanded="true"], .ps-panel-open #psMenuBtn { border-color: #38bdf8; color: #e0f2fe; }
+
+  /* Everything that used to float over the map waits in the menu. */
+  .ps-phone #workspaceActions, .ps-phone .s3-site-bar, .ps-phone .cesium-viewer-toolbar,
+  .ps-phone .cesium-viewer-animationContainer, .ps-phone .studio-grip,
+  .ps-phone .ps-panel:not(.ps-show) { display: none !important; }
+
+  /* One panel at a time, as a sheet above the timeline. */
+  .ps-phone .ps-panel.ps-show {
+    display: block !important; position: fixed !important; inset: auto 8px calc(34px + env(safe-area-inset-bottom, 0px)) 8px !important;
+    top: auto !important; width: auto !important; max-width: none !important; max-height: 58dvh !important;
+    overflow: auto !important; transform: none !important; z-index: 170 !important; margin: 0 !important;
+  }
+
+  /* The menu sheet. */
+  #psSheet {
+    position: fixed; inset: auto 0 0 0; z-index: 200; max-height: 82dvh; overflow: auto;
+    padding: 6px 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-radius: 16px 16px 0 0;
+    background: #0f1b2d; border-top: 1px solid #334b66; box-shadow: 0 -12px 32px rgba(0, 0, 0, .55);
+    color: #e2e8f0; font: 15px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  #psSheet[hidden], #psScrim[hidden] { display: none; }
+  #psScrim { position: fixed; inset: 0; z-index: 199; background: rgba(2, 6, 23, .45); }
+  #psSheet .ps-grab { width: 40px; height: 4px; border-radius: 2px; background: #475569; margin: 6px auto 10px; }
+  #psSheet .ps-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  #psSheet .ps-head b { font-size: 15px; color: #f8fafc; }
+  #psSheet .ps-head span { font-size: 12px; color: #7dd3fc; }
+  #psSheet h3 { margin: 12px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+  #psSheet .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #psSheet .ps-item {
+    display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 10px 12px; border-radius: 12px;
+    border: 1px solid #2b3f58; background: #13243a; color: #e2e8f0; text-decoration: none; text-align: left;
+    font: 600 14px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer;
+  }
+  #psSheet .ps-item:active, #psSheet .ps-item:focus-visible { border-color: #38bdf8; outline: none; }
+  #psSheet .ps-item.ps-on { border-color: #38bdf8; background: #10314a; }
+  #psSheet .ps-item i { font-style: normal; width: 20px; text-align: center; }
+}
+@media (max-width: 760px) and (max-height: 640px) {
+  /* Short phones: the whole menu fits without scrolling. */
+  #psSheet { padding-top: 2px; }
+  #psSheet .ps-grab { margin: 4px auto 6px; }
+  #psSheet h3 { margin: 7px 0 3px; }
+  #psSheet .ps-grid { gap: 6px; }
+  #psSheet .ps-item { min-height: 42px; padding: 7px 10px; font-size: 13px; }
+  #psSheet .ps-head span { font-size: 11px; }
+}
+@media (min-width: 761px) {
+  #psMenuBtn, #psSheet, #psScrim { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) { #psSheet { scroll-behavior: auto; } }
