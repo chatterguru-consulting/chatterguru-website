@@ -1,0 +1,57 @@
+{
+  "schema": 2,
+  "evidence": {
+    "kind": "aesa-export",
+    "source_head": "839a8017cd8d1f8a157f9fb37dee1d4a046f2aff",
+    "scene_id": "king_farm_barn",
+    "osm": true,
+    "exporter": "scripts/publish_website_viewer.py",
+    "cesium": "1.119.0"
+  },
+  "files": {
+    "credits.html": {
+      "bytes": 4722,
+      "sha256": "e714cbcabebb26c6481cc5231d045b27c6f7776476ca39a1dd0f62c48e51fbd7"
+    },
+    "icons/icon-192.png": {
+      "bytes": 2952,
+      "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
+    },
+    "index.html": {
+      "bytes": 2943803,
+      "sha256": "7939537a4ab2c494cbada0ed0d9957c7f96f55857e14b90c1c5ab38be12287cf"
+    },
+    "models/synth_airliner.glb": {
+      "bytes": 35884,
+      "sha256": "a98724199239279b9dd7819f904c424d468423f5b757d74c6ff14bbd33739bcf"
+    },
+    "models/synth_car.glb": {
+      "bytes": 21512,
+      "sha256": "c0baaa26a10eb759b39133b2710a357dbd371b7dbf1564398ba8ab3750206446"
+    },
+    "models/synth_quadcopter.glb": {
+      "bytes": 38036,
+      "sha256": "48132f2ee4f3e3470bcee22f795539453cb08422c38fd8a8bcadfe3540b5f5df"
+    },
+    "models/synth_suv.glb": {
+      "bytes": 23904,
+      "sha256": "37ce118c7248a535600bcef8598152b9b8e697423d58bef72fc94cf7b2e598bb"
+    },
+    "models/synth_truck.glb": {
+      "bytes": 31944,
+      "sha256": "4a8d072a62e22158acf94e3571711e073798bf2e83dd05067d41fffb263aa16e"
+    },
+    "models/synth_van.glb": {
+      "bytes": 23212,
+      "sha256": "4974a5ed043471fcbb5a25e0ddd161e81ecd7647a036c7edbbc6748347d7b555"
+    },
+    "osm-derived-data.geojson": {
+      "bytes": 293158,
+      "sha256": "952955f177bd790532205b8c194b8922da66a93dc7dd3a96e3b859f1f37b078d"
+    },
+    "rights-and-sources.md": {
+      "bytes": 2688,
+      "sha256": "49cb9cb195a350ff28bf4935bf8aa2f5c1e46c1893696b7ce82ce2c6077ede68"
+    }
+  }
+}

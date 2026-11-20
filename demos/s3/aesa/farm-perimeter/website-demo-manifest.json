@@ -1,0 +1,61 @@
+{
+  "schema": 2,
+  "evidence": {
+    "kind": "aesa-export",
+    "source_head": "839a8017cd8d1f8a157f9fb37dee1d4a046f2aff",
+    "scene_id": "ground_surveillance",
+    "osm": false,
+    "exporter": "scripts/publish_website_viewer.py",
+    "cesium": "1.119.0"
+  },
+  "files": {
+    "credits.html": {
+      "bytes": 4293,
+      "sha256": "9602887e258e5b4a88696a3f24c8a7dabf72f4e61ba811953ed877120b72cc7c"
+    },
+    "icons/icon-192.png": {
+      "bytes": 2952,
+      "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
+    },
+    "index.html": {
+      "bytes": 1493592,
+      "sha256": "17d5a01b11114bfaaa4600d576e401c412e3390d7c5eaa37b21913b3512704d9"
+    },
+    "models/synth_car.glb": {
+      "bytes": 21512,
+      "sha256": "c0baaa26a10eb759b39133b2710a357dbd371b7dbf1564398ba8ab3750206446"
+    },
+    "models/synth_deer.glb": {
+      "bytes": 33264,
+      "sha256": "b230ef0d5fd8b923a702600726d3620a81aee0cbbe6dbff6a3833f4d40acd852"
+    },
+    "models/synth_helicopter.glb": {
+      "bytes": 55160,
+      "sha256": "d960e4905b92b3a3dc68ec5d60fe34e3e5642adac84e1c47645cc860ef060575"
+    },
+    "models/synth_light_aircraft.glb": {
+      "bytes": 22928,
+      "sha256": "5735e1e5e5d3e8c49f26dd8f076028d13dbcba01fc9b1b839c754269dcd8229b"
+    },
+    "models/synth_person.glb": {
+      "bytes": 15820,
+      "sha256": "ecccf98b141ed383fb8174a0acd12428828b42e8fa8993fdc82a4b7b4bbf71f7"
+    },
+    "models/synth_tracked_carrier.glb": {
+      "bytes": 7380,
+      "sha256": "8b66cbedd146160570867d339178b57b05b3d6656de5b5375814cb40223c0ecc"
+    },
+    "models/synth_truck.glb": {
+      "bytes": 31944,
+      "sha256": "4a8d072a62e22158acf94e3571711e073798bf2e83dd05067d41fffb263aa16e"
+    },
+    "models/synth_wheeled_carrier.glb": {
+      "bytes": 37604,
+      "sha256": "6d04ea5f0ef945a4c518f4133e695ad9d6ae6c630027d828ebf3b88923053933"
+    },
+    "rights-and-sources.md": {
+      "bytes": 2331,
+      "sha256": "45961d0282acbaced419c3bec8f484f5b944958debc41244b35d58729e807c70"
+    }
+  }
+}

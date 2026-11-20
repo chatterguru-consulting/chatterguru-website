@@ -128,8 +128,11 @@ def verify_bundle(bundle: Path, *, expected_schema: int | None = None) -> tuple[
     else:
         required = {"kind", "source_head", "scene_id", "exporter"}
         scene_id = evidence.get("scene_id")
-        if (set(evidence) not in (required, required | {"cesium"})
-                or kind != "workbench-export"
+        # AESA search-while-track scenes say whether they draw OpenStreetMap data.
+        allowed = (required | {"cesium", "osm"}) if kind == "aesa-export" else (required | {"cesium"})
+        if (not required <= set(evidence) <= allowed
+                or kind not in ("workbench-export", "aesa-export")
+                or (kind == "aesa-export" and type(evidence.get("osm")) is not bool)
                 or not _is_digest(evidence["source_head"], 40)
                 or type(scene_id) is not str or not re.fullmatch(r"[a-z0-9]+(?:_[a-z0-9]+)*", scene_id)
                 or evidence["exporter"] != "scripts/publish_website_viewer.py"

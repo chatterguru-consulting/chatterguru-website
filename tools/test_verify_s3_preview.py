@@ -101,6 +101,25 @@ class PreviewVerificationTest(unittest.TestCase):
         self.write_manifest()
         with self.assertRaisesRegex(ValueError, "export identity"):
             verify_bundle(self.root)
+        # AESA scenes carry the same identity plus whether they draw OpenStreetMap data.
+        self.data["evidence"].update(source_head="1" * 40, kind="aesa-export", scene_id="king_farm_barn", osm=True)
+        self.write_manifest()
+        self.assertEqual(verify_bundle(self.root, expected_schema=2)[0], 2)
+        for bad in ({"osm": "yes"}, {"osm": None}, {"extra": 1}):
+            with self.subTest(bad=bad):
+                evidence = {**self.data["evidence"], **bad}
+                if bad.get("osm", 0) is None:
+                    evidence.pop("osm")
+                self.data["evidence"] = evidence
+                self.write_manifest()
+                with self.assertRaisesRegex(ValueError, "export identity"):
+                    verify_bundle(self.root)
+                self.data["evidence"] = {k: v for k, v in evidence.items() if k != "extra"}
+                self.data["evidence"]["osm"] = True
+        self.data["evidence"]["kind"] = "workbench-export"
+        self.write_manifest()
+        with self.assertRaisesRegex(ValueError, "export identity"):
+            verify_bundle(self.root)
 
     def test_invalid_local_link_and_anchor(self):
         self.page.write_text('<a href="old.html">Old</a><img src="#miss"><a href="#miss">Missing</a>',
