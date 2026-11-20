@@ -11,7 +11,7 @@
  * - Never cached: the 3D scene pages and their data (megabytes each), map tiles from
  *   USGS and anything else from another site. Those go straight to the network.
  */
-const VERSION = 'cg-app-2026-11-20';
+const VERSION = 'cg-app-2026-11-20b';
 const PAGES = VERSION + ':pages';
 const STATIC = VERSION + ':static';
 const CESIUM = 'cg-cesium-1.119.0';
@@ -45,14 +45,18 @@ function isScene(path) {
     || path.startsWith('/demos/s3/recorded-crossing/');
 }
 
-async function page(request) {
+// Cache writes finish under event.waitUntil, so a phone cannot stop the worker mid-write.
+function store(event, name, key, response, max) {
+  const copy = response.clone();
+  event.waitUntil(caches.open(name).then((c) => c.put(key, copy)).then(() => trim(name, max)).catch(() => {}));
+}
+
+async function page(event) {
+  const request = event.request;
   const url = new URL(request.url);
   try {
     const response = await fetch(request);
-    if (response.ok && !isScene(url.pathname)) {
-      const copy = response.clone();
-      caches.open(PAGES).then((c) => c.put(url.pathname, copy)).then(() => trim(PAGES, MAX_PAGES));
-    }
+    if (response.ok && !isScene(url.pathname)) store(event, PAGES, url.pathname, response, MAX_PAGES);
     return response;
   } catch (err) {
     const cached = await caches.match(url.pathname, { cacheName: PAGES });
@@ -60,27 +64,25 @@ async function page(request) {
   }
 }
 
-async function cacheFirst(request, name, max) {
-  const cached = await caches.match(request, { cacheName: name });
+async function cacheFirst(event, name, max) {
+  const cached = await caches.match(event.request, { cacheName: name });
   if (cached) return cached;
-  const response = await fetch(request);
-  if (response.ok) {
-    const copy = response.clone();
-    caches.open(name).then((c) => c.put(request, copy)).then(() => trim(name, max));
-  }
+  const response = await fetch(event.request);
+  if (response.ok) store(event, name, event.request, response, max);
   return response;
 }
 
-async function staleWhileRevalidate(request) {
-  const cached = await caches.match(request, { cacheName: STATIC });
-  const fresh = fetch(request).then((response) => {
-    if (response.ok) {
-      const copy = response.clone();
-      caches.open(STATIC).then((c) => c.put(request, copy)).then(() => trim(STATIC, MAX_STATIC));
-    }
+async function staleWhileRevalidate(event) {
+  const cached = await caches.match(event.request, { cacheName: STATIC });
+  const fresh = fetch(event.request).then((response) => {
+    if (response.ok) store(event, STATIC, event.request, response, MAX_STATIC);
     return response;
-  });
-  return cached || fresh;
+  }).catch(() => cached || Response.error());  // offline: the cached copy, no unhandled error
+  if (cached) {
+    event.waitUntil(fresh.catch(() => {}));
+    return cached;
+  }
+  return fresh;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -90,12 +92,12 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // map tiles and other sites: network only
   const path = url.pathname;
   if (request.mode === 'navigate') {
-    event.respondWith(page(request));
+    event.respondWith(page(event));
   } else if (path.startsWith('/demos/s3/vendor/cesium-1.119.0/')) {
-    event.respondWith(cacheFirst(request, CESIUM, MAX_CESIUM));
+    event.respondWith(cacheFirst(event, CESIUM, MAX_CESIUM));
   } else if (path.startsWith('/assets/') || path.startsWith('/demos/s3/shared/')
              || path === '/favicon.ico' || path === '/manifest.webmanifest') {
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(staleWhileRevalidate(event));
   }
   // Everything else (scene pages' data, models, the recorded replay): network only.
 });
