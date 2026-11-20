@@ -2,7 +2,7 @@
   "schema": 2,
   "evidence": {
     "kind": "aesa-export",
-    "source_head": "9853635cdc913cc076eb8c20f4c344e32d43c8bf",
+    "source_head": "839a8017cd8d1f8a157f9fb37dee1d4a046f2aff",
     "scene_id": "maritime",
     "osm": false,
     "exporter": "scripts/publish_website_viewer.py",
@@ -11,15 +11,15 @@
   "files": {
     "credits.html": {
       "bytes": 4279,
-      "sha256": "e47f947d4e0cbd21952795182a3ec82df58dabea3bf7e1d73048e3f120888900"
+      "sha256": "fe960f5f1f54aaeec0b4659bf3d6709b383cf5dcc640767a9362afd3764d0135"
     },
     "icons/icon-192.png": {
       "bytes": 2952,
       "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
     },
     "index.html": {
-      "bytes": 1238411,
-      "sha256": "0d14e60f6dfe618aed8a8ee42e9a66b24bbd43e45377e42360cf51660e70e88c"
+      "bytes": 1238537,
+      "sha256": "2fda357d8b3732723103409ec539ec32d5ad745338e3ddef4b8dca01fd1ed519"
     },
     "models/synth_bird_flock.glb": {
       "bytes": 53440,
@@ -47,7 +47,7 @@
     },
     "rights-and-sources.md": {
       "bytes": 2324,
-      "sha256": "c06a7b7f0b021ccda9bbe34f7f969b6af9330d04d05c66c4b613dba1d52a077c"
+      "sha256": "d5d068c5b5f354267edc6e6ef97300e5ee76b43fe1194b95dc7cecc8ec8a3ea5"
     }
   }
 }

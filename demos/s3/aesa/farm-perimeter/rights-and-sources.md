@@ -1,7 +1,7 @@
 # AESA ground surveillance, farmland near Poolesville, Maryland: data sources and credits
 
 This page is the S³ Workbench Cesium Scenario Studio exported for the public website.
-The scene, target motion and sensor overlays come from the Workbench export at source revision `9853635cdc913cc076eb8c20f4c344e32d43c8bf`.
+The scene, target motion and sensor overlays come from the Workbench export at source revision `839a8017cd8d1f8a157f9fb37dee1d4a046f2aff`.
 Your browser draws them. The sensors are simulated with generic, educational models, and the
 targets and missions are fictional.
 

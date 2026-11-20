@@ -2681,8 +2681,8 @@
       "sha256": "bf7720b61870dc34a7fef7f4fa610ec123ad78f065f1713f77f06ccc6a5bec73"
     },
     "index.html": {
-      "bytes": 10772884,
-      "sha256": "7ef8412b2a52d6122b7a710415046a55071d313ef3f94ac6a477c4a8dec2abf3"
+      "bytes": 10773010,
+      "sha256": "e52248be1b218f27f59a00cc4c371776f951b138e46ec257578d5e8e7a7734f3"
     },
     "models/synth_car.glb": {
       "bytes": 21512,

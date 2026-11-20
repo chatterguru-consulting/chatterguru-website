@@ -915,3 +915,32 @@ button:focus-visible {
     gap: 4px;
   }
 }
+
+/* "Install app" in the phone menu (assets/site.js); hidden on wider screens. */
+.nav-install, .nav-install-help {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .nav-install:not([hidden]) {
+    display: block;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: #e8f6f8;
+    color: var(--teal-dark);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .nav-install-help:not([hidden]) {
+    display: block;
+    margin: 4px 10px 2px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+}

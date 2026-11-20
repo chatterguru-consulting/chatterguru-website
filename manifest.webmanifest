@@ -1,0 +1,23 @@
+{
+  "name": "Chatterguru S³ Studio",
+  "short_name": "Chatterguru",
+  "description": "Chatterguru Consulting: radar and sensor systems engineering, and the S³ 3D sensor scenes.",
+  "id": "/",
+  "start_url": "/s3-studio.html?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0b6d82",
+  "categories": ["education", "business"],
+  "icons": [
+    { "src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "3D scenes", "url": "/s3-studio.html#examples", "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "AESA radar", "url": "/s3-studio.html#aesa", "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Contact", "url": "/contact.html", "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

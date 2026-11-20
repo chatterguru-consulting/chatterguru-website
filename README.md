@@ -21,13 +21,17 @@ Open [the local homepage](http://127.0.0.1:8000/). Use the server for the 3D sce
 - [Contact](contact.html) lists ways to get in touch about a briefing or a technical question.
 - `team.html` and `case-study-templates.html` are forwarding pages. Nothing links to them on purpose: they send visitors who still have the old addresses to Founder & Lab and S³ Studio.
 - `favicon.ico` is the browser tab icon, and `assets/og-s3-studio.jpg` is the picture shown when a page is shared.
+- The site installs as an app ("Chatterguru") from a phone's browser: `manifest.webmanifest`, the icons in `assets/icons/`, and the service worker `sw.js`, which `assets/site.js` registers. The phone menu offers "Install app" where the browser supports it and the Add to Home Screen steps on iPhone. The worker keeps site pages and the pinned Cesium build on the phone, never the 3D scene pages or map tiles, and shows `offline.html` (reached only through the worker, so nothing links to it) when a page is not available offline. Change `VERSION` in `sw.js` when the site's styles or scripts change.
 
 ## Validate before publishing
 
 ```bash
 python -B -m unittest discover -s tools
 python -B tools/verify_s3_preview.py . --bundle demos/s3/recorded-crossing
+python -B tools/verify_site_app.py . --browser msedge
 ```
+
+`verify_site_app.py` (needs Playwright) checks that the browser can install the site, that the service worker takes over and works offline, and that it never stores scenes or map tiles.
 
 `tools/verify_s3_studio.py` checks every Studio and AESA scene, plays each one in a browser at desktop and phone sizes, and fails a phone layout whose floating controls cover more than 15% of the screen.
 
