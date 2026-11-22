@@ -2,15 +2,15 @@
   "schema": 2,
   "evidence": {
     "kind": "workbench-export",
-    "source_head": "1fbe66375fdb6580bb5ff4c28f0ce2b0fca8e205",
+    "source_head": "034f8852bd2d5b8fb02006acabd0dff94730d993",
     "scene_id": "king_farm",
     "exporter": "scripts/publish_website_viewer.py",
     "cesium": "1.119.0"
   },
   "files": {
     "credits.html": {
-      "bytes": 4900,
-      "sha256": "f31120ab0a0b5355e40da8be188f73962c58cc7154f29e30fab0d5c95c685fbc"
+      "bytes": 4911,
+      "sha256": "3a61dc9419fbef0467e09a80e0778a51f1a019d8ff2f0a4027dc905a9e93c013"
     },
     "icons/icon-192.png": {
       "bytes": 2952,
@@ -4425,8 +4425,8 @@
       "sha256": "8cb868b5939c1dd98848d4d87456017c578c846e58b9f23a0678e6de1d97d1df"
     },
     "index.html": {
-      "bytes": 11769472,
-      "sha256": "9de1f3f14e569c4ff2eae53b981e20a433b342ff08b7d647a019397c8a51f0e4"
+      "bytes": 18296434,
+      "sha256": "5587b745c01b760ceb51db728b80c8052d3bca0c4e476216a13698b43911e787"
     },
     "models/synth_airliner.glb": {
       "bytes": 35884,
@@ -4457,12 +4457,12 @@
       "sha256": "4974a5ed043471fcbb5a25e0ddd161e81ecd7647a036c7edbbc6748347d7b555"
     },
     "osm-derived-data.geojson": {
-      "bytes": 184785,
-      "sha256": "c0257ca57790141e610c955b5300bc82c33f842d56fb14e4662147e19d653a01"
+      "bytes": 293158,
+      "sha256": "952955f177bd790532205b8c194b8922da66a93dc7dd3a96e3b859f1f37b078d"
     },
     "rights-and-sources.md": {
-      "bytes": 2889,
-      "sha256": "7c18da01149b628f7c6de089df5df7888d2230029c0513d0263ba3020f149e78"
+      "bytes": 2900,
+      "sha256": "df75d4822621eb200b66ad292a52fa4df0151b93a86618513d5560c6cb01ed8c"
     }
   }
 }

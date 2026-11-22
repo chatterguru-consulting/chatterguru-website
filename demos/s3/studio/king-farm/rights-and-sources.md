@@ -1,7 +1,7 @@
 # King Farm, Rockville, Maryland: data sources and credits
 
 This page is the S³ Workbench Cesium Scenario Studio exported for the public website.
-The scene, target motion and sensor overlays come from the Workbench export at source revision `1fbe66375fdb6580bb5ff4c28f0ce2b0fca8e205`.
+The scene, target motion and sensor overlays come from the Workbench export at source revision `034f8852bd2d5b8fb02006acabd0dff94730d993`.
 Your browser draws them. The sensors are simulated with generic, educational models, and the
 targets and missions are fictional.
 
@@ -11,11 +11,11 @@ targets and missions are fictional.
 | --- | --- | --- |
 | 3D globe library | CesiumJS 1.119.0, self-hosted, unmodified | Apache License 2.0 |
 | Basemap “Satellite” (loaded from USGS while you view) | USGS The National Map: Orthoimagery: the live `USGSImageryOnly` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
-| Basemap “Topo” (loaded from USGS while you view) | USGS The National Map: Imagery Topo: the live `USGSImageryTopo` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
+| Basemap “Topo” (loaded from USGS while you view) | USGS The National Map: Topo: the live `USGSTopo` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
 | Basemap “Map” (loaded from USGS while you view) | USGS The National Map: Topo: the live `USGSTopo` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
 | Basemap “Relief” (loaded from USGS while you view) | USGS The National Map: Shaded Relief: the live `USGSShadedReliefOnly` tile service at basemap.nationalmap.gov. USGS assembles it from several regional imagery and map sources. | Public domain U.S. Government data; credit USGS |
 | Close-up aerial photography over the scene | USDA National Agriculture Imagery Program (NAIP) from the USGS NAIP Imagery service (service metadata dated January 2025; nominal resolution about 0.6 m, which varies by acquisition). 1101 tiles baked at zoom 15–17; they fade in as the camera comes down. | Public domain; credit USDA NAIP / USGS |
-| Buildings, roads and other map features | OpenStreetMap (453 buildings, 55 roads). Download the extract used here: osm-derived-data.geojson (osm-derived-data.geojson) | © OpenStreetMap contributors (https://www.openstreetmap.org/copyright); extract offered under the Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/) |
+| Buildings, roads and other map features | OpenStreetMap (453 buildings, 55 roads, 64 landcover, 44 streams). Download the extract used here: osm-derived-data.geojson (osm-derived-data.geojson) | © OpenStreetMap contributors (https://www.openstreetmap.org/copyright); extract offered under the Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/) |
 | Terrain | synthetic rolling hills for illustration | See source |
 | Vehicle and aircraft models | S³ Workbench synthetic models | Chatterguru Consulting LLC |
 
