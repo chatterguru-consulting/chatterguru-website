@@ -2,7 +2,7 @@
   "schema": 2,
   "evidence": {
     "kind": "aesa-export",
-    "source_head": "839a8017cd8d1f8a157f9fb37dee1d4a046f2aff",
+    "source_head": "034f8852bd2d5b8fb02006acabd0dff94730d993",
     "scene_id": "ground_surveillance",
     "osm": false,
     "exporter": "scripts/publish_website_viewer.py",
@@ -10,16 +10,16 @@
   },
   "files": {
     "credits.html": {
-      "bytes": 4293,
-      "sha256": "9602887e258e5b4a88696a3f24c8a7dabf72f4e61ba811953ed877120b72cc7c"
+      "bytes": 4278,
+      "sha256": "2e3dd552355b08cff773b6d78c13ae2f4b53f038189e6711a0a2ac3235d5ea5b"
     },
     "icons/icon-192.png": {
       "bytes": 2952,
       "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
     },
     "index.html": {
-      "bytes": 1493592,
-      "sha256": "17d5a01b11114bfaaa4600d576e401c412e3390d7c5eaa37b21913b3512704d9"
+      "bytes": 1508157,
+      "sha256": "5f9579c7a0960fa384194148c5a42d1de3a4adc0e72cb4168e5a02024fdf1517"
     },
     "models/synth_car.glb": {
       "bytes": 21512,
@@ -54,8 +54,8 @@
       "sha256": "6d04ea5f0ef945a4c518f4133e695ad9d6ae6c630027d828ebf3b88923053933"
     },
     "rights-and-sources.md": {
-      "bytes": 2331,
-      "sha256": "45961d0282acbaced419c3bec8f484f5b944958debc41244b35d58729e807c70"
+      "bytes": 2316,
+      "sha256": "90af297c2f5e432a374d7f9a8a64999cae8b8a478977e3053303566f5477bd7b"
     }
   }
 }
