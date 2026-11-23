@@ -2,7 +2,7 @@
   "schema": 2,
   "evidence": {
     "kind": "aesa-export",
-    "source_head": "034f8852bd2d5b8fb02006acabd0dff94730d993",
+    "source_head": "db62b5811c384e00f6938ff05fe2bf1ac47f9e01",
     "scene_id": "king_farm_barn",
     "osm": true,
     "exporter": "scripts/publish_website_viewer.py",
@@ -11,15 +11,15 @@
   "files": {
     "credits.html": {
       "bytes": 4707,
-      "sha256": "d41951e8736785c16a257932f4ce679d7d17939a092b4542bc4cd7433475df86"
+      "sha256": "867f9d37e3efe79036a51cc76f16a34aba360e25409fa4ed9ba6d170129c8ea2"
     },
     "icons/icon-192.png": {
       "bytes": 2952,
       "sha256": "5085c05a8f1513a3e29ea8cf908fe82e402c7fedcc874c08686f0a2da612b2b1"
     },
     "index.html": {
-      "bytes": 2957558,
-      "sha256": "dda9de46ce90d0f602171e0d7d53e2375eee42ab2f9f7aca1500934811472a93"
+      "bytes": 2990511,
+      "sha256": "085db203b538be05960cd8a24657c12ae62f0e906169766544a88a9cd0a7876e"
     },
     "models/synth_airliner.glb": {
       "bytes": 35884,
@@ -51,7 +51,7 @@
     },
     "rights-and-sources.md": {
       "bytes": 2673,
-      "sha256": "f8146c8c26a3fd03e88960b51bac6d34b8670e43133a6afc0938d1875f085a40"
+      "sha256": "76a8e46dd0056ad71cdbee0b5fd11b635aef9177b46977187a4fbc088517e089"
     }
   }
 }
