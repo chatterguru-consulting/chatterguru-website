@@ -15,6 +15,11 @@
 
   // label, icon, and what it does: click an existing button, open a panel, or follow a link.
   var ACTIONS = [
+    // Sensor views open full screen on a phone (studio_sensor_views.js).
+    { group: 'Sensors', label: 'EO/IR camera', icon: '📷', call: ['studioOpenSensor', 'flir'], need: 'flirGimbalCanvas' },
+    { group: 'Sensors', label: 'RF range-Doppler', icon: '📡', call: ['studioOpenSensor', 'rdm'], need: 'rdmPopoutCanvas' },
+    { group: 'Sensors', label: 'SAR image', icon: '🛰', call: ['studioOpenSensor', 'sar'], need: 'sarPopoutCanvas', sar: true },
+    { group: 'Sensors', label: 'SAR on the map', icon: '🗺', call: ['studioSarOnMap', true], need: 'sarPopoutCanvas', sar: true },
     { group: 'Scene', label: 'Restart', icon: '↺', click: 'btnResetSim' },
     { group: 'Scene', label: 'Map controls', icon: '\u{1F5FA}', click: 'workspaceView' },
     // Inspect opens the radar console as a sheet (on a phone it stays hidden until opened).
@@ -38,6 +43,10 @@
   function present(a) {
     if (a.site && !document.querySelector('.s3-site-bar')) return false;
     if (a.click) { var b = byId(a.click); return !!b && !b.hidden; }
+    if (a.call) {
+      if (typeof window[a.call[0]] !== 'function' || (a.need && !byId(a.need))) return false;
+      return !a.sar || (typeof window.studioSarAvailable === 'function' && window.studioSarAvailable());
+    }
     // A panel the workspace already moved into its Map controls drawer is reached there.
     if (a.panel) return a.panel.some(function (id) { var el = byId(id); return !!el && !inDrawer(el); });
     return true;
@@ -139,6 +148,7 @@
       var a = ACTIONS[+t.getAttribute('data-ps')];
       closeSheet();
       if (a.panel) openPanel(a);
+      else if (a.call) { closePanel(); window[a.call[0]](a.call[1]); }
       else { closePanel(); var b = byId(a.click); if (b) b.click(); }
     });
     document.body.appendChild(scrim);

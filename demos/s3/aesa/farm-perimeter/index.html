@@ -2076,8 +2076,9 @@
           }
           return tagged(wallCode, t);
         };
-        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], base], c: [q[0], q[1], top], shade, kind: 'wall' });
-        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], top], c: [p[0], p[1], top], shade, kind: 'wall' });
+        const wall = { dir: [ex / len, ey / len], p0: [p[0], p[1]], z0: base, z1: top, win: windows, bi, seed };
+        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], base], c: [q[0], q[1], top], shade, kind: 'wall', wall });
+        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], top], c: [p[0], p[1], top], shade, kind: 'wall', wall });
       }
       // roof
       const roofShade = (normal) => {
@@ -3229,6 +3230,108 @@
     return (t00 * (1 - fx) + t10 * fx) * (1 - fy) + (t01 * (1 - fx) + t11 * fx) * fy;
   }
 
+  // Temperature of open ground, road or paving at one point (the ray-march and the GPU
+  // ground bake share it). Leaves the road and marking cover in _road2.
+  function groundTempAt(world, px, py, pix, lot, shade, canopy) {
+    const map = world.map, T = world.temps, cond = world.cond;
+    let road = 0, mark = 0;
+    if (world.roadIndex) {
+      roadAtInto(world.roadIndex, px, py, pix, _road2);
+      road = _road2[0]; mark = _road2[1];
+    } else { _road2[0] = 0; _road2[1] = 0; }
+    // 1 inside the modelled town, fading to open country over 200 m outside it
+    let urban = 0;
+    if (map) {
+      const mapX1 = map.x0 + map.nx * map.cell, mapY1 = map.y0 + map.ny * map.cell;
+      const ox = px < map.x0 ? (map.x0 - px) : (px > mapX1 ? (px - mapX1) : 0);
+      const oy = py < map.y0 ? (map.y0 - py) : (py > mapY1 ? (py - mapY1) : 0);
+      urban = (ox === 0 && oy === 0) ? 1 : clamp(1 - Math.hypot(ox, oy) * 0.005, 0, 1);
+    }
+    const roadOrLot = road > lot ? road : lot;
+    let pixTemp = 0;
+    if (roadOrLot < 1) {
+      let open = landGround(world, px, py, T, shade, urban, pix);
+      open += canopy * (cond.night * 2.0 - cond.load * 4.0);     // sheltered under crowns
+      pixTemp += open * (1 - roadOrLot);
+    }
+    if (road > 0 && lot < 1) {
+      let asphalt = T.road + (T.roadShadow - T.road) * shade + fbm(px * 0.5, py * 0.5, 2) * 0.45
+        + fbm(px * 0.04, py * 0.04, 2) * 0.6;               // patching and wear
+      asphalt -= mark * 1.6;                                      // painted markings: lower emissivity
+      pixTemp += asphalt * road * (1 - lot);
+    }
+    if (lot > 0) {
+      const paving = T.paving + fbm(px * 0.3, py * 0.3, 2) * 0.6;
+      pixTemp += paving * lot;
+    }
+    return pixTemp;
+  }
+
+  // Ground maps for the GPU renderer (#gpu): temperature, material, colour variant, ambient
+  // occlusion and canopy on a regular grid, from the same functions as the ray-march.
+  // Returns a resumable job: call step(ms) until it returns true.
+  StudioIR.bakeGround = function (world, x0, y0, cell, nx, ny) {
+    const n = nx * ny, out = { x0, y0, cell, nx, ny, temp: new Float32Array(n), info: new Uint8Array(n * 4) };
+    const map = world.map, ground = world.ground;
+    let row = 0;
+    out.step = function (ms) {
+      const t0 = Date.now();
+      while (row < ny) {
+        const py = y0 + (row + 0.5) * cell;
+        for (let c = 0; c < nx; c++) {
+          const px = x0 + (c + 0.5) * cell, i = row * nx + c;
+          let lot = 0, shade = 0, canopy = 0;
+          if (map) { sampleMapInto(map, px, py, _map5); lot = _map5[2]; shade = _map5[3]; canopy = _map5[4]; }
+          const gz0 = ground(px, py);
+          const gxN = -(ground(px + 8, py) - gz0) * 0.125, gyN = -(ground(px, py + 8) - gz0) * 0.125;
+          const nLen = Math.hypot(gxN, gyN, 1) || 1;
+          _nrm3[0] = gxN / nLen; _nrm3[1] = gyN / nLen; _nrm3[2] = 1 / nLen;
+          world.groundNormal = _nrm3; world.rayGrazing = 0.45;
+          out.temp[i] = groundTempAt(world, px, py, cell, lot, shade, canopy);
+          const m = groundMaterial(world, px, py, _road2[0], lot, _road2[1], canopy);
+          let ao = 255;
+          if (map && map.ao) {
+            const ac = Math.floor((px - map.x0) / map.cell), ar = Math.floor((py - map.y0) / map.cell);
+            if (ac >= 0 && ar >= 0 && ac < map.nx && ar < map.ny) ao = 255 - Math.round(0.55 * map.ao[ar * map.nx + ac]);
+          }
+          out.info[i * 4] = m; out.info[i * 4 + 1] = _gvar; out.info[i * 4 + 2] = ao; out.info[i * 4 + 3] = Math.round(canopy * 255);
+        }
+        row++;
+        if (Date.now() - t0 > ms) break;
+      }
+      world.groundNormal = null;
+      out.progress = row / ny;
+      return row >= ny;
+    };
+    return out;
+  };
+
+  // Where each target is this instant and how it is drawn (both renderers use it).
+  StudioIR.vehicleInstances = function (world, state) {
+    const ids = Object.keys(state.targets);
+    return ids.map((id, k) => {
+      const tg = state.targets[id];
+      const meta = (world.scene.targets || {})[id] || { class: 'car', size_m: [4.5, 1.8, 1.5], engine: 'front' };
+      const v = tg.velocity, speed = Math.hypot(v[0], v[1]);
+      const heading = speed > 0.3 ? Math.atan2(v[0], v[1]) : (tg.info.heading_deg || 0) * DEG;
+      const size = meta.size_m;
+      const cls = String(meta.class || '').toLowerCase();
+      const airborne = (
+        meta.domain === 'air' || meta.domain === 'multirotor' || meta.domain === 'fixed_wing' ||
+        cls === 'drone' || cls === 'fixed_wing_drone' || cls === 'helicopter' ||
+        cls === 'light_aircraft' || cls === 'airliner' || cls === 'jet' || cls === 'bird_flock'
+      );
+      const gz = world.ground(tg.position[0], tg.position[1]);
+      const baseZ = airborne ? tg.position[2] - size[2] / 2 : gz + 0.06;
+      const shade = StudioIR.vehicleShade(meta, world.cond, speed > 0.5);
+      const basePos = [tg.position[0], tg.position[1], baseZ];
+      return { id, vid: k + 1, meta, basePos, heading, size, shade, speed,
+               box: { id, center: [tg.position[0], tg.position[1], baseZ + size[2] / 2], base: basePos, heading, size, meta, speed } };
+    });
+  };
+  // The material the last shading call named (a window pane, a tyre...), or -1.
+  StudioIR.lastMaterial = function () { return _mat; };
+
   // ---- render: temperature image -------------------------------------------------
   function ensureTriBounds(world) {
     if (world.triBounds) return world.triBounds;
@@ -3378,35 +3481,8 @@
         const grazing = dotDN > 0.03 ? dotDN : 0.03;
         world.rayGrazing = grazing;
         const pix = pixAcross / grazing;
-        let road = 0, mark = 0;
-        if (roadIndex) {
-          roadAtInto(roadIndex, px, py, pix, _road2);
-          road = _road2[0]; mark = _road2[1];
-        }
-        // 1 inside the modelled town, fading to open country over 200 m outside it
-        let urban = 0;
-        if (map) {
-          const ox = px < map.x0 ? (map.x0 - px) : (px > mapX1 ? (px - mapX1) : 0);
-          const oy = py < map.y0 ? (map.y0 - py) : (py > mapY1 ? (py - mapY1) : 0);
-          urban = (ox === 0 && oy === 0) ? 1 : clamp(1 - Math.hypot(ox, oy) * 0.005, 0, 1);
-        }
-        const roadOrLot = road > lot ? road : lot;
-        let pixTemp = 0;
-        if (roadOrLot < 1) {
-          let open = landGround(world, px, py, T, shade, urban, pix);
-          open += canopy * (cond.night * 2.0 - cond.load * 4.0);     // sheltered under crowns
-          pixTemp += open * (1 - roadOrLot);
-        }
-        if (road > 0 && lot < 1) {
-          let asphalt = T.road + (T.roadShadow - T.road) * shade + fbm(px * 0.5, py * 0.5, 2) * 0.45
-            + fbm(px * 0.04, py * 0.04, 2) * 0.6;               // patching and wear
-          asphalt -= mark * 1.6;                                      // painted markings: lower emissivity
-          pixTemp += asphalt * road * (1 - lot);
-        }
-        if (lot > 0) {
-          const paving = T.paving + fbm(px * 0.3, py * 0.3, 2) * 0.6;
-          pixTemp += paving * lot;
-        }
+        const pixTemp = groundTempAt(world, px, py, pix, lot, shade, canopy);
+        const road = _road2[0], mark = _road2[1];
         buf.temp[i] = pixTemp;
         if (optical) {
           buf.mat[i] = groundMaterial(world, px, py, road, lot, mark, canopy);
@@ -3509,26 +3585,10 @@
 
     // 4. vehicles from the radar's own telemetry
     const vehicleBoxes = [];
-    Object.keys(state.targets).forEach(id => {
-      const tg = state.targets[id];
-      const meta = (world.scene.targets || {})[id] || { class: 'car', size_m: [4.5, 1.8, 1.5], engine: 'front' };
-      const v = tg.velocity, speed = Math.hypot(v[0], v[1]);
-      const heading = speed > 0.3 ? Math.atan2(v[0], v[1]) : (tg.info.heading_deg || 0) * DEG;
-      const size = meta.size_m;
-      const cls = String(meta.class || '').toLowerCase();
-      const airborne = (
-        meta.domain === 'air' || meta.domain === 'multirotor' || meta.domain === 'fixed_wing' ||
-        cls === 'drone' || cls === 'fixed_wing_drone' || cls === 'helicopter' ||
-        cls === 'light_aircraft' || cls === 'airliner' || cls === 'jet' || cls === 'bird_flock'
-      );
-      const gz = world.ground(tg.position[0], tg.position[1]);
-      const baseZ = airborne ? tg.position[2] - size[2] / 2 : gz + 0.06;
-      const shade = StudioIR.vehicleShade(meta, cond, speed > 0.5);
-      const basePos = [tg.position[0], tg.position[1], baseZ];
-      const mesh = StudioIR.buildVehicleMesh(meta, basePos, heading, size, shade);
-      const vid = 1 + Object.keys(state.targets).indexOf(id);
-      mesh.tris.forEach(t => { t.id = vid; rasterTriangle(cam, buf, t, near); });
-      vehicleBoxes.push({ id, center: [tg.position[0], tg.position[1], baseZ + size[2] / 2], base: basePos, heading, size, meta, speed });
+    StudioIR.vehicleInstances(world, state).forEach(vi => {
+      const mesh = StudioIR.buildVehicleMesh(vi.meta, vi.basePos, vi.heading, vi.size, vi.shade);
+      mesh.tris.forEach(t => { t.id = vi.vid; rasterTriangle(cam, buf, t, near); });
+      vehicleBoxes.push(vi.box);
     });
 
     // 5. atmosphere: transmission and path radiance (8-12 um, humid mid-latitude)
@@ -3695,6 +3755,7 @@
   // Vehicle paint colours, picked per vehicle so a car park is not one colour.
   const PAINTS = [[0.56, 0.57, 0.59], [0.07, 0.07, 0.08], [0.84, 0.84, 0.82], [0.48, 0.06, 0.05],
                   [0.07, 0.15, 0.36], [0.30, 0.31, 0.30], [0.62, 0.50, 0.08], [0.26, 0.30, 0.20]];
+  StudioIR.PAINTS = PAINTS;
   // Planck radiance at 4 um, relative to a 20 C blackbody (c2 / lambda = 3597 K).
   const planck4 = (tc) => { const tk = Math.max(150, tc + 273.15); return (Math.exp(3597 / 293.15) - 1) / (Math.exp(3597 / tk) - 1); };
   // Thermal glow in SWIR at 1.6 um: only surfaces hundreds of degrees hot (c2 / lambda = 8993 K).
@@ -5329,6 +5390,11 @@
 
   // label, icon, and what it does: click an existing button, open a panel, or follow a link.
   var ACTIONS = [
+    // Sensor views open full screen on a phone (studio_sensor_views.js).
+    { group: 'Sensors', label: 'EO/IR camera', icon: '📷', call: ['studioOpenSensor', 'flir'], need: 'flirGimbalCanvas' },
+    { group: 'Sensors', label: 'RF range-Doppler', icon: '📡', call: ['studioOpenSensor', 'rdm'], need: 'rdmPopoutCanvas' },
+    { group: 'Sensors', label: 'SAR image', icon: '🛰', call: ['studioOpenSensor', 'sar'], need: 'sarPopoutCanvas', sar: true },
+    { group: 'Sensors', label: 'SAR on the map', icon: '🗺', call: ['studioSarOnMap', true], need: 'sarPopoutCanvas', sar: true },
     { group: 'Scene', label: 'Restart', icon: '↺', click: 'btnResetSim' },
     { group: 'Scene', label: 'Map controls', icon: '\u{1F5FA}', click: 'workspaceView' },
     // Inspect opens the radar console as a sheet (on a phone it stays hidden until opened).
@@ -5352,6 +5418,10 @@
   function present(a) {
     if (a.site && !document.querySelector('.s3-site-bar')) return false;
     if (a.click) { var b = byId(a.click); return !!b && !b.hidden; }
+    if (a.call) {
+      if (typeof window[a.call[0]] !== 'function' || (a.need && !byId(a.need))) return false;
+      return !a.sar || (typeof window.studioSarAvailable === 'function' && window.studioSarAvailable());
+    }
     // A panel the workspace already moved into its Map controls drawer is reached there.
     if (a.panel) return a.panel.some(function (id) { var el = byId(id); return !!el && !inDrawer(el); });
     return true;
@@ -5453,6 +5523,7 @@
       var a = ACTIONS[+t.getAttribute('data-ps')];
       closeSheet();
       if (a.panel) openPanel(a);
+      else if (a.call) { closePanel(); window[a.call[0]](a.call[1]); }
       else { closePanel(); var b = byId(a.click); if (b) b.click(); }
     });
     document.body.appendChild(scrim);
