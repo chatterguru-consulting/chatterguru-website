@@ -2,7 +2,7 @@
   "schema": 2,
   "evidence": {
     "kind": "workbench-export",
-    "source_head": "db62b5811c384e00f6938ff05fe2bf1ac47f9e01",
+    "source_head": "1d1a7b5965438269207b60be48cea7c27016aaa8",
     "scene_id": "mountain_ridge",
     "exporter": "scripts/publish_website_viewer.py",
     "cesium": "1.119.0"
@@ -10,7 +10,7 @@
   "files": {
     "credits.html": {
       "bytes": 4912,
-      "sha256": "80db395fe4f73a6f70fcf2baf0510957a0f6be89c660fe8d15b35afb16ca05b4"
+      "sha256": "7a282b54ebaf5827b378332a788658196769e4a44eff98173db14ac88e39a236"
     },
     "icons/icon-192.png": {
       "bytes": 2952,
@@ -2681,8 +2681,8 @@
       "sha256": "bf7720b61870dc34a7fef7f4fa610ec123ad78f065f1713f77f06ccc6a5bec73"
     },
     "index.html": {
-      "bytes": 21321507,
-      "sha256": "f4f57788011e028da8dfc206b72ed8253920181789f9f37a954799b3c6252daa"
+      "bytes": 21378908,
+      "sha256": "0768912b4ebfb561e6b27f4afb25e3cd989936375f0f4b0caeaee01b51fc423a"
     },
     "models/synth_car.glb": {
       "bytes": 21512,
@@ -2718,7 +2718,7 @@
     },
     "rights-and-sources.md": {
       "bytes": 2902,
-      "sha256": "ec7349c9be694a9b905e967098d022adaa830a1c18a6cc9b0503a028e165563b"
+      "sha256": "c3e68606876519cb18eb5ee1b61a9a35ff12257856a195c304dc8220d55e5a54"
     }
   }
 }

@@ -10064,8 +10064,9 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
           }
           return tagged(wallCode, t);
         };
-        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], base], c: [q[0], q[1], top], shade, kind: 'wall' });
-        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], top], c: [p[0], p[1], top], shade, kind: 'wall' });
+        const wall = { dir: [ex / len, ey / len], p0: [p[0], p[1]], z0: base, z1: top, win: windows, bi, seed };
+        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], base], c: [q[0], q[1], top], shade, kind: 'wall', wall });
+        tris.push({ a: [p[0], p[1], base], b: [q[0], q[1], top], c: [p[0], p[1], top], shade, kind: 'wall', wall });
       }
       // roof
       const roofShade = (normal) => {
@@ -11217,6 +11218,108 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     return (t00 * (1 - fx) + t10 * fx) * (1 - fy) + (t01 * (1 - fx) + t11 * fx) * fy;
   }
 
+  // Temperature of open ground, road or paving at one point (the ray-march and the GPU
+  // ground bake share it). Leaves the road and marking cover in _road2.
+  function groundTempAt(world, px, py, pix, lot, shade, canopy) {
+    const map = world.map, T = world.temps, cond = world.cond;
+    let road = 0, mark = 0;
+    if (world.roadIndex) {
+      roadAtInto(world.roadIndex, px, py, pix, _road2);
+      road = _road2[0]; mark = _road2[1];
+    } else { _road2[0] = 0; _road2[1] = 0; }
+    // 1 inside the modelled town, fading to open country over 200 m outside it
+    let urban = 0;
+    if (map) {
+      const mapX1 = map.x0 + map.nx * map.cell, mapY1 = map.y0 + map.ny * map.cell;
+      const ox = px < map.x0 ? (map.x0 - px) : (px > mapX1 ? (px - mapX1) : 0);
+      const oy = py < map.y0 ? (map.y0 - py) : (py > mapY1 ? (py - mapY1) : 0);
+      urban = (ox === 0 && oy === 0) ? 1 : clamp(1 - Math.hypot(ox, oy) * 0.005, 0, 1);
+    }
+    const roadOrLot = road > lot ? road : lot;
+    let pixTemp = 0;
+    if (roadOrLot < 1) {
+      let open = landGround(world, px, py, T, shade, urban, pix);
+      open += canopy * (cond.night * 2.0 - cond.load * 4.0);     // sheltered under crowns
+      pixTemp += open * (1 - roadOrLot);
+    }
+    if (road > 0 && lot < 1) {
+      let asphalt = T.road + (T.roadShadow - T.road) * shade + fbm(px * 0.5, py * 0.5, 2) * 0.45
+        + fbm(px * 0.04, py * 0.04, 2) * 0.6;               // patching and wear
+      asphalt -= mark * 1.6;                                      // painted markings: lower emissivity
+      pixTemp += asphalt * road * (1 - lot);
+    }
+    if (lot > 0) {
+      const paving = T.paving + fbm(px * 0.3, py * 0.3, 2) * 0.6;
+      pixTemp += paving * lot;
+    }
+    return pixTemp;
+  }
+
+  // Ground maps for the GPU renderer (#gpu): temperature, material, colour variant, ambient
+  // occlusion and canopy on a regular grid, from the same functions as the ray-march.
+  // Returns a resumable job: call step(ms) until it returns true.
+  StudioIR.bakeGround = function (world, x0, y0, cell, nx, ny) {
+    const n = nx * ny, out = { x0, y0, cell, nx, ny, temp: new Float32Array(n), info: new Uint8Array(n * 4) };
+    const map = world.map, ground = world.ground;
+    let row = 0;
+    out.step = function (ms) {
+      const t0 = Date.now();
+      while (row < ny) {
+        const py = y0 + (row + 0.5) * cell;
+        for (let c = 0; c < nx; c++) {
+          const px = x0 + (c + 0.5) * cell, i = row * nx + c;
+          let lot = 0, shade = 0, canopy = 0;
+          if (map) { sampleMapInto(map, px, py, _map5); lot = _map5[2]; shade = _map5[3]; canopy = _map5[4]; }
+          const gz0 = ground(px, py);
+          const gxN = -(ground(px + 8, py) - gz0) * 0.125, gyN = -(ground(px, py + 8) - gz0) * 0.125;
+          const nLen = Math.hypot(gxN, gyN, 1) || 1;
+          _nrm3[0] = gxN / nLen; _nrm3[1] = gyN / nLen; _nrm3[2] = 1 / nLen;
+          world.groundNormal = _nrm3; world.rayGrazing = 0.45;
+          out.temp[i] = groundTempAt(world, px, py, cell, lot, shade, canopy);
+          const m = groundMaterial(world, px, py, _road2[0], lot, _road2[1], canopy);
+          let ao = 255;
+          if (map && map.ao) {
+            const ac = Math.floor((px - map.x0) / map.cell), ar = Math.floor((py - map.y0) / map.cell);
+            if (ac >= 0 && ar >= 0 && ac < map.nx && ar < map.ny) ao = 255 - Math.round(0.55 * map.ao[ar * map.nx + ac]);
+          }
+          out.info[i * 4] = m; out.info[i * 4 + 1] = _gvar; out.info[i * 4 + 2] = ao; out.info[i * 4 + 3] = Math.round(canopy * 255);
+        }
+        row++;
+        if (Date.now() - t0 > ms) break;
+      }
+      world.groundNormal = null;
+      out.progress = row / ny;
+      return row >= ny;
+    };
+    return out;
+  };
+
+  // Where each target is this instant and how it is drawn (both renderers use it).
+  StudioIR.vehicleInstances = function (world, state) {
+    const ids = Object.keys(state.targets);
+    return ids.map((id, k) => {
+      const tg = state.targets[id];
+      const meta = (world.scene.targets || {})[id] || { class: 'car', size_m: [4.5, 1.8, 1.5], engine: 'front' };
+      const v = tg.velocity, speed = Math.hypot(v[0], v[1]);
+      const heading = speed > 0.3 ? Math.atan2(v[0], v[1]) : (tg.info.heading_deg || 0) * DEG;
+      const size = meta.size_m;
+      const cls = String(meta.class || '').toLowerCase();
+      const airborne = (
+        meta.domain === 'air' || meta.domain === 'multirotor' || meta.domain === 'fixed_wing' ||
+        cls === 'drone' || cls === 'fixed_wing_drone' || cls === 'helicopter' ||
+        cls === 'light_aircraft' || cls === 'airliner' || cls === 'jet' || cls === 'bird_flock'
+      );
+      const gz = world.ground(tg.position[0], tg.position[1]);
+      const baseZ = airborne ? tg.position[2] - size[2] / 2 : gz + 0.06;
+      const shade = StudioIR.vehicleShade(meta, world.cond, speed > 0.5);
+      const basePos = [tg.position[0], tg.position[1], baseZ];
+      return { id, vid: k + 1, meta, basePos, heading, size, shade, speed,
+               box: { id, center: [tg.position[0], tg.position[1], baseZ + size[2] / 2], base: basePos, heading, size, meta, speed } };
+    });
+  };
+  // The material the last shading call named (a window pane, a tyre...), or -1.
+  StudioIR.lastMaterial = function () { return _mat; };
+
   // ---- render: temperature image -------------------------------------------------
   function ensureTriBounds(world) {
     if (world.triBounds) return world.triBounds;
@@ -11366,35 +11469,8 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
         const grazing = dotDN > 0.03 ? dotDN : 0.03;
         world.rayGrazing = grazing;
         const pix = pixAcross / grazing;
-        let road = 0, mark = 0;
-        if (roadIndex) {
-          roadAtInto(roadIndex, px, py, pix, _road2);
-          road = _road2[0]; mark = _road2[1];
-        }
-        // 1 inside the modelled town, fading to open country over 200 m outside it
-        let urban = 0;
-        if (map) {
-          const ox = px < map.x0 ? (map.x0 - px) : (px > mapX1 ? (px - mapX1) : 0);
-          const oy = py < map.y0 ? (map.y0 - py) : (py > mapY1 ? (py - mapY1) : 0);
-          urban = (ox === 0 && oy === 0) ? 1 : clamp(1 - Math.hypot(ox, oy) * 0.005, 0, 1);
-        }
-        const roadOrLot = road > lot ? road : lot;
-        let pixTemp = 0;
-        if (roadOrLot < 1) {
-          let open = landGround(world, px, py, T, shade, urban, pix);
-          open += canopy * (cond.night * 2.0 - cond.load * 4.0);     // sheltered under crowns
-          pixTemp += open * (1 - roadOrLot);
-        }
-        if (road > 0 && lot < 1) {
-          let asphalt = T.road + (T.roadShadow - T.road) * shade + fbm(px * 0.5, py * 0.5, 2) * 0.45
-            + fbm(px * 0.04, py * 0.04, 2) * 0.6;               // patching and wear
-          asphalt -= mark * 1.6;                                      // painted markings: lower emissivity
-          pixTemp += asphalt * road * (1 - lot);
-        }
-        if (lot > 0) {
-          const paving = T.paving + fbm(px * 0.3, py * 0.3, 2) * 0.6;
-          pixTemp += paving * lot;
-        }
+        const pixTemp = groundTempAt(world, px, py, pix, lot, shade, canopy);
+        const road = _road2[0], mark = _road2[1];
         buf.temp[i] = pixTemp;
         if (optical) {
           buf.mat[i] = groundMaterial(world, px, py, road, lot, mark, canopy);
@@ -11497,26 +11573,10 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
 
     // 4. vehicles from the radar's own telemetry
     const vehicleBoxes = [];
-    Object.keys(state.targets).forEach(id => {
-      const tg = state.targets[id];
-      const meta = (world.scene.targets || {})[id] || { class: 'car', size_m: [4.5, 1.8, 1.5], engine: 'front' };
-      const v = tg.velocity, speed = Math.hypot(v[0], v[1]);
-      const heading = speed > 0.3 ? Math.atan2(v[0], v[1]) : (tg.info.heading_deg || 0) * DEG;
-      const size = meta.size_m;
-      const cls = String(meta.class || '').toLowerCase();
-      const airborne = (
-        meta.domain === 'air' || meta.domain === 'multirotor' || meta.domain === 'fixed_wing' ||
-        cls === 'drone' || cls === 'fixed_wing_drone' || cls === 'helicopter' ||
-        cls === 'light_aircraft' || cls === 'airliner' || cls === 'jet' || cls === 'bird_flock'
-      );
-      const gz = world.ground(tg.position[0], tg.position[1]);
-      const baseZ = airborne ? tg.position[2] - size[2] / 2 : gz + 0.06;
-      const shade = StudioIR.vehicleShade(meta, cond, speed > 0.5);
-      const basePos = [tg.position[0], tg.position[1], baseZ];
-      const mesh = StudioIR.buildVehicleMesh(meta, basePos, heading, size, shade);
-      const vid = 1 + Object.keys(state.targets).indexOf(id);
-      mesh.tris.forEach(t => { t.id = vid; rasterTriangle(cam, buf, t, near); });
-      vehicleBoxes.push({ id, center: [tg.position[0], tg.position[1], baseZ + size[2] / 2], base: basePos, heading, size, meta, speed });
+    StudioIR.vehicleInstances(world, state).forEach(vi => {
+      const mesh = StudioIR.buildVehicleMesh(vi.meta, vi.basePos, vi.heading, vi.size, vi.shade);
+      mesh.tris.forEach(t => { t.id = vi.vid; rasterTriangle(cam, buf, t, near); });
+      vehicleBoxes.push(vi.box);
     });
 
     // 5. atmosphere: transmission and path radiance (8-12 um, humid mid-latitude)
@@ -11683,6 +11743,7 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
   // Vehicle paint colours, picked per vehicle so a car park is not one colour.
   const PAINTS = [[0.56, 0.57, 0.59], [0.07, 0.07, 0.08], [0.84, 0.84, 0.82], [0.48, 0.06, 0.05],
                   [0.07, 0.15, 0.36], [0.30, 0.31, 0.30], [0.62, 0.50, 0.08], [0.26, 0.30, 0.20]];
+  StudioIR.PAINTS = PAINTS;
   // Planck radiance at 4 um, relative to a 20 C blackbody (c2 / lambda = 3597 K).
   const planck4 = (tc) => { const tk = Math.max(150, tc + 273.15); return (Math.exp(3597 / 293.15) - 1) / (Math.exp(3597 / tk) - 1); };
   // Thermal glow in SWIR at 1.6 um: only surfaces hundreds of degrees hot (c2 / lambda = 8993 K).
@@ -12264,7 +12325,10 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     .svc-stage canvas.svc-grow, .svc-stage .svc-grow > canvas { width: 100% !important; height: 100% !important; max-height: none !important; }
     .svc-stage #flirGimbalCanvas, .svc-stage #sarPopoutCanvas, .svc-stage #rdmPopoutCanvas.svc-grow {
       width: 100% !important; height: 100% !important; max-height: none !important; }
-    .svc-stage #rdmPopoutCanvas.svc-grow { flex: 1 1 auto !important; min-height: 0 !important; }
+    .svc-stage #rdmPopoutCanvas.svc-grow { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; }
+    .svc-stage > #rdmStageBox { flex: 1 1 auto !important; min-height: 0; display: flex; flex-direction: column; }
+    .svc-stage #rdmPopoutAbContainer.svc-grow { flex: 1 1 0 !important; }
+    .svc-stage .rdm-stap-status { font-size: 10px; padding: 3px 6px; }
     .svc-stage #rdmPopoutAbContainer.svc-grow { grid-template-rows: minmax(0, 1fr); }
     .svc-stage #rdmPopoutAbContainer > div { min-height: 0; }
     .svc-stage #rdmPopoutAbContainer canvas { flex: 1 1 auto; min-height: 0; height: 100% !important; }
@@ -12274,7 +12338,7 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
       max-width: 34vw; overflow: hidden; text-overflow: ellipsis; }
     .svc-dock { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
     .svc-dock::-webkit-scrollbar { display: none; }
-    .svc-btn { flex: 0 0 auto; min-width: 62px; height: 52px; padding: 4px 8px; border-radius: 12px; border: 1px solid #334155;
+    .svc-btn { flex: 0 0 auto; min-width: 60px; height: 48px; padding: 4px 8px; border-radius: 12px; border: 1px solid #334155;
       background: linear-gradient(#1e293b, #0f172a); color: #e2e8f0; display: flex; flex-direction: column; align-items: center;
       justify-content: center; gap: 2px; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .svc-btn .svc-ico { font-size: 17px; line-height: 1; }
@@ -12311,6 +12375,21 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
       .svc-btn { width: 60px; min-width: 60px; height: 48px; }
       .svc-sheet { left: auto; top: 0; width: min(420px, 62vw); max-height: none; border-radius: 16px 0 0 16px; border-top: 0; border-left: 1px solid #334155; }
     }
+    .svc-btn.svc-view { border-color: #475569; }
+    .svc-btn.svc-view.on { border-color: #fbbf24; background: linear-gradient(#713f12, #422006); }
+    .svc-btn.svc-view.on .svc-lab { color: #fef3c7; }
+    .svc-sep { flex: 0 0 1px; align-self: stretch; background: #334155; margin: 2px 2px; }
+    @media (orientation: portrait) {
+      .svc-stage #rdmPopoutAbContainer.svc-grow { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+    }
+    @media (orientation: landscape) and (max-height: 560px) { .svc-sep { flex: 0 0 1px; height: 1px; width: auto; align-self: stretch; } }
+    #svcSarMap { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 2147482990;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-radius: 999px; background: rgba(2, 6, 23, 0.86);
+      border: 1px solid #a78bfa; color: #ede9fe; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5); max-width: calc(100vw - 16px); }
+    #svcSarMap input[type=range] { width: 90px; accent-color: #a78bfa; }
+    #svcSarMap button { min-height: 32px; border-radius: 999px; padding: 0 12px; border: 1px solid #a78bfa; background: #2e1065; color: #ede9fe; font-weight: 700; }
     #rdmPopoutCanvas, #sarPopoutCanvas, #rdmPopoutAbConvCanvas, #rdmPopoutAbAdapCanvas { touch-action: none; }
     .sv-fs-bar { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
     .sv-fs-bar button { min-height: 34px; }
@@ -12353,6 +12432,8 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
           value: () => irState().band, pick: (v) => call('setIrBand', v) },
         { icon: '🎛', label: () => (irState().sensor === false ? 'Ideal' : 'Sensor'), on: () => irState().sensor !== false,
           run: () => call('setIrSensorModel', irState().sensor === false) },
+        { icon: '✨', label: () => (irState().gpu === false ? 'Reference' : 'GPU'), on: () => irState().gpu !== false,
+          run: () => call('setIrGpu', irState().gpu === false), title: 'GPU graphics or the ray-marched reference' },
         { icon: '🎨', label: () => ({ whot: 'White hot', bhot: 'Black hot', ironbow: 'Ironbow', nvg: 'NVG' }[window.flirPolarity] || 'Palette'),
           title: 'Palette', menu: () => [['whot', 'White hot'], ['bhot', 'Black hot'], ['ironbow', 'Ironbow'], ['nvg', 'NVG']],
           value: () => window.flirPolarity, pick: (v) => call('setFlirPolarity', v), hide: () => irState().band === 'eo' },
@@ -12400,6 +12481,7 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
         proxy('chkSarShadow', '🌓', 'Shadow'),
         proxy('chkSarLayover', '📐', 'Layover'),
         proxy('chkSarDrape', '🗺', 'Drape'),
+        { icon: '🛰', label: 'On the map', run: () => sarOnMap(true), hide: () => !sarAvailable() },
         { icon: '⟲', label: 'Reset', run: () => call('resetSarZoom') },
       ],
       canvases: ['sarPopoutCanvas'],
@@ -12506,11 +12588,14 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
       const want = spec.grow().filter(Boolean);
       cur.root.querySelectorAll('.svc-grow').forEach(n => { if (!want.includes(n)) n.classList.remove('svc-grow'); });
       want.forEach(n => n.classList.add('svc-grow'));
+      // A/B on or off changes which canvases are on screen: size them and draw again.
+      const key = want.map(n => n.id).join(',');
+      if (cur.growKey !== key) { const first = cur.growKey === undefined; cur.growKey = key; if (!first) setTimeout(fitCanvases, 40); }
     }
   }
 
-  function open(view) {
-    if (cur) close();
+  function open(view, opts) {
+    if (cur) close({ keepModal: true });
     const spec = VIEWS[view];
     const content = $(spec.content);
     const stage = spec.stage().filter(Boolean);
@@ -12520,7 +12605,7 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     const root = el(doc, 'div', 'svc'); root.setAttribute('role', 'dialog'); root.setAttribute('aria-label', spec.title + ' full screen');
     const stageBox = el(doc, 'div', 'svc-stage');
     root.appendChild(stageBox);
-    cur = { view, root, homes: [], sizes: {}, pop: null, scrubbing: false };
+    cur = { view, root, homes: [], sizes: {}, pop: null, scrubbing: false, ownsModal: Boolean(opts && opts.ownsModal) };
     stage.forEach(n => borrow(n, stageBox));
     spec.grow().filter(Boolean).forEach(n => n.classList.add('svc-grow'));
 
@@ -12547,6 +12632,12 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
 
     // Dock: everyday controls, then all controls and exit.
     const dock = el(doc, 'div', 'svc-dock');
+    // Switch between the three sensor views without leaving full screen.
+    [['flir', '📷', 'EO/IR'], ['rdm', '📡', 'RF'], ['sar', '🛰', 'SAR']].forEach(([v, icon, label]) => {
+      if (!$(VIEWS[v].content)) return;
+      dock.appendChild(dockButton(doc, { icon, label, on: () => Boolean(cur && cur.view === v), run: () => switchView(v) }, 'svc-view'));
+    });
+    dock.appendChild(el(doc, 'span', 'svc-sep'));
     spec.dock.forEach(it => dock.appendChild(dockButton(doc, it)));
     const more = dockButton(doc, { icon: '☰', label: 'All controls', run: () => toggleSheet() }, 'svc-more');
     const exit = dockButton(doc, { icon: '✕', label: 'Exit', run: () => close() }, 'svc-exit');
@@ -12594,10 +12685,12 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     cur.sheet.classList.toggle('open', want);
   }
 
-  function close() {
+  function close(opts) {
     if (!cur) return;
     const c = cur, doc = c.root.ownerDocument, spec = VIEWS[c.view];
     cur = null;
+    // On a phone the workbench window only ever served the console: close it with it.
+    if (c.ownsModal && !(opts && opts.keepModal)) { quiet = true; try { call('setRdmPopout', false); } finally { quiet = false; } }
     clearInterval(c.timer);
     if (c.pop) c.pop.remove();
     doc.removeEventListener('keydown', c.onKey);
@@ -12613,7 +12706,116 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     }, 60);
   }
 
-  window.studioSensorConsole = { open, close, isOpen: () => Boolean(cur), view: () => (cur ? cur.view : null), sheet: toggleSheet };
+  // ---- phones: sensor views open straight into the console ------------------------------
+  const PHONE = window.matchMedia ? window.matchMedia('(max-width: 760px), (max-height: 500px)') : { matches: false };
+  const TAB = { flir: 'flir', rdm: 'rdm', sar: 'sar' };
+  let quiet = false;   // set while this code drives the workbench itself
+  function openSensor(view) {
+    if (!VIEWS[view] || !$(VIEWS[view].content)) return false;
+    const owns = !(typeof rdmPopoutOpen !== 'undefined' && rdmPopoutOpen) && !isModalOpen();
+    quiet = true;
+    try { call('setRdmPopout', true); call('switchPopoutTab', TAB[view]); } finally { quiet = false; }
+    return open(view, { ownsModal: owns || (cur && cur.ownsModal) });
+  }
+  function isModalOpen() {
+    const m = $('rdmPopoutModal') || document.querySelector('.rdm-popout-modal');
+    return Boolean(m && m.offsetParent !== null && getComputedStyle(m).display !== 'none');
+  }
+  function switchView(view) {
+    if (!cur || cur.view === view) return;
+    const owns = cur.ownsModal;
+    close({ keepModal: true });
+    quiet = true;
+    try { call('switchPopoutTab', TAB[view]); } finally { quiet = false; }
+    open(view, { ownsModal: owns });
+  }
+  window.studioOpenSensor = openSensor;
+
+  // The radar console's RF / IR / SAR buttons, the workbench tabs and the workbench itself:
+  // on a phone each goes straight to full screen (the small in-panel views are cramped).
+  const hudView = window.studioHudView;
+  window.studioHudView = function (view, ev) {
+    if (PHONE.matches && VIEWS[view]) { if (ev && ev.stopPropagation) ev.stopPropagation(); openSensor(view); return; }
+    return hudView ? hudView(view, ev) : undefined;
+  };
+  function wrapGlobal(name, after) {
+    const orig = window[name];
+    if (typeof orig !== 'function' || orig._svcWrapped) return;
+    const wrapped = function () { const r = orig.apply(this, arguments); if (!quiet) { try { after.apply(this, arguments); } catch (e) { console.warn(name, e); } } return r; };
+    wrapped._svcWrapped = true;
+    window[name] = wrapped;
+  }
+  function phoneFollow() {
+    wrapGlobal('switchPopoutTab', (tab) => {
+      const v = tab === 'flir' ? 'flir' : tab === 'rdm' ? 'rdm' : tab === 'sar' ? 'sar' : null;
+      if (PHONE.matches && v && isModalOpen() && (!cur || cur.view !== v)) open(v, { ownsModal: true });
+    });
+    wrapGlobal('setRdmPopout', (on) => {
+      if (!PHONE.matches || !on || cur) return;
+      const tab = typeof currentPopoutTab === 'string' ? currentPopoutTab : 'rdm';
+      if (VIEWS[tab]) setTimeout(() => { if (!cur && isModalOpen()) open(tab, { ownsModal: true }); }, 30);
+    });
+  }
+
+  // ---- SAR on the map: the image draped on the satellite basemap, nothing else in the way ----
+  function sarAvailable() { const p = window.__STUDIO_SAR_PAYLOAD__; return Boolean(p && p.available); }
+  let sarSaved = null;
+  function activeBasemap() {
+    const ids = { btnSat: 'satellite', btnTopo: 'topo', btnOsm: 'osm', btnDark: 'dark' };
+    const on = Object.keys(ids).find(id => { const b = $(id); return b && b.classList.contains('active'); });
+    return on ? ids[on] : 'satellite';
+  }
+  function sarOnMap(on) {
+    const layers = window.studioMapLayers;
+    if (on) {
+      if (!sarAvailable()) return;
+      if (!sarSaved) {
+        const clutterBtn = $('quickBtnClutter') || $('btnClutter');
+        const drape = $('chkSarDrape');
+        sarSaved = { basemap: activeBasemap(), clutter: clutterBtn ? clutterBtn.classList.contains('active') : true,
+                     layers: layers ? layers.getState() : null, drape: drape ? drape.checked : false };
+      }
+      close();
+      call('setBasemap', 'satellite');
+      call('toggleClutter', false);
+      if (layers) { layers.setRfBeams(false); layers.setLayer('ir', false); layers.setLayer('aoi', false); }
+      else { call('setRfBeamsOnGlobe', false); call('setIrFovOnGlobe', false); }
+      const drape = $('chkSarDrape'); if (drape) drape.checked = true;
+      call('toggleSarOverlay', 'drape', true);
+      call('flyToSarSwath');
+      showSarChip(true);
+    } else {
+      showSarChip(false);
+      const s = sarSaved; sarSaved = null;
+      if (!s) return;
+      call('setBasemap', s.basemap);
+      call('toggleClutter', s.clutter);
+      if (layers && s.layers) Object.keys(s.layers).forEach(k => layers.setLayer(k, s.layers[k]));
+      const drape = $('chkSarDrape'); if (drape) drape.checked = s.drape;
+      call('toggleSarOverlay', 'drape', s.drape);
+    }
+  }
+  function showSarChip(on) {
+    let chip = $('svcSarMap');
+    if (!on) { if (chip) chip.remove(); return; }
+    if (chip) return;
+    ensureStyle(document);
+    chip = el(document, 'div'); chip.id = 'svcSarMap'; chip.setAttribute('role', 'status');
+    chip.appendChild(el(document, 'span', '', '🛰 SAR on map'));
+    const alpha = el(document, 'input'); alpha.type = 'range'; alpha.min = '15'; alpha.max = '100'; alpha.step = '5';
+    const real = $('sarDrapeAlphaSlider'); alpha.value = real ? real.value : '82'; alpha.setAttribute('aria-label', 'SAR opacity');
+    alpha.addEventListener('input', () => { const r = $('sarDrapeAlphaSlider'); if (r) r.value = alpha.value; call('setSarDrapeOpacity', alpha.value); });
+    chip.appendChild(alpha);
+    const back = el(document, 'button', '', 'Back'); back.type = 'button'; back.title = 'Put the map back as it was';
+    back.addEventListener('click', () => sarOnMap(false));
+    chip.appendChild(back);
+    document.body.appendChild(chip);
+  }
+  window.studioSarOnMap = sarOnMap;
+  window.studioSarAvailable = sarAvailable;
+
+  window.studioSensorConsole = { open, close, isOpen: () => Boolean(cur), view: () => (cur ? cur.view : null), sheet: toggleSheet,
+    switchView, openSensor };
   window.studioSetMapFullScreen = (view, on) => (on ? open(view) : close());
 
   // In the panel: a "Full screen" button beside the RF and SAR maps, and touch on both maps.
@@ -12708,7 +12910,10 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
     c.addEventListener('pointercancel', up);
   }
 
-  function setup() { try { ensureMapButtons(); } catch (e) { console.warn('sensor console', e); } }
+  function setup() {
+    try { ensureMapButtons(); } catch (e) { console.warn('sensor console', e); }
+    try { phoneFollow(); } catch (e) { console.warn('sensor console phone', e); }
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup);
   else setup();
 })();
@@ -12747,6 +12952,9 @@ window.toggleRdmAbCompare = toggleRdmAbCompare;
   };
   const BAND_KEY = 'studio-ir-band:' + (typeof location !== 'undefined' ? location.pathname : '');
   try { const b = localStorage.getItem(BAND_KEY); if (b && IR.BANDS && IR.BANDS[b]) S.band = b; } catch (e) { /* storage blocked */ }
+  const GPU_KEY = 'studio-ir-gpu:' + (typeof location !== 'undefined' ? location.pathname : '');
+  S.gpu = true;
+  try { if (localStorage.getItem(GPU_KEY) === 'off') S.gpu = false; } catch (e) { /* storage blocked */ }
   const SENSOR_KEY = 'studio-ir-sensor-model:' + (typeof location !== 'undefined' ? location.pathname : '');
   try { if (localStorage.getItem(SENSOR_KEY) === 'off') S.sensor = false; } catch (e) { /* storage blocked */ }
   window.studioIrState = S;
@@ -13007,10 +13215,37 @@ self.onmessage = function(ev) {
     }, 150);
   }
 
+  function gpuReady() {
+    const G = window.StudioIRGpu;
+    if (!S.gpu || !G || G.state === 'failed') return false;
+    return G.prepare(world(), () => { if (visible(canvas())) redraw(); });
+  }
+  function gpuDispatch(job) {
+    const G = window.StudioIRGpu;
+    let fr = null;
+    try {
+      fr = G.frame({ world: world(), state: job.st, w: job.rw, h: job.rh, hfovDeg: job.hfovDeg, look: job.look, band: job.band,
+        ss: job.isRefine ? 2 : 1, ideal: job.ideal, noise: job.noise, frameIndex: job.frameIndex, palette: job.polarity });
+    } catch (e) { console.warn('EO/IR GPU frame', e); fr = null; }
+    if (!fr) return false;
+    S.lastGpu = true;
+    const c = canvas();
+    if (visible(c)) {
+      const { cw, ch } = fitCanvas(c);
+      paintRgba(c, cw, ch, job.rw, job.rh, fr.rgba, fr.img.cam, job.st, fr.sens.lo, fr.sens.hi, job.cuedTarget,
+        fr.img.vehicleBoxes, fr.img.cond, job.t, job.tl, fr.img.temp, fr.img.range);
+      if (S.last) S.last.sens.exposure = fr.sens.exposure;
+    }
+    if (!job.isRefine) scheduleRefine(job);
+    return true;
+  }
+
   function flushDispatch() {
     S.dispatchScheduled = false;
     const job = S.pendingJob;
     if (!job) return;
+    if (gpuReady()) { S.pendingJob = null; if (gpuDispatch(job)) return; S.pendingJob = job; }
+    S.lastGpu = false;
     const worker = ensureWorker();
     if (!worker) {
       S.pendingJob = null;
@@ -13080,7 +13315,8 @@ self.onmessage = function(ev) {
     const { cw, ch, dpr } = fitCanvas(c);
     const isPlaying = typeof viewer !== 'undefined' && viewer && viewer.clock && Boolean(viewer.clock.shouldAnimate);
     const isRefine = Boolean(S.refinePass);
-    const maxW = isRefine ? refineWidth() : (isPlaying ? 320 : 448);
+    const gpuOn = gpuReady();
+    const maxW = isRefine ? refineWidth() : gpuOn ? (isPlaying ? 640 : 960) : (isPlaying ? 320 : 448);
     const rw = Math.min(maxW, Math.round(cw * dpr)), rh = Math.max(120, Math.round(rw * ch / cw));
     S.aspect = rh / rw;
     const { look, cuedTarget } = lookFor(st);
@@ -13214,7 +13450,10 @@ self.onmessage = function(ev) {
     const sensorTag = S.sensor ? '' : (cw < 640 ? ' · IDEAL' : ' · IDEAL SCENE (sensor model off)');
     const bandInfo = (IR.BANDS && IR.BANDS[S.band]) || { label: 'LWIR 8–12 µm' };
     const polTag = bandInfo.colour ? '' : ` · ${pol}`;
-    textBox(ctx, `${bandInfo.label}${polTag} · HFOV ${S.hfov.toFixed(1)}°${sensorTag}${edgeSuffix}`, 8, 20, 'left', S.sensor ? '#e2e8f0' : '#a5f3fc');
+    const G = window.StudioIRGpu;
+    const gpuTag = S.lastGpu ? ' · GPU' : (S.gpu && G && G.state !== 'failed' && G.state !== 'idle' && G.state !== 'ready'
+      ? ` · GPU ${Math.round((G.progress || 0) * 100)}%` : '');
+    textBox(ctx, `${bandInfo.label}${polTag} · HFOV ${S.hfov.toFixed(1)}°${sensorTag}${edgeSuffix}${gpuTag}`, 8, 20, 'left', S.sensor ? '#e2e8f0' : '#a5f3fc');
     const frameIdx = Math.round(t * S.frameRate), frames = Math.round(tl.dur * S.frameRate);
     // Narrow (phone) images: the right-hand readouts go on their own line so they don't overprint the left ones.
     const narrow = cw < 640;
@@ -13249,6 +13488,38 @@ self.onmessage = function(ev) {
     if (noise) { noise.disabled = !S.sensor; const l = noise.closest('label'); if (l) l.style.opacity = S.sensor ? '' : '0.45'; }
     return box;
   }
+
+  // "GPU graphics" beside "Sensor model": the WebGL renderer, or the ray-marched reference.
+  function ensureGpuToggle() {
+    let box = el('chkIrGpu');
+    if (!box) {
+      const sensor = el('chkIrSensorModel');
+      const host = sensor && sensor.closest('label');
+      if (!host || !host.parentNode) return null;
+      const label = host.ownerDocument.createElement('label');
+      label.title = 'GPU graphics: lit 3D scene with sun shadows, glints and anti-aliasing, drawn by the graphics chip. '
+        + 'Off draws the ray-marched reference image.';
+      box = host.ownerDocument.createElement('input');
+      box.type = 'checkbox'; box.id = 'chkIrGpu';
+      box.addEventListener('change', () => window.setIrGpu(box.checked));
+      label.appendChild(box);
+      label.appendChild(host.ownerDocument.createTextNode(' GPU graphics'));
+      host.parentNode.insertBefore(label, host.nextSibling);
+    }
+    const G = window.StudioIRGpu;
+    const available = !!G && G.state !== 'failed' && (G.supported ? G.supported() : true);
+    box.checked = S.gpu && available;
+    box.disabled = !available;
+    const l = box.closest('label'); if (l) l.style.opacity = available ? '' : '0.45';
+    if (!available && l) l.title = 'GPU graphics are not available in this browser' + (G && G.error ? ' (' + G.error + ')' : '');
+    return box;
+  }
+  window.setIrGpu = function (on) {
+    S.gpu = Boolean(on);
+    try { localStorage.setItem(GPU_KEY, S.gpu ? 'on' : 'off'); } catch (e) { /* storage blocked */ }
+    ensureGpuToggle();
+    redraw();
+  };
 
   // Band buttons (EO / SWIR / MWIR / LWIR) before the palette, and band-aware titles (#1556).
   function ensureBandControls() {
@@ -13288,6 +13559,7 @@ self.onmessage = function(ev) {
 
   function controls() {
     ensureSensorToggle();
+    ensureGpuToggle();
     ensureBandControls();
     ensureStage();
     const tl = timeline();
@@ -13744,6 +14016,714 @@ self.onmessage = function(ev) {
     try { updateFovOnGlobe(); } catch (e) { console.warn('IR FOV footprint', e); }
   };
   setTimeout(loop, 300);
+})();
+
+// ==== GPU renderer for the EO/IR camera (WebGL2) ======================================
+// The same scene as the ray-marched renderer (studio_ir_renderer.js), drawn on the
+// graphics chip: terrain mesh, roads as draped ribbons, extruded buildings with a
+// procedural window grid, 3D tree crowns and the target models, lit by the sun with a
+// real shadow map, sky ambient, specular glints, haze, anti-aliasing and a filmic tone.
+// Temperatures come from the physics model itself: building and vehicle faces are
+// shaded by the same functions at each vertex, the ground from a map baked with the
+// same ground model. IR bands are read back and pass through the same sensor model
+// (noise, AGC, palette). The ray-marched renderer stays the reference and the fallback.
+(function () {
+  'use strict';
+  const IR = window.StudioIR;
+  if (!IR || !IR.MATERIAL || !IR.render || typeof document === 'undefined') return;
+  const M = IR.MATERIAL;
+  const G = window.StudioIRGpu = { state: 'idle', progress: 0, error: null };
+  const BAND_CODE = { eo: 0, swir: 1, mwir: 2, lwir: 3 };
+  const KIND = { terrain: 0, wall: 1, roof: 2, vehicle: 3, crown: 4, trunk: 5, road: 6 };
+  const STRIDE = 18;   // pos3 nrm3 temp mat vari kind wdir2 wp02 z0 z1 seed win
+
+  let gl = null, cvs = null, progs = null, caps = null;
+  let scene = null;    // GPU buffers for one world
+  let lut = null;
+
+  // ---------- small math ----------
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  function viewMat(pos, right, up, fwd) {
+    return new Float32Array([
+      right[0], up[0], -fwd[0], 0,
+      right[1], up[1], -fwd[1], 0,
+      right[2], up[2], -fwd[2], 0,
+      -dot(right, pos), -dot(up, pos), dot(fwd, pos), 1]);
+  }
+  function perspective(tanX, tanY, n, f) {
+    return new Float32Array([1 / tanX, 0, 0, 0, 0, 1 / tanY, 0, 0, 0, 0, -(f + n) / (f - n), -1, 0, 0, -2 * f * n / (f - n), 0]);
+  }
+  function ortho(e, n, f) {
+    return new Float32Array([1 / e, 0, 0, 0, 0, 1 / e, 0, 0, 0, 0, -2 / (f - n), 0, 0, 0, -(f + n) / (f - n), 1]);
+  }
+  function mul(a, b) {   // column-major a * b
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+      let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k]; o[c * 4 + r] = s;
+    }
+    return o;
+  }
+
+  // ---------- shaders ----------
+  const COMMON = `#version 300 es
+precision highp float; precision highp int; precision highp sampler2DShadow;
+`;
+  const VS = COMMON + `
+layout(location=0) in vec3 aPos; layout(location=1) in vec3 aNrm; layout(location=2) in vec4 aInfo;  // temp mat vari kind
+layout(location=3) in vec4 aWall; layout(location=4) in vec4 aWall2;   // dir.xy p0.xy | z0 z1 seed win
+uniform mat4 uViewProj; uniform mat4 uLight;
+out vec3 vPos; out vec3 vNrm; out vec4 vInfo; out vec4 vWall; out vec4 vWall2; out vec4 vLight;
+void main(){ vPos=aPos; vNrm=aNrm; vInfo=aInfo; vWall=aWall; vWall2=aWall2; vLight=uLight*vec4(aPos,1.0);
+  gl_Position=uViewProj*vec4(aPos,1.0); }`;
+  const VS_DEPTH = COMMON + `
+layout(location=0) in vec3 aPos; uniform mat4 uLight; void main(){ gl_Position=uLight*vec4(aPos,1.0); }`;
+  const FS_DEPTH = COMMON + `void main(){}`;
+
+  const FS = COMMON + `
+in vec3 vPos; in vec3 vNrm; in vec4 vInfo; in vec4 vWall; in vec4 vWall2; in vec4 vLight;
+layout(location=0) out vec4 oCol; layout(location=1) out vec4 oRange;
+uniform int uBand; uniform int uPass;          // pass 0 final, 1 EO metering (packed luminance), 2 IR packed values
+uniform vec3 uCam; uniform vec3 uSun; uniform float uAir, uNight, uLoad, uDay, uSunI, uExposure;
+uniform sampler2DShadow uShadow; uniform float uShadowOn;
+uniform sampler2D uAlbedo;                      // 256 variants x 32 materials
+uniform float uSwir[32]; uniform float uEps[32];
+uniform sampler2D uGInfo; uniform sampler2D uGInfoN; uniform sampler2D uGTemp; uniform vec4 uGRect;   // inner ground maps
+uniform sampler2D uOInfo; uniform sampler2D uOInfoN; uniform sampler2D uOTemp; uniform vec4 uORect;   // outer ground maps
+uniform float uHasInner, uHasOuter;
+uniform float uTGrass, uTSoil, uTRoad, uTRoadSh, uTCanopy;
+float hash(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y)*2.0-1.0; }
+float fbm(vec2 p){ float s=0.0,a=0.5; for(int k=0;k<4;k++){ s+=a*vnoise(p); p*=2.03; a*=0.5; } return s; }
+vec3 pack24(float n){ n=clamp(n,0.0,1.0)*16777215.0; float r=floor(n/65536.0); float g=floor((n-r*65536.0)/256.0); float b=n-r*65536.0-g*256.0; return vec3(r,g,b)/255.0; }
+float planck4(float tc){ float tk=max(150.0,tc+273.15); return (exp(3597.0/293.15)-1.0)/(exp(3597.0/tk)-1.0); }
+float glow16(float tc){ float tk=tc+273.15; return tk<450.0?0.0:4e3*exp(-8993.0/tk); }
+vec3 aces(vec3 x){ x*=0.8; return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0); }
+float shadowAt(vec3 n){
+  if(uShadowOn<0.5) return 1.0;
+  vec3 p=vLight.xyz/vLight.w*0.5+0.5;
+  if(p.x<0.0||p.x>1.0||p.y<0.0||p.y>1.0||p.z>1.0) return 1.0;
+  float ndl=max(dot(n,uSun),0.0); float bias=0.0006+0.0025*(1.0-ndl);
+  vec2 tx=1.0/vec2(textureSize(uShadow,0)); float s=0.0;
+  for(int y=-1;y<=1;y++) for(int x=-1;x<=1;x++) s+=texture(uShadow,vec3(p.xy+vec2(x,y)*tx,p.z-bias));
+  return s/9.0;
+}
+void main(){
+  vec3 N=normalize(vNrm); vec3 V=normalize(uCam-vPos); if(dot(N,V)<0.0) N=-N;
+  float temp=vInfo.x; int mat=int(vInfo.y+0.5); float vari=vInfo.z; int kind=int(vInfo.w+0.5);
+  float ao=1.0, canopy=0.0;
+  float dist=length(uCam-vPos);
+  if(kind==0){   // ground: baked maps
+    vec2 gi=(vPos.xy-uGRect.xy)/uGRect.zw, go=(vPos.xy-uORect.xy)/uORect.zw;
+    bool inner=uHasInner>0.5&&all(greaterThanEqual(gi,vec2(0.0)))&&all(lessThanEqual(gi,vec2(1.0)));
+    bool outer=uHasOuter>0.5&&all(greaterThanEqual(go,vec2(0.0)))&&all(lessThanEqual(go,vec2(1.0)));
+    if(inner){ vec4 a=texture(uGInfoN,gi); vec4 b=texture(uGInfo,gi); mat=int(a.r*255.0+0.5); vari=b.g*255.0; ao=b.b; canopy=b.a; temp=texture(uGTemp,gi).r; }
+    else if(outer){ vec4 a=texture(uOInfoN,go); vec4 b=texture(uOInfo,go); mat=int(a.r*255.0+0.5); vari=b.g*255.0; ao=b.b; canopy=b.a; temp=texture(uOTemp,go).r; }
+    else { mat=1; vari=128.0+fbm(vPos.xy*0.006)*120.0; temp=uTGrass+fbm(vPos.xy*0.02)*0.5; }
+    // fine detail below the map's cell size, fading with range
+    float fine=fbm(vPos.xy*0.9)*clamp(1.0-dist/2500.0,0.0,1.0);
+    vari=clamp(vari+fine*30.0,0.0,255.0);
+  }
+  if(kind==1 && vWall2.w>0.5){   // wall: window grid (glass reflects the cold sky; some rooms leak heat)
+    float u=dot(vPos.xy-vWall.zw,vWall.xy), v=vPos.z-vWall2.x, eaves=vWall2.y-vWall2.x, sd=vWall2.z;
+    if(v>0.8&&v<eaves-0.4){
+      float fu=mod(u+sd*1.7,3.2), fv=mod(v-0.9,3.0);
+      float pane=hash(vec2(floor((u+sd*1.7)/3.2)+sd*311.0,floor((v-0.9)/3.0)+7.0));
+      if(fu>0.9&&fu<2.3&&fv<1.5&&pane>0.12){ mat=11; float leak=pane>0.7?2.5+uNight*2.0:0.0;
+        temp=0.84*(uAir+4.0+leak)+0.16*(uAir-30.0)+(pane-0.5)*1.2; vari=pane*255.0; }
+      else if(fu>0.75&&fu<2.45&&fv<1.65) ao*=0.82;   // frame and reveal
+    }
+    ao*=0.55+0.45*clamp(v/2.5,0.0,1.0);
+  }
+  if(mat==6){   // water: wind ripples break up the mirror, fading with range
+    float k=clamp(1.0-dist/9000.0,0.15,1.0);
+    vec2 q=vPos.xy*0.35; float t1=fbm(q+vec2(0.0,3.1)), t2=fbm(q*1.7+vec2(5.2,1.3));
+    N=normalize(N+vec3(t1,t2,0.0)*0.22*k);
+  }
+  float sh=shadowAt(N);
+  float ndl=max(dot(N,uSun),0.0);
+  if(kind==4){ temp+=(ndl*sh-0.3)*0.85*(0.45+0.55*uLoad); ao*=0.55+0.45*clamp(N.z*0.5+0.5,0.0,1.0); }
+  if(kind==6){   // road ribbon: markings and shade
+    float along=vWall.x, across=vWall.y; bool marked=vWall2.w>0.5;
+    bool m=marked&&((abs(across)<0.035&&mod(along,12.0)<6.0)||abs(across)>0.93);
+    if(m){ mat=21; temp-=1.6; }
+    temp=mix(uTRoadSh,temp,sh)+fbm(vPos.xy*0.5)*0.45+fbm(vPos.xy*0.04)*0.6;
+    vari=clamp(128.0+fbm(vPos.xy*0.03)*200.0,0.0,255.0);
+  }
+  float lam=ndl*sh*(1.0-0.5*canopy);
+  float tau=exp(-0.18e-3*dist);
+  if(uBand==3){   // LWIR: temperature, then the 8-12 um atmosphere
+    float t=tau*temp+(1.0-tau)*(uAir-2.0);
+    oCol=vec4(pack24((t+200.0)/4000.0),1.0); oRange=vec4(pack24(dist/60000.0),1.0); return;
+  }
+  if(uBand==2){   // MWIR: 4 um emission plus reflected sun on low-emissivity surfaces
+    float e=uEps[mat]; float L=e*planck4(temp)+(1.0-e)*(1.2*lam*uSunI+0.25*planck4(uAir-25.0));
+    float tm=exp(-0.25e-3*dist); L=tm*L+(1.0-tm)*planck4(uAir-2.0);
+    oCol=vec4(pack24((L*50.0+200.0)/4000.0),1.0); oRange=vec4(pack24(dist/60000.0),1.0); return;
+  }
+  vec2 auv=vec2((vari+0.5)/256.0,(float(mat)+0.5)/32.0);
+  vec3 alb=texture(uAlbedo,auv).rgb; alb*=alb;
+  if(uBand==1){   // SWIR: reflected light; foliage bright, water black
+    float vk=0.9+0.2*vari/255.0;
+    float v=uSwir[mat]*vk*(lam*uSunI*1.1*(0.55+0.45*ao)+0.2*uDay*ao+0.003)+glow16(temp);
+    float f=1.0-exp(-dist/16000.0); v+=(0.1*uDay-v)*f;
+    oCol=vec4(pack24((v*100.0+200.0)/4000.0),1.0); oRange=vec4(pack24(dist/60000.0),1.0); return;
+  }
+  // EO: sun, sky, glints, haze
+  float warm=1.0-uSunI; vec3 sunC=vec3(1.0,0.93-0.18*warm,0.82-0.35*warm);
+  vec3 hor=vec3(0.74,0.80,0.88)*uDay, zen=vec3(0.30,0.48,0.82)*uDay;
+  float hemi=0.6+0.4*clamp(N.z,0.0,1.0);
+  vec3 col=alb*(sunC*lam*uSunI*1.15*(0.55+0.45*ao)+vec3(0.92,0.97,1.08)*(0.22*uDay+0.004)*ao*hemi);
+  float spec=0.0, refl=0.0;
+  if(mat==11){ spec=0.6; refl=0.10; } else if(mat==6){ spec=0.9; refl=0.10; } else if(mat==12){ spec=0.25; refl=0.04; }
+  if(spec>0.0){
+    vec3 H=normalize(uSun+V); float fres=0.04+0.96*pow(1.0-max(dot(N,V),0.0),5.0);
+    col+=sunC*spec*pow(max(dot(N,H),0.0),mat==6?400.0:120.0)*sh*uSunI*3.0*fres;
+    vec3 R=reflect(-V,N); col+=mix(hor,zen,clamp(R.z,0.0,1.0))*(refl+fres*(mat==6?0.55:0.3));
+  }
+  if(mat==11 && vari>178.0) col+=vec3(1.0,0.78,0.45)*0.35*uNight;   // lit rooms at night
+  float hz=1.0-exp(-dist/40000.0); col=mix(col,hor*0.45,hz);
+  if(uPass==1){ float lum=dot(col,vec3(0.2126,0.7152,0.0722)); oCol=vec4(pack24(lum/4.0),1.0); oRange=vec4(0.0); return; }
+  vec3 c=aces(col*uExposure); float y=dot(c,vec3(0.2126,0.7152,0.0722)); c=clamp(y+(c-y)*1.12,0.0,1.0);
+  oCol=vec4(pow(c,vec3(1.0/2.2)),1.0); oRange=vec4(0.0);
+}`;
+
+  const VS_SKY = COMMON + `
+const vec2 P[3]=vec2[3](vec2(-1,-1),vec2(3,-1),vec2(-1,3)); out vec2 vNdc;
+void main(){ vNdc=P[gl_VertexID]; gl_Position=vec4(P[gl_VertexID],0.9999,1.0); }`;
+  const FS_SKY = COMMON + `
+in vec2 vNdc; layout(location=0) out vec4 oCol; layout(location=1) out vec4 oRange;
+uniform vec3 uRight, uUp, uFwd; uniform float uTanX, uTanY; uniform vec3 uSun; uniform int uBand, uPass;
+uniform float uAir, uDay, uSunI, uExposure;
+vec3 pack24(float n){ n=clamp(n,0.0,1.0)*16777215.0; float r=floor(n/65536.0); float g=floor((n-r*65536.0)/256.0); float b=n-r*65536.0-g*256.0; return vec3(r,g,b)/255.0; }
+float planck4(float tc){ float tk=max(150.0,tc+273.15); return (exp(3597.0/293.15)-1.0)/(exp(3597.0/tk)-1.0); }
+vec3 aces(vec3 x){ x*=0.8; return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0); }
+void main(){
+  vec3 d=normalize(uFwd+vNdc.x*uTanX*uRight+vNdc.y*uTanY*uUp);
+  float el=max(d.z,0.0); oRange=vec4(pack24(40000.0/60000.0),1.0);
+  float skyT=uAir-8.0-42.0*pow(max(el,0.001),0.45);
+  if(uBand==3){ oCol=vec4(pack24((skyT+200.0)/4000.0),1.0); return; }
+  if(uBand==2){ oCol=vec4(pack24((0.9*planck4(skyT)*50.0+200.0)/4000.0),1.0); return; }
+  if(uBand==1){ oCol=vec4(pack24((0.12*uDay*(1.0-min(1.0,el)*0.6)*100.0+200.0)/4000.0),1.0); return; }
+  if(uPass==1){ oCol=vec4(0.0); return; }   // the sky does not meter
+  vec3 hor=vec3(0.74,0.80,0.88)*uDay, zen=vec3(0.30,0.48,0.82)*uDay;
+  vec3 col=mix(hor,zen,pow(el,0.5));
+  float sd=max(dot(d,uSun),0.0); float warm=1.0-uSunI;
+  col+=vec3(1.0,0.9-0.2*warm,0.75-0.3*warm)*(pow(sd,600.0)*6.0+pow(sd,12.0)*0.25)*uSunI;
+  vec3 c=aces(col*uExposure); float y=dot(c,vec3(0.2126,0.7152,0.0722)); c=clamp(y+(c-y)*1.12,0.0,1.0);
+  oCol=vec4(pow(c,vec3(1.0/2.2)),1.0);
+}`;
+
+  function compile(vs, fs) {
+    const mk = (type, src) => {
+      const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('shader: ' + gl.getShaderInfoLog(s));
+      return s;
+    };
+    const p = gl.createProgram();
+    gl.attachShader(p, mk(gl.VERTEX_SHADER, vs)); gl.attachShader(p, mk(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('link: ' + gl.getProgramInfoLog(p));
+    const u = {}, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(p, i); const name = info.name.replace(/\[0\]$/, ''); u[name] = gl.getUniformLocation(p, info.name); }
+    return { p, u };
+  }
+
+  function init() {
+    if (gl) return true;
+    if (G.state === 'failed') return false;
+    try {
+      cvs = document.createElement('canvas'); cvs.width = 4; cvs.height = 4;
+      gl = cvs.getContext('webgl2', { antialias: false, alpha: false, depth: false, preserveDrawingBuffer: false, powerPreference: 'high-performance' });
+      if (!gl) throw new Error('WebGL2 is not available');
+      progs = { main: compile(VS, FS), depth: compile(VS_DEPTH, FS_DEPTH), sky: compile(VS_SKY, FS_SKY) };
+      caps = { maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE), samples: Math.min(4, gl.getParameter(gl.MAX_SAMPLES) || 0) };
+      cvs.addEventListener('webglcontextlost', (e) => { e.preventDefault(); fail(new Error('graphics context lost')); });
+      return true;
+    } catch (e) { fail(e); return false; }
+  }
+  function fail(e) {
+    G.state = 'failed'; G.error = String(e && e.message || e);
+    console.warn('EO/IR GPU renderer off:', G.error);
+    gl = null; scene = null;
+  }
+  G.supported = function () {
+    try { const c = document.createElement('canvas'); return !!c.getContext('webgl2'); } catch (e) { return false; }
+  };
+
+  // ---------- textures ----------
+  function tex2D(w, h, internal, format, type, data, filter) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return t;
+  }
+  function albedoLut() {
+    if (lut) return lut;
+    const data = new Uint8Array(256 * 32 * 4);
+    for (let m = 0; m < 32; m++) for (let v = 0; v < 256; v++) {
+      let a;
+      if (m === M.PAINT) a = IR.PAINTS[v % IR.PAINTS.length];
+      else a = (IR.OPTICS[m] ? IR.albedo(m, v) : [0.3, 0.3, 0.3]);
+      const i = (m * 256 + v) * 4;
+      // stored as sqrt to keep precision in the darks; squared in the lookup below
+      data[i] = Math.round(Math.sqrt(Math.min(1, a[0])) * 255); data[i + 1] = Math.round(Math.sqrt(Math.min(1, a[1])) * 255);
+      data[i + 2] = Math.round(Math.sqrt(Math.min(1, a[2])) * 255); data[i + 3] = 255;
+    }
+    lut = tex2D(256, 32, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, data, gl.LINEAR);
+    return lut;
+  }
+
+  // ---------- geometry for one world ----------
+  function pushVert(arr, p, n, temp, mat, vari, kind, wall) {
+    arr.push(p[0], p[1], p[2], n[0], n[1], n[2], temp, mat, vari, kind);
+    if (wall) arr.push(wall[0], wall[1], wall[2], wall[3], wall[4], wall[5], wall[6], wall[7]);
+    else arr.push(0, 0, 0, 0, 0, 0, 0, 0);
+  }
+  const KIND_MAT = { wall: M.BRICK, roof: M.ROOF, plant: M.PLANT, vehicle: M.PAINT };
+  function shadeVertex(tri, p) {
+    let t = 0;
+    try { t = tri.shade(p[0], p[1], p[2]); } catch (e) { t = 10; }
+    const m = IR.lastMaterial();
+    return [t, m >= 0 ? m : (tri.mat != null ? tri.mat : (KIND_MAT[tri.kind] != null ? KIND_MAT[tri.kind] : M.PAVING))];
+  }
+  function trisToVerts(tris, arr, kindOf, variOf) {
+    for (const tri of tris) {
+      let n = norm(cross(sub(tri.b, tri.a), sub(tri.c, tri.a)));
+      const kind = kindOf(tri), vari = variOf(tri);
+      const w = tri.wall;
+      const wall = w ? [w.dir[0], w.dir[1], w.p0[0], w.p0[1], w.z0, w.z1, w.seed * 1000, w.win ? 1 : 0] : null;
+      for (const p of [tri.a, tri.b, tri.c]) {
+        const [t, m] = shadeVertex(tri, p);
+        // walls: the window grid is drawn per pixel, so corners take the plain wall
+        pushVert(arr, p, n, t, m, vari, kind, wall);
+      }
+    }
+  }
+  // An icosahedron (20 faces) for tree crowns, with smooth normals.
+  const ICO = (() => {
+    const t = (1 + Math.sqrt(5)) / 2;
+    const v = [[-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0], [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t], [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]].map(norm);
+    const f = [[0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11], [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+      [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9], [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]];
+    // one subdivision: 80 faces
+    const verts = v.slice(), cache = new Map(), faces = [];
+    const midpoint = (a, b) => { const k = a < b ? a + ',' + b : b + ',' + a; if (cache.has(k)) return cache.get(k);
+      const m = norm([(verts[a][0] + verts[b][0]) / 2, (verts[a][1] + verts[b][1]) / 2, (verts[a][2] + verts[b][2]) / 2]); verts.push(m); cache.set(k, verts.length - 1); return verts.length - 1; };
+    f.forEach(([a, b, c]) => { const ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a); faces.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]); });
+    return { verts, faces };
+  })();
+
+  function buildWorld(world) {
+    const T = world.temps, cond = world.cond;
+    const arr = [];
+    // terrain: the DEM grid (thinned to <= 320 a side) plus rings reaching 25 km out
+    const dem = world.dem, ground = world.ground;
+    let xs = [], ys = [];
+    if (dem && dem.elevation_m) {
+      const sx = Math.max(1, Math.ceil(dem.nx / 320)), sy = Math.max(1, Math.ceil(dem.ny / 320));
+      for (let c = 0; c < dem.nx; c += sx) xs.push(dem.x_min_m + c * dem.dx_m);
+      for (let r = 0; r < dem.ny; r += sy) ys.push(dem.y_min_m + r * dem.dy_m);
+      xs.push(dem.x_min_m + (dem.nx - 1) * dem.dx_m); ys.push(dem.y_min_m + (dem.ny - 1) * dem.dy_m);
+    } else { for (let k = -12; k <= 12; k++) { xs.push(k * 500); ys.push(k * 500); } }
+    const ring = [400, 1200, 3000, 7000, 14000, 25000];
+    const x0 = xs[0], x1 = xs[xs.length - 1], y0 = ys[0], y1 = ys[ys.length - 1];
+    xs = ring.slice().reverse().map(d => x0 - d).concat(xs, ring.map(d => x1 + d));
+    ys = ring.slice().reverse().map(d => y0 - d).concat(ys, ring.map(d => y1 + d));
+    const nx = xs.length, ny = ys.length, z = new Float32Array(nx * ny);
+    for (let r = 0; r < ny; r++) for (let c = 0; c < nx; c++) z[r * nx + c] = ground(xs[c], ys[r]);
+    const nrmAt = (c, r) => {
+      const cl = Math.max(0, c - 1), cr = Math.min(nx - 1, c + 1), rd = Math.max(0, r - 1), ru = Math.min(ny - 1, r + 1);
+      const dzx = (z[r * nx + cr] - z[r * nx + cl]) / Math.max(1e-3, xs[cr] - xs[cl]);
+      const dzy = (z[ru * nx + c] - z[rd * nx + c]) / Math.max(1e-3, ys[ru] - ys[rd]);
+      return norm([-dzx, -dzy, 1]);
+    };
+    for (let r = 0; r + 1 < ny; r++) for (let c = 0; c + 1 < nx; c++) {
+      const P = (cc, rr) => [xs[cc], ys[rr], z[rr * nx + cc]];
+      const q = [[c, r], [c + 1, r], [c + 1, r + 1], [c, r + 1]];
+      [[0, 1, 2], [0, 2, 3]].forEach(t => t.forEach(k => pushVert(arr, P(q[k][0], q[k][1]), nrmAt(q[k][0], q[k][1]), T.grass, M.GRASS, 128, KIND.terrain, null)));
+    }
+    const terrainCount = arr.length / STRIDE;
+
+    // roads: ribbons draped 0.25 m above the ground, with along / across coordinates
+    (world.scene.roads || []).forEach((rd, ri) => {
+      const line = rd.line, hw = (rd.width_m || 6) / 2, marked = (rd.width_m || 0) >= 10;
+      const pts = [];
+      for (let i = 0; i + 1 < line.length; i++) {
+        const a = line[i], b = line[i + 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(L / 8));
+        for (let k = 0; k < n; k++) pts.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]);
+      }
+      pts.push(line[line.length - 1]);
+      let along = 0;
+      const side = pts.map((p, i) => {
+        const q0 = pts[Math.max(0, i - 1)], q1 = pts[Math.min(pts.length - 1, i + 1)];
+        const d = norm([q1[0] - q0[0], q1[1] - q0[1], 0]);
+        return [-d[1], d[0]];
+      });
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const segL = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+        const V = (k, s) => { const p = pts[k]; const x = p[0] + side[k][0] * hw * s, y = p[1] + side[k][1] * hw * s; return [x, y, ground(x, y) + 0.25]; };
+        const quad = [[i, -1, along], [i + 1, -1, along + segL], [i + 1, 1, along + segL], [i, 1, along]];
+        [[0, 1, 2], [0, 2, 3]].forEach(t => t.forEach(k => {
+          const [pi, s, al] = quad[k];
+          pushVert(arr, V(pi, s), [0, 0, 1], T.road, M.ASPHALT, 128, KIND.road, [al, s, 0, 0, 0, 0, ri, marked ? 1 : 0]);
+        }));
+        along += segL;
+      }
+    });
+
+    // buildings and rooftop plant
+    trisToVerts(world.tris, arr, t => (t.kind === 'wall' ? KIND.wall : KIND.roof), t => (t.vari != null ? t.vari : 128));
+
+    // trees: lumpy crowns and trunks
+    world.trees.forEach(tr => {
+      const cT = T.canopy + 0.45 + (tr.seed - 0.5) * 0.9, vari = Math.floor(tr.seed * 255);
+      const lump = (k) => 1 + 0.13 * Math.sin(k * 12.9898 + tr.seed * 78.233) ;
+      const vp = ICO.verts.map((v, k) => [tr.c[0] + v[0] * tr.r[0] * lump(k), tr.c[1] + v[1] * tr.r[1] * lump(k + 3), tr.c[2] + v[2] * tr.r[2] * lump(k + 7)]);
+      ICO.faces.forEach(f => f.forEach(k => pushVert(arr, vp[k], ICO.verts[k], cT, M.CANOPY, vari, KIND.crown, null)));
+      const top = tr.c[2] - tr.r[2] * 0.5, rad = Math.max(0.12, Math.min(tr.r[0], tr.r[1]) * 0.1);
+      if (top - tr.base > 0.5) {
+        const barkT = T.canopy - 0.15 + cond.load * 0.6;
+        for (let k = 0; k < 5; k++) {
+          const a0 = k / 5 * Math.PI * 2, a1 = (k + 1) / 5 * Math.PI * 2;
+          const P = (a, zz) => [tr.c[0] + Math.cos(a) * rad, tr.c[1] + Math.sin(a) * rad, zz];
+          const nn = [Math.cos((a0 + a1) / 2), Math.sin((a0 + a1) / 2), 0];
+          [P(a0, tr.base), P(a1, tr.base), P(a1, top), P(a0, tr.base), P(a1, top), P(a0, top)].forEach(p => pushVert(arr, p, nn, barkT, M.SOIL, 40, KIND.trunk, null));
+        }
+      }
+    });
+
+    const data = new Float32Array(arr);
+    const vao = gl.createVertexArray(), vbo = gl.createBuffer();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    setAttribs();
+    gl.bindVertexArray(null);
+    const dyn = { vao: gl.createVertexArray(), vbo: gl.createBuffer() };
+    gl.bindVertexArray(dyn.vao); gl.bindBuffer(gl.ARRAY_BUFFER, dyn.vbo); setAttribs(); gl.bindVertexArray(null);
+    return { world, vao, vbo, count: data.length / STRIDE, terrainCount, dyn, inner: null, outer: null, bakeJob: null, xs: [x0, x1], ys: [y0, y1] };
+  }
+  function setAttribs() {
+    const B = STRIDE * 4;
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, B, 0);
+    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, B, 12);
+    gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.FLOAT, false, B, 24);
+    gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, B, 40);
+    gl.enableVertexAttribArray(4); gl.vertexAttribPointer(4, 4, gl.FLOAT, false, B, 56);
+  }
+
+  // Ground maps are baked a slice at a time, so the page stays responsive; the town
+  // (inner, fine) first, then the country around it (outer, coarse).
+  function planBake(sc) {
+    const w = sc.world, map = w.map, lc = w.lc;
+    let bx0, by0, bx1, by1;
+    if (map) { bx0 = map.x0; by0 = map.y0; bx1 = map.x0 + map.nx * map.cell; by1 = map.y0 + map.ny * map.cell; }
+    else if (lc) { bx0 = lc.x0; by0 = lc.y0; bx1 = lc.x0 + lc.nx * lc.cell; by1 = lc.y0 + lc.ny * lc.cell; }
+    const plans = [];
+    const maxTex = Math.min(caps.maxTex, 4096);
+    if (bx0 !== undefined) {
+      // at most 3.2 km of town in detail, around its middle
+      const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2, half = Math.min(1600, Math.max(bx1 - bx0, by1 - by0) / 2);
+      const size = half * 2, cell = Math.max(2, size / Math.min(1200, maxTex));
+      plans.push({ key: 'inner', x0: cx - half, y0: cy - half, cell, n: Math.ceil(size / cell) });
+    }
+    const ox0 = Math.max(sc.xs[0], (bx0 !== undefined ? (bx0 + bx1) / 2 : 0) - 9000), oy0 = Math.max(sc.ys[0], (by0 !== undefined ? (by0 + by1) / 2 : 0) - 9000);
+    const ox1 = Math.min(sc.xs[1], ox0 + 18000), oy1 = Math.min(sc.ys[1], oy0 + 18000);
+    const osize = Math.max(ox1 - ox0, oy1 - oy0, 1000), ocell = Math.max(12, osize / Math.min(900, maxTex));
+    plans.push({ key: 'outer', x0: ox0, y0: oy0, cell: ocell, n: Math.ceil(osize / ocell) });
+    return plans;
+  }
+  function bakeStep(sc, ms) {
+    if (!sc.plans) sc.plans = planBake(sc);
+    const plan = sc.plans[0];
+    if (!plan) return true;
+    if (!sc.bakeJob) sc.bakeJob = IR.bakeGround(sc.world, plan.x0, plan.y0, plan.cell, plan.n, plan.n);
+    const done = sc.bakeJob.step(ms);
+    const total = sc.plans.length + (sc.inner ? 1 : 0) + (sc.outer ? 1 : 0);
+    G.progress = ((sc.inner ? 1 : 0) + (sc.outer ? 1 : 0) + sc.bakeJob.progress) / Math.max(1, total);
+    if (!done) return false;
+    const j = sc.bakeJob, n = plan.n;
+    const maps = {
+      rect: [plan.x0, plan.y0, plan.cell * n, plan.cell * n],
+      info: tex2D(n, n, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, j.info, gl.LINEAR),
+      infoN: tex2D(n, n, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, j.info, gl.NEAREST),
+      temp: tex2D(n, n, gl.R16F, gl.RED, gl.FLOAT, j.temp, gl.LINEAR),
+    };
+    sc[plan.key] = maps;
+    sc.plans.shift(); sc.bakeJob = null;
+    return sc.plans.length === 0;
+  }
+
+  // Prepare the GPU scene for a world; returns true once it can draw.
+  G.prepare = function (world, onReady) {
+    if (!init()) return false;
+    if (scene && scene.world === world) {
+      if (!scene.baking && (!scene.plans || scene.plans.length)) startBaking(onReady);
+      return G.state === 'ready';
+    }
+    try {
+      if (scene) { gl.deleteBuffer(scene.vbo); gl.deleteVertexArray(scene.vao); }
+      G.state = 'building'; G.progress = 0;
+      scene = buildWorld(world);
+      albedoLut();
+      startBaking(onReady);
+    } catch (e) { fail(e); }
+    return false;
+  };
+  function startBaking(onReady) {
+    const sc = scene;
+    if (!sc || sc.baking) return;
+    sc.baking = true;
+    const tick = () => {
+      if (scene !== sc || G.state === 'failed') return;
+      let done = false;
+      try { done = bakeStep(sc, 14); } catch (e) { fail(e); return; }
+      const innerReady = !!sc.inner || !(sc.plans && sc.plans.some(p => p.key === 'inner'));
+      if (innerReady && G.state !== 'ready') { G.state = 'ready'; if (onReady) onReady(); }
+      if (done) { sc.baking = false; G.progress = 1; if (onReady) onReady(); return; }
+      setTimeout(tick, 0);
+    };
+    setTimeout(tick, 0);
+  }
+
+  // ---------- render targets ----------
+  const targetCache = new Map();
+  function ensureTargets(w, h, msaa) {
+    const key = w + 'x' + h + ':' + msaa;
+    if (targetCache.has(key)) { const t = targetCache.get(key); targetCache.delete(key); targetCache.set(key, t); return t; }
+    while (targetCache.size >= 3) { const k = targetCache.keys().next().value; targetCache.get(k).del.forEach(f => f()); targetCache.delete(k); }
+    const del = [];
+    const rb = (fmt, samples) => { const r = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, r);
+      if (samples) gl.renderbufferStorageMultisample(gl.RENDERBUFFER, samples, fmt, w, h); else gl.renderbufferStorage(gl.RENDERBUFFER, fmt, w, h);
+      del.push(() => gl.deleteRenderbuffer(r)); return r; };
+    const fb = () => { const f = gl.createFramebuffer(); del.push(() => gl.deleteFramebuffer(f)); return f; };
+    const t = { key, del, w, h };
+    // packed (IR, metering): two RGBA8 colour attachments, no MSAA
+    t.pack = fb(); gl.bindFramebuffer(gl.FRAMEBUFFER, t.pack);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, rb(gl.RGBA8, 0));
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.RENDERBUFFER, rb(gl.RGBA8, 0));
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb(gl.DEPTH_COMPONENT32F, 0));
+    // EO colour: MSAA, resolved into a plain target for read-back
+    if (msaa) {
+      t.ms = fb(); gl.bindFramebuffer(gl.FRAMEBUFFER, t.ms);
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, rb(gl.RGBA8, msaa));
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.RENDERBUFFER, rb(gl.RGBA8, msaa));
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb(gl.DEPTH_COMPONENT32F, msaa));
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    targetCache.set(key, t);
+    return t;
+  }
+  let shadowT = null;
+  function ensureShadow(size) {
+    if (shadowT && shadowT.size === size) return shadowT;
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT24, size, size, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    const fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, tex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    shadowT = { size, tex, fb };
+    return shadowT;
+  }
+
+  // ---------- one frame ----------
+  function vehicleVerts(world, state) {
+    const arr = [];
+    const boxes = [];
+    IR.vehicleInstances(world, state).forEach(vi => {
+      const mesh = IR.buildVehicleMesh(vi.meta, vi.basePos, vi.heading, vi.size, vi.shade);
+      const paint = (vi.vid * 2654435761 >>> 28) % IR.PAINTS.length;
+      trisToVerts(mesh.tris, arr, () => KIND.vehicle, () => paint);
+      boxes.push(vi.box);
+    });
+    return { data: new Float32Array(arr), boxes };
+  }
+
+  function drawScene(prog, sc, dynCount) {
+    gl.bindVertexArray(sc.vao); gl.drawArrays(gl.TRIANGLES, 0, sc.count);
+    if (dynCount) { gl.bindVertexArray(sc.dyn.vao); gl.drawArrays(gl.TRIANGLES, 0, dynCount); }
+    gl.bindVertexArray(null);
+  }
+
+  function setMainUniforms(u, o) {
+    const w = o.world, c = w.cond, T = w.temps;
+    const sunUp = Math.max(0, Math.sin(c.sunEl * Math.PI / 180));
+    gl.uniformMatrix4fv(u.uViewProj, false, o.viewProj);
+    gl.uniformMatrix4fv(u.uLight, false, o.light);
+    gl.uniform3fv(u.uCam, o.cam.pos); gl.uniform3fv(u.uSun, c.sunDir);
+    gl.uniform1f(u.uAir, c.air); gl.uniform1f(u.uNight, c.night); gl.uniform1f(u.uLoad, c.load);
+    gl.uniform1f(u.uDay, Math.min(1, Math.max(0.02, sunUp * 5 + 0.04))); gl.uniform1f(u.uSunI, Math.min(1, Math.max(0, sunUp * 2.2)));
+    gl.uniform1f(u.uExposure, o.exposure || 1);
+    gl.uniform1i(u.uBand, BAND_CODE[o.band]); gl.uniform1i(u.uPass, o.pass);
+    gl.uniform1f(u.uTGrass, T.grass); gl.uniform1f(u.uTSoil, T.soil); gl.uniform1f(u.uTRoad, T.road); gl.uniform1f(u.uTRoadSh, T.roadShadow); gl.uniform1f(u.uTCanopy, T.canopy);
+    const swir = new Float32Array(32), eps = new Float32Array(32);
+    for (let m = 0; m < 32; m++) { const op = IR.OPTICS[m]; swir[m] = op ? op.swir : 0.3; eps[m] = op ? op.eps : 0.95; }
+    gl.uniform1fv(u.uSwir, swir); gl.uniform1fv(u.uEps, eps);
+    let unit = 0;
+    const bind = (name, tex) => { if (u[name] == null) return; gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); gl.uniform1i(u[name], unit); unit++; };
+    bind('uShadow', o.shadowTex); gl.uniform1f(u.uShadowOn, o.shadowOn ? 1 : 0);
+    bind('uAlbedo', lut);
+    const sc = o.sc, inner = sc.inner, outer = sc.outer;
+    bind('uGInfo', inner ? inner.info : lut); bind('uGInfoN', inner ? inner.infoN : lut); bind('uGTemp', inner ? inner.temp : lut);
+    bind('uOInfo', outer ? outer.info : lut); bind('uOInfoN', outer ? outer.infoN : lut); bind('uOTemp', outer ? outer.temp : lut);
+    gl.uniform4fv(u.uGRect, inner ? inner.rect : [0, 0, 1, 1]); gl.uniform4fv(u.uORect, outer ? outer.rect : [0, 0, 1, 1]);
+    gl.uniform1f(u.uHasInner, inner ? 1 : 0); gl.uniform1f(u.uHasOuter, outer ? 1 : 0);
+  }
+
+  function renderPass(o, fbo, w, h) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+    gl.viewport(0, 0, w, h);
+    gl.clearColor(0, 0, 0, 0); gl.clearDepth(1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // sky
+    gl.disable(gl.DEPTH_TEST); gl.depthMask(false);
+    const s = progs.sky; gl.useProgram(s.p);
+    const c = o.world.cond, sunUp = Math.max(0, Math.sin(c.sunEl * Math.PI / 180));
+    gl.uniform3fv(s.u.uRight, o.cam.right); gl.uniform3fv(s.u.uUp, o.cam.up); gl.uniform3fv(s.u.uFwd, o.cam.fwd);
+    gl.uniform1f(s.u.uTanX, o.tanX); gl.uniform1f(s.u.uTanY, o.tanY); gl.uniform3fv(s.u.uSun, c.sunDir);
+    gl.uniform1i(s.u.uBand, BAND_CODE[o.band]); gl.uniform1i(s.u.uPass, o.pass);
+    gl.uniform1f(s.u.uAir, c.air); gl.uniform1f(s.u.uDay, Math.min(1, Math.max(0.02, sunUp * 5 + 0.04))); gl.uniform1f(s.u.uSunI, Math.min(1, Math.max(0, sunUp * 2.2)));
+    gl.uniform1f(s.u.uExposure, o.exposure || 1);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    // scene
+    gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.depthFunc(gl.LEQUAL);
+    gl.disable(gl.CULL_FACE);
+    const m = progs.main; gl.useProgram(m.p);
+    setMainUniforms(m.u, o);
+    drawScene(m, o.sc, o.dynCount);
+  }
+
+  function readPacked(fbo, w, h) {
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fbo);
+    const a = new Uint8Array(w * h * 4), b = new Uint8Array(w * h * 4);
+    gl.readBuffer(gl.COLOR_ATTACHMENT0); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, a);
+    gl.readBuffer(gl.COLOR_ATTACHMENT1); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, b);
+    return [a, b];
+  }
+  const unpack = (d, i) => (d[i] * 65536 + d[i + 1] * 256 + d[i + 2]) / 16777215;
+
+  // EO camera model on the GPU image: optics blur (1-2-1 kernel) and shot noise.
+  function sensorEo(px, w, h, noise, frame) {
+    const tmp = new Float32Array(w * h * 3);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) for (let c = 0; c < 3; c++) {
+      const l = px[(y * w + Math.max(0, x - 1)) * 4 + c], m = px[(y * w + x) * 4 + c], r = px[(y * w + Math.min(w - 1, x + 1)) * 4 + c];
+      tmp[(y * w + x) * 3 + c] = (l + 2 * m + r) / 4;
+    }
+    let seed = (1000 + frame * 7919) >>> 0;
+    const rnd = () => { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0) / 4294967296; };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) for (let c = 0; c < 3; c++) {
+      const u = tmp[(Math.max(0, y - 1) * w + x) * 3 + c], m = tmp[(y * w + x) * 3 + c], d = tmp[(Math.min(h - 1, y + 1) * w + x) * 3 + c];
+      let v = (u + 2 * m + d) / 4;
+      if (noise) v += (rnd() + rnd() + rnd() - 1.5) * 0.012 * 255 * Math.sqrt(Math.max(0.02, v / 255));
+      px[(y * w + x) * 4 + c] = v;
+    }
+  }
+
+  // Render one camera frame. o: { world, state, w, h, hfovDeg, look, band, ss, ideal, noise, frameIndex, palette }
+  // Returns the same shape as StudioIR.frame: { img, sens, rgba, band }.
+  G.frame = function (o) {
+    const sc = scene;
+    if (!gl || !sc || sc.world !== o.world || G.state !== 'ready') return null;
+    const band = IR.BANDS[o.band] ? o.band : 'lwir';
+    const ss = band === 'eo' ? 1 : (o.ss > 1 ? 2 : 1);
+    const w = o.w, h = o.h, W = w * ss, H = h * ss;
+    const st = o.state, world = o.world;
+    const cam = IR.camera(st.platform, o.look, o.hfovDeg || 22.5, w, h);
+    const tanX = (w / 2) / cam.f, tanY = (h / 2) / cam.f;
+    const agl = st.platform[2] - world.ground(st.platform[0], st.platform[1]);
+    const near = agl < 60 ? 1.5 : 8, far = 60000;
+    const viewProj = mul(perspective(tanX, tanY, near, far), viewMat(cam.pos, cam.right, cam.up, cam.fwd));
+    // vehicles this instant
+    const veh = vehicleVerts(world, st);
+    gl.bindBuffer(gl.ARRAY_BUFFER, sc.dyn.vbo); gl.bufferData(gl.ARRAY_BUFFER, veh.data, gl.DYNAMIC_DRAW);
+    const dynCount = veh.data.length / STRIDE;
+    // sun shadow map around where the camera looks
+    const c = world.cond;
+    const hit = IR.groundHit(world.ground, cam.pos, cam.fwd, 40000);
+    const centre = hit ? hit.p : [cam.pos[0] + cam.fwd[0] * 3000, cam.pos[1] + cam.fwd[1] * 3000, world.ground(cam.pos[0], cam.pos[1])];
+    const rng = hit ? hit.t : 3000;
+    const ext = Math.min(4500, Math.max(250, rng * Math.tan((o.hfovDeg || 22.5) * Math.PI / 360) * 2.2 + 150));
+    const shadowOn = c.sunEl > 1;
+    const size = Math.min(caps.maxTex, ext > 1500 ? 4096 : 2048);
+    const sh = ensureShadow(size);
+    const sd = c.sunDir, lf = [-sd[0], -sd[1], -sd[2]];
+    let lr = cross(lf, [0, 0, 1]); if (Math.hypot(lr[0], lr[1], lr[2]) < 1e-3) lr = [1, 0, 0]; lr = norm(lr);
+    const lu = norm(cross(lr, lf));
+    const lpos = [centre[0] + sd[0] * 6000, centre[1] + sd[1] * 6000, centre[2] + sd[2] * 6000];
+    const light = mul(ortho(ext, 10, 12000), viewMat(lpos, lr, lu, lf));
+    if (shadowOn) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, sh.fb); gl.viewport(0, 0, size, size);
+      gl.clearDepth(1); gl.clear(gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+      gl.colorMask(false, false, false, false);
+      const d = progs.depth; gl.useProgram(d.p); gl.uniformMatrix4fv(d.u.uLight, false, light);
+      gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(1.5, 3);
+      drawScene(d, sc, dynCount);
+      gl.disable(gl.POLYGON_OFFSET_FILL); gl.colorMask(true, true, true, true);
+    }
+    const base = { world, sc, cam, tanX, tanY, viewProj, light, shadowTex: sh.tex, shadowOn, band, dynCount };
+    let rgba, img, sens;
+    if (band === 'eo') {
+      // meter on a small image, then the full frame with that exposure
+      const mw = 128, mh = Math.max(16, Math.round(128 * h / w));
+      const mt = ensureTargets(mw, mh, 0);
+      renderPass(Object.assign({}, base, { pass: 1, exposure: 1 }), mt.pack, mw, mh);
+      const [lumD] = readPacked(mt.pack, mw, mh);
+      const lums = [];
+      for (let i = 0; i < mw * mh; i++) if (lumD[i * 4 + 3] > 0) lums.push(unpack(lumD, i * 4) * 4);
+      lums.sort((a, b) => a - b);
+      let mean = 0; lums.forEach(v => { mean += v; }); mean = mean / Math.max(1, lums.length) || 1e-3;
+      const p995 = lums[Math.floor(lums.length * 0.995)] || 1e-3;
+      const gain = Math.min(12, Math.max(0.5, Math.min(0.18 / mean, 1.25 / p995)));
+      const tt = ensureTargets(w, h, caps.samples || 0);
+      const fbo = tt.ms || tt.pack;
+      renderPass(Object.assign({}, base, { pass: 0, exposure: gain }), fbo, w, h);
+      if (tt.ms) {
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, tt.ms); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, tt.pack);
+        gl.readBuffer(gl.COLOR_ATTACHMENT0); gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.NONE]);
+        gl.blitFramebuffer(0, 0, w, h, 0, 0, w, h, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+      }
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, tt.pack); gl.readBuffer(gl.COLOR_ATTACHMENT0);
+      const raw = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, raw);
+      rgba = new Uint8ClampedArray(w * h * 4);
+      for (let y = 0; y < h; y++) rgba.set(raw.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4);
+      if (!o.ideal) sensorEo(rgba, w, h, o.noise !== false, o.frameIndex || 0);
+      img = { w, h, temp: null, range: null, cam, cuedTarget: null, vehicleBoxes: veh.boxes, cond: c };
+      sens = { lo: 0, hi: 1 / gain, exposure: gain };
+    } else {
+      const t = ensureTargets(W, H, 0);
+      renderPass(Object.assign({}, base, { pass: 2, exposure: 1 }), t.pack, W, H);
+      const [vD, rD] = readPacked(t.pack, W, H);
+      const temp = new Float32Array(w * h), range = new Float32Array(w * h), inv = 1 / (ss * ss);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        let s = 0, r = Infinity;
+        for (let j = 0; j < ss; j++) for (let i = 0; i < ss; i++) {
+          const k = ((H - 1 - (y * ss + j)) * W + x * ss + i) * 4;
+          s += unpack(vD, k) * 4000 - 200; r = Math.min(r, unpack(rD, k) * 60000);
+        }
+        temp[y * w + x] = s * inv; range[y * w + x] = r;
+      }
+      img = { w, h, temp, range, cam, cuedTarget: null, vehicleBoxes: veh.boxes, cond: c };
+      sens = IR.sensor(img, { frameIndex: o.frameIndex, noise: o.noise, ideal: o.ideal });
+      rgba = IR.toRgba(sens.level, w, h, o.palette || 'whot');
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return { img, sens, rgba, band, gpu: true };
+  };
 })();
 
   </script>
@@ -15316,6 +16296,11 @@ self.onmessage = function(ev) {
 
   // label, icon, and what it does: click an existing button, open a panel, or follow a link.
   var ACTIONS = [
+    // Sensor views open full screen on a phone (studio_sensor_views.js).
+    { group: 'Sensors', label: 'EO/IR camera', icon: '📷', call: ['studioOpenSensor', 'flir'], need: 'flirGimbalCanvas' },
+    { group: 'Sensors', label: 'RF range-Doppler', icon: '📡', call: ['studioOpenSensor', 'rdm'], need: 'rdmPopoutCanvas' },
+    { group: 'Sensors', label: 'SAR image', icon: '🛰', call: ['studioOpenSensor', 'sar'], need: 'sarPopoutCanvas', sar: true },
+    { group: 'Sensors', label: 'SAR on the map', icon: '🗺', call: ['studioSarOnMap', true], need: 'sarPopoutCanvas', sar: true },
     { group: 'Scene', label: 'Restart', icon: '↺', click: 'btnResetSim' },
     { group: 'Scene', label: 'Map controls', icon: '\u{1F5FA}', click: 'workspaceView' },
     // Inspect opens the radar console as a sheet (on a phone it stays hidden until opened).
@@ -15339,6 +16324,10 @@ self.onmessage = function(ev) {
   function present(a) {
     if (a.site && !document.querySelector('.s3-site-bar')) return false;
     if (a.click) { var b = byId(a.click); return !!b && !b.hidden; }
+    if (a.call) {
+      if (typeof window[a.call[0]] !== 'function' || (a.need && !byId(a.need))) return false;
+      return !a.sar || (typeof window.studioSarAvailable === 'function' && window.studioSarAvailable());
+    }
     // A panel the workspace already moved into its Map controls drawer is reached there.
     if (a.panel) return a.panel.some(function (id) { var el = byId(id); return !!el && !inDrawer(el); });
     return true;
@@ -15440,6 +16429,7 @@ self.onmessage = function(ev) {
       var a = ACTIONS[+t.getAttribute('data-ps')];
       closeSheet();
       if (a.panel) openPanel(a);
+      else if (a.call) { closePanel(); window[a.call[0]](a.call[1]); }
       else { closePanel(); var b = byId(a.click); if (b) b.click(); }
     });
     document.body.appendChild(scrim);
