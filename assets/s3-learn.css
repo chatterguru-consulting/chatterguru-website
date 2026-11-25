@@ -1,0 +1,91 @@
+.learn-lab {
+  max-width: 860px;
+}
+
+.learn-lab [hidden] {
+  display: none;
+}
+
+.learn-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.learn-controls label {
+  display: grid;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.learn-controls select {
+  min-width: 140px;
+  padding: 7px 10px;
+  border: 1px solid #7797a0;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.learn-controls select:focus-visible,
+.learn-math summary:focus-visible {
+  outline: 2px solid var(--teal-dark);
+  outline-offset: 2px;
+}
+
+.learn-response {
+  margin: 18px 0 0;
+  padding: 12px;
+  border: 1px solid #d5e5e9;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.learn-response canvas {
+  display: block;
+  width: 100%;
+  height: clamp(175px, 31vw, 260px);
+}
+
+.learn-response figcaption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.learn-result {
+  font-weight: 700;
+}
+
+.learn-math {
+  padding: 12px 16px;
+  border-left: 3px solid #167488;
+  background: #f4f9fa;
+}
+
+.learn-math summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.learn-curriculum {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.learn-curriculum li {
+  padding: 14px 16px;
+  border: 1px solid #d5e5e9;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.learn-curriculum h3 {
+  margin: 0;
+  font-size: 18px;
+}

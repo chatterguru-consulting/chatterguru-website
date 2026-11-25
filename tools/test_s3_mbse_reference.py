@@ -9,6 +9,7 @@ from urllib.parse import urlsplit
 SITE = Path(__file__).resolve().parents[1]
 REFERENCE = "s3-engineering-reference.html"
 EXPLORER = "s3-mbse.html"
+LEARNING = "s3-learn.html"
 
 
 class PageIndex(HTMLParser):
@@ -32,7 +33,7 @@ class PageIndex(HTMLParser):
 
 class MbseReferenceTest(unittest.TestCase):
     def test_documentation_links_resolve_in_pages_and_export(self):
-        pages = {name: PageIndex(name) for name in (REFERENCE, EXPLORER)}
+        pages = {name: PageIndex(name) for name in (REFERENCE, EXPLORER, LEARNING)}
         export = json.loads((SITE / "assets/s3-mbse-data.json").read_text(encoding="utf-8"))
         explorer_routes = pages[EXPLORER].diagrams | {row["id"] for row in export["archipelago_slices"]}
         for name, page in pages.items():
@@ -54,6 +55,11 @@ class MbseReferenceTest(unittest.TestCase):
         for name in (EXPLORER, "systems-engineering.html", "s3-studio.html"):
             with self.subTest(page=name):
                 self.assertIn(REFERENCE, PageIndex(name).links)
+
+    def test_studio_and_engineering_reference_link_to_learning(self):
+        for name in (REFERENCE, "s3-studio.html"):
+            with self.subTest(page=name):
+                self.assertIn(LEARNING, PageIndex(name).links)
 
 
 if __name__ == "__main__":

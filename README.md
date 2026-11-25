@@ -17,6 +17,7 @@ Open [the local homepage](http://127.0.0.1:8000/). Use the server for the 3D sce
 - [Home](index.html) introduces the practice and links to the [capabilities](capabilities.html).
 - [S³ Studio](s3-studio.html) is the demo gallery. It links to the King Farm and South Mountain Workbench exports (`demos/s3/studio/`), three AESA search-while-track scenes (`demos/s3/aesa/`), a recorded radar replay, and the original browser explorers. The evidence labels explain what produced each view.
 - [S³ systems engineering](s3-mbse.html) hosts the ConOps, candidate requirements, SysML-style explorer and exported evidence. The [engineering reference](s3-engineering-reference.html) adds model theory, worked examples, and a public documentation coverage catalog. See the [MBSE documentation review guide](docs/S3_MBSE_DOCUMENTATION.md) when updating either page.
+- [Learn sensor physics](s3-learn.html) opens the first interactive SAR lesson and the public learning roadmap. The [education production guide](docs/S3_EDUCATION_ROADMAP.md) links the coverage review, teaching references, and companion media plan.
 - `demos/s3/shared/` holds the phone layout every 3D scene loads: on a phone the map gets the screen, and the controls live in one Menu sheet. The radar repository's `scripts/publish_website_viewer.py` writes it.
 - [Founder & Lab](about.html) covers Chatterpaul Joseph’s career, the lab, and community service. [Run for Jericho](run-for-jericho.html) has its own public address.
 - [Contact](contact.html) lists ways to get in touch about a briefing or a technical question.
