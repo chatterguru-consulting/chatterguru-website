@@ -1,8 +1,8 @@
 {
   "schema": "chatterguru-s3-mbse-public-v2",
   "notation_status": "SysML-style architecture documentation (not interoperable XMI or executable SysML v2)",
-  "generated_utc": "2026-11-25T00:11:56Z",
-  "source_revision": "4abf8877cf",
+  "generated_utc": "2026-11-25T03:36:36Z",
+  "source_revision": "73c48072c3",
   "governance_notice": "Synthetic / educational multisensor research architecture. All candidate requirements retain explicit CANDIDATE_UNAPPROVED status until formal owner baseline approval. AST/file traceability checks are distinct from executed verification, independent validation, and owner acceptance.",
   "conops": {
     "document_id": "CG-RAD-CONOPS-001",
@@ -1658,6 +1658,12 @@
             "passed": true
           },
           {
+            "control": "Sign-off record states no decision",
+            "expected": "CANDIDATE_UNAPPROVED",
+            "observed": "CANDIDATE_UNAPPROVED",
+            "passed": true
+          },
+          {
             "control": "Reviewer rejects",
             "expected": "REJECTED",
             "observed": "REJECTED",
@@ -1670,8 +1676,8 @@
             "passed": true
           }
         ],
-        "controls_passed": 9,
-        "controls_total": 9
+        "controls_passed": 10,
+        "controls_total": 10
       },
       {
         "id": "mission_authoring_gate",
@@ -1804,11 +1810,11 @@
       "limits": "Synthetic educational models with one deterministic seed. These are physics and tracking sanity gates, not detection-probability claims or field performance."
     },
     "repository_scale": {
-      "source_modules": 813,
-      "test_files": 842,
-      "test_functions_defined": 8300,
+      "source_modules": 818,
+      "test_files": 846,
+      "test_functions_defined": 8321,
       "note": "Test functions defined in the repository; parametrized cases run more. This is not a pass count."
     }
   },
-  "payload_sha256": "f0a88a6ddc4400de99f11c36fa5b588253f06e012133b3e097f1c590e996e56a"
+  "payload_sha256": "9a4f98156e07870b8dc5b6b28303016695e678a8d9fd3b51bc6cbba0edd00102"
 }
