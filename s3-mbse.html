@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S³ Systems Engineering | Chatterguru Consulting LLC</title>
+  <meta name="description" content="How Sensor Scenario Studio (S³) is engineered: ConOps, a traced requirements tree, SysML-style architecture views, governance gates exercised at export, and qualification evidence, with every owner sign-off still open.">
+  <link rel="canonical" href="https://www.chatterguru.com/s3-mbse.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chatterguru Consulting LLC">
+  <meta property="og:title" content="S³ Systems Engineering | Chatterguru Consulting LLC">
+  <meta property="og:description" content="ConOps, traced requirements, SysML-style architecture views and executed verification evidence behind Sensor Scenario Studio (S³).">
+  <meta property="og:url" content="https://www.chatterguru.com/s3-mbse.html">
+  <meta property="og:image" content="https://www.chatterguru.com/assets/og-s3-studio.jpg">
+  <meta property="og:image:alt" content="Chatterguru Sensor Scenario Studio SysML-Style MBSE Digital Thread">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0b6d82">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Chatterguru">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-20">
+  <link rel="stylesheet" href="assets/s3-mbse.css?v=2026-11-25e">
+  <script src="assets/site.js?v=2026-11-20" defer></script>
+  <script src="assets/s3-mbse.js?v=2026-11-25e" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a aria-current="page" href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+
+  <main id="main">
+    <section class="hero page-hero">
+      <div class="hero-content">
+        <p class="eyebrow">Systems engineering · Sensor Scenario Studio (S³)</p>
+        <h1>How S³ is engineered, with the evidence attached.</h1>
+        <p>S³ is built from a concept of operations down to traced requirements, architecture views, source modules and tests. Its governance gates and a physics qualification campaign are run every time this page’s data is exported. The page also shows what is not done: no requirement is approved until the owner signs it off.</p>
+        <div class="hero-actions">
+          <a class="button" href="#thread">Follow the digital thread</a>
+          <a class="button secondary" href="#evidence">See the executed evidence</a>
+          <a class="button secondary" href="s3-studio.html">Open the S³ demos</a>
+        </div>
+        <div class="mbse-kpis" aria-label="Traceability and verification figures from this export">
+          <div class="mbse-kpi"><strong id="kpi-total-reqs">–</strong><span>Candidate requirements, each traced to code and a test</span></div>
+          <div class="mbse-kpi"><strong id="kpi-gates">–</strong><span>Governance gate controls giving the expected decision</span></div>
+          <div class="mbse-kpi"><strong id="kpi-qual">–</strong><span>Qualification checks passed at export</span></div>
+          <div class="mbse-kpi"><strong id="kpi-signoff">–</strong><span>Owner sign-offs given (the rest are open)</span></div>
+        </div>
+        <p class="mbse-rev">Generated from source revision <code id="kpi-rev">–</code>. Stakeholder needs: <span id="kpi-stk-reqs">–</span> · system candidates: <span id="kpi-sys-reqs">–</span>.</p>
+      </div>
+    </section>
+
+    <section class="section" id="thread">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">The digital thread at a glance</p>
+          <h2>From operating concept to owner sign-off, counted from the source.</h2>
+          <p>Each step is counted from the same export. Select a step to inspect it.</p>
+        </div>
+        <ol class="thread-chain" id="thread-chain" aria-label="Digital thread steps"></ol>
+      </div>
+    </section>
+
+    <section class="section alt" id="sysml-explorer">
+      <div class="section-inner">
+        <div class="mbse-gov-banner" role="note">
+          <div>
+            <strong>Governance &amp; Notation Honesty:</strong> These interactive views are <strong>SysML-style architecture documentation</strong> (not interoperable XMI or executable SysML v2). All requirements retain explicit <code>CANDIDATE_UNAPPROVED</code> status; AST/file traceability is tracked separately from executed verification, independent validation, and owner acceptance.
+          </div>
+          <span class="mbse-gov-pill candidate">CANDIDATE_UNAPPROVED · Draft Preview</span>
+        </div>
+
+        <div class="section-heading">
+          <p class="mini-label">Interactive SysML-Style Architecture Views</p>
+          <h2>Click any block, constraint, or requirement to trace the digital thread.</h2>
+        </div>
+
+        <div class="sysml-tabs" role="tablist" aria-label="SysML-style diagram selector">
+          <button type="button" class="sysml-tab" role="tab" data-diagram="bdd" aria-selected="true"><code>bdd</code> Architecture</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="ibd" aria-selected="false"><code>ibd</code> Same-Source Flow</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="req" aria-selected="false"><code>req</code> Requirements &amp; V&amp;V</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="par" aria-selected="false"><code>par</code> Physics Constraints</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="uc" aria-selected="false"><code>uc</code> CONOPS Context</button>
+        </div>
+
+        <div class="sysml-workspace">
+          <div class="sysml-stage-card">
+            <div class="sysml-stage-bar">
+              <strong id="sysml-frame-title">bdd [package] S3_Unified_Architecture</strong>
+              <span id="sysml-frame-caption">Click any element to inspect linked requirements and modules.</span>
+            </div>
+            <div class="sysml-svg-wrap" id="sysml-svg-wrap"></div>
+            <div class="sysml-legend" aria-label="SysML notation legend">
+              <span><i class="legend-swatch" style="background:#e4f4f8;border-color:#0b6d82;"></i>«block» / «part»</span>
+              <span><i class="legend-swatch" style="background:#fff6e0;border-color:#a87314;"></i>«requirement» / «constraint»</span>
+              <span><i class="legend-swatch" style="background:#eaf5ee;border-color:#1f6a46;"></i>«testCase» / Sealed Evidence</span>
+              <span>◆— Composition · ┄▷ «deriveReqt» / «verify» · ━▶ «itemFlow»</span>
+            </div>
+          </div>
+
+          <aside class="sysml-inspector" id="sysml-inspector" aria-live="polite">
+            <span class="stereo">«block»</span>
+            <h3>Select a SysML element</h3>
+            <p>Click any block, constraint, or test case in the diagram to inspect its properties, linked requirements, and implementing modules.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="evidence">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Verification evidence · executed at export</p>
+          <h2>The gates are run, not described.</h2>
+          <p id="evidence-rule"></p>
+        </div>
+        <div class="ev-grid" id="gate-cards"></div>
+        <article class="ev-card" id="qualification">
+          <div id="qual-card"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section alt" id="readiness">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Readiness and sign-off</p>
+          <h2>Engineering readiness is checked; acceptance is left to a human.</h2>
+          <p id="readiness-summary"></p>
+        </div>
+        <div class="rtm-table-wrap">
+          <table class="rtm-table">
+            <thead>
+              <tr><th>Epic</th><th>Scope</th><th>Merged PRs</th><th>Declared files</th><th>Owner acceptance (open)</th></tr>
+            </thead>
+            <tbody id="readiness-tbody"></tbody>
+          </table>
+        </div>
+        <p class="rtm-count" id="scale-line"></p>
+      </div>
+    </section>
+
+    <section class="section" id="archipelago">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">The Documented Archipelago · Progressive Technical Depth</p>
+          <h2>Drill from system context down to exact implemented equations &amp; limits.</h2>
+          <p>Each implemented sensor and processing island documents its real data flow, governing equations, algorithm compatibility boundaries, and verification links—while planned capabilities (LiDAR, fusion, governed AI authoring) remain explicitly marked unimplemented.</p>
+        </div>
+        <div class="conops-grid" id="archipelago-grid"></div>
+      </div>
+    </section>
+
+    <section class="section alt" id="multilevel-reqs">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Multi-Level Requirements Tree · System → Subsystem → Model</p>
+          <h2>Full atomic <code>shall</code> statements with objective acceptance criteria.</h2>
+          <p>Separates stakeholder needs from normative System (SyRS), Subsystem (SSR), and Simulation-Model requirements—tracking verification execution independently from AST traceability and owner approval.</p>
+        </div>
+        <div class="rtm-table-wrap">
+          <table class="rtm-table">
+            <thead>
+              <tr>
+                <th>ID &amp; Level</th>
+                <th>Parent</th>
+                <th>Normative Shall Statement &amp; Rationale</th>
+                <th>Method &amp; Acceptance Criteria</th>
+                <th>Verification &amp; Approval State</th>
+              </tr>
+            </thead>
+            <tbody id="multilevel-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="conops">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Concept of Operations · <span id="conops-doc-id">CG-RAD-CONOPS-001</span></p>
+          <h2>Phased operating model from research references to hardware gates.</h2>
+          <p id="conops-reading-rule">Describes the intended operating concept and explicit maturity gates across research, integrated synthetic studies, and future hardware-in-the-loop phases.</p>
+        </div>
+        <article class="conops-phase conops-proposal" id="conops-proposal"></article>
+        <div class="conops-grid" id="conops-phases"></div>
+      </div>
+    </section>
+
+    <section class="section alt" id="rtm-section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Live Automated Traceability</p>
+          <h2>Candidate Requirements Traceability Matrix (RTM).</h2>
+          <p>Generated by <code>scripts/audit_candidate_requirements_rtm.py</code>. Every entry names source modules that exist and a negative-control test function that the audit finds in the test code. That proves the trace, not a test result; the executed evidence is above.</p>
+        </div>
+
+        <div class="rtm-controls">
+          <div class="rtm-filter-pills" role="group" aria-label="Filter requirements by group">
+            <button type="button" class="rtm-filter-btn" data-group="all" aria-pressed="true">All (49)</button>
+            <button type="button" class="rtm-filter-btn" data-group="stakeholder" aria-pressed="false">Stakeholder Needs (24)</button>
+            <button type="button" class="rtm-filter-btn" data-group="hbf" aria-pressed="false">Hybrid Array HBF (12)</button>
+            <button type="button" class="rtm-filter-btn" data-group="s3_stap" aria-pressed="false">S3-STAP (8)</button>
+            <button type="button" class="rtm-filter-btn" data-group="s3_sar" aria-pressed="false">S³-SAR (5)</button>
+          </div>
+          <input type="search" id="rtm-search" class="rtm-search" placeholder="Filter by ID, keyword, module, or test…" aria-label="Filter requirements">
+        </div>
+
+        <p class="rtm-count" id="rtm-count"></p>
+
+        <div class="rtm-table-wrap">
+          <table class="rtm-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Group</th>
+                <th>Governance</th>
+                <th>Requirement Summary</th>
+                <th>Implementing Module(s)</th>
+                <th>AST-Verified Negative Control</th>
+              </tr>
+            </thead>
+            <tbody id="rtm-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="s3-mbse.html">S³ MBSE &amp; SysML</a>
+        <a href="systems-engineering.html">Systems Engineering</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="contact.html">Contact</a>
+        <a href="https://www.linkedin.com/in/chatterpaul-joseph-300068104" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
