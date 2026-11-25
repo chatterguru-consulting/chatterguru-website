@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S³ MBSE &amp; SysML-Style Digital Thread | Chatterguru Consulting LLC</title>
+  <meta name="description" content="Interactive SysML-style architecture diagrams, candidate CONOPS (CG-RAD-CONOPS-001), multi-level requirements tree, and AST-verified 49-requirement traceability matrix behind Sensor Scenario Studio (S³).">
+  <link rel="canonical" href="https://www.chatterguru.com/s3-mbse.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chatterguru Consulting LLC">
+  <meta property="og:title" content="S³ MBSE &amp; SysML-Style Digital Thread | Chatterguru Consulting LLC">
+  <meta property="og:description" content="Interactive SysML-style architecture views (uc, req, bdd, ibd, par), candidate CONOPS, deep-dive equations, and AST-verified requirements traceability for Sensor Scenario Studio (S³).">
+  <meta property="og:url" content="https://www.chatterguru.com/s3-mbse.html">
+  <meta property="og:image" content="https://www.chatterguru.com/assets/og-s3-studio.jpg">
+  <meta property="og:image:alt" content="Chatterguru Sensor Scenario Studio SysML-Style MBSE Digital Thread">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15">
+  <link rel="stylesheet" href="assets/s3-mbse.css?v=2026-11-22">
+  <script src="assets/site.js?v=2026-11-15" defer></script>
+  <script src="assets/s3-mbse.js?v=2026-11-22" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a aria-current="page" href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+
+  <main id="main">
+    <section class="hero page-hero">
+      <div class="hero-content">
+        <p class="eyebrow">Model-Based Systems Engineering · SysML-Style Digital Thread</p>
+        <h1>Real MBSE rigor behind Sensor Scenario Studio (S³).</h1>
+        <p>Instead of static slideware, inspect the live SysML-style architecture documentation, candidate Concept of Operations (<code>CG-RAD-CONOPS-001</code>), parametric physical constraints, multi-level requirements tree, and 49 AST-verified candidate requirements behind S³.</p>
+        <div class="hero-actions">
+          <a class="button" href="#sysml-explorer">Explore SysML diagrams</a>
+          <a class="button secondary" href="#rtm-section">Inspect 49-row RTM</a>
+          <a class="button secondary" href="s3-studio.html">Open S³ Studio demos</a>
+        </div>
+        <div class="mbse-kpis" aria-label="Live MBSE traceability metrics">
+          <div class="mbse-kpi"><strong id="kpi-total-reqs">49</strong><span>AST-verified requirements</span></div>
+          <div class="mbse-kpi"><strong id="kpi-stk-reqs">24</strong><span>Stakeholder needs (STK)</span></div>
+          <div class="mbse-kpi"><strong id="kpi-sys-reqs">25</strong><span>System candidates (HBF / STAP / SAR)</span></div>
+          <div class="mbse-kpi"><strong id="kpi-rev">live</strong><span>Verified source revision</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="sysml-explorer">
+      <div class="section-inner">
+        <div class="mbse-gov-banner" role="note">
+          <div>
+            <strong>Governance &amp; Notation Honesty:</strong> These interactive views are <strong>SysML-style architecture documentation</strong> (not interoperable XMI or executable SysML v2). All requirements retain explicit <code>CANDIDATE_UNAPPROVED</code> status; AST/file traceability is tracked separately from executed verification, independent validation, and owner acceptance.
+          </div>
+          <span class="mbse-gov-pill candidate">CANDIDATE_UNAPPROVED · Draft Preview</span>
+        </div>
+
+        <div class="section-heading">
+          <p class="mini-label">Interactive SysML-Style Architecture Views</p>
+          <h2>Click any block, constraint, or requirement to trace the digital thread.</h2>
+        </div>
+
+        <div class="sysml-tabs" role="tablist" aria-label="SysML-style diagram selector">
+          <button type="button" class="sysml-tab" role="tab" data-diagram="bdd" aria-selected="true"><code>bdd</code> Architecture</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="ibd" aria-selected="false"><code>ibd</code> Same-Source Flow</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="req" aria-selected="false"><code>req</code> Requirements &amp; V&amp;V</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="par" aria-selected="false"><code>par</code> Physics Constraints</button>
+          <button type="button" class="sysml-tab" role="tab" data-diagram="uc" aria-selected="false"><code>uc</code> CONOPS Context</button>
+        </div>
+
+        <div class="sysml-workspace">
+          <div class="sysml-stage-card">
+            <div class="sysml-stage-bar">
+              <strong id="sysml-frame-title">bdd [package] S3_Unified_Architecture</strong>
+              <span id="sysml-frame-caption">Click any element to inspect linked requirements and modules.</span>
+            </div>
+            <div class="sysml-svg-wrap" id="sysml-svg-wrap"></div>
+            <div class="sysml-legend" aria-label="SysML notation legend">
+              <span><i class="legend-swatch" style="background:#e4f4f8;border-color:#0b6d82;"></i>«block» / «part»</span>
+              <span><i class="legend-swatch" style="background:#fff6e0;border-color:#a87314;"></i>«requirement» / «constraint»</span>
+              <span><i class="legend-swatch" style="background:#eaf5ee;border-color:#1f6a46;"></i>«testCase» / Sealed Evidence</span>
+              <span>◆— Composition · ┄▷ «deriveReqt» / «verify» · ━▶ «itemFlow»</span>
+            </div>
+          </div>
+
+          <aside class="sysml-inspector" id="sysml-inspector" aria-live="polite">
+            <span class="stereo">«block»</span>
+            <h3>Select a SysML element</h3>
+            <p>Click any block, constraint, or test case in the diagram to inspect its properties, linked requirements, and implementing modules.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="archipelago">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">The Documented Archipelago · Progressive Technical Depth</p>
+          <h2>Drill from system context down to exact implemented equations &amp; limits.</h2>
+          <p>Each implemented sensor and processing island documents its real data flow, governing equations, algorithm compatibility boundaries, and verification links—while planned capabilities (LiDAR, fusion, governed AI authoring) remain explicitly marked unimplemented.</p>
+        </div>
+        <div class="conops-grid" id="archipelago-grid"></div>
+      </div>
+    </section>
+
+    <section class="section alt" id="multilevel-reqs">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Multi-Level Requirements Tree · System → Subsystem → Model</p>
+          <h2>Full atomic <code>shall</code> statements with objective acceptance criteria.</h2>
+          <p>Separates stakeholder needs from normative System (SyRS), Subsystem (SSR), and Simulation-Model requirements—tracking verification execution independently from AST traceability and owner approval.</p>
+        </div>
+        <div class="rtm-table-wrap">
+          <table class="rtm-table">
+            <thead>
+              <tr>
+                <th>ID &amp; Level</th>
+                <th>Parent</th>
+                <th>Normative Shall Statement &amp; Rationale</th>
+                <th>Method &amp; Acceptance Criteria</th>
+                <th>Verification &amp; Approval State</th>
+              </tr>
+            </thead>
+            <tbody id="multilevel-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="conops">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Concept of Operations · <span id="conops-doc-id">CG-RAD-CONOPS-001</span></p>
+          <h2>Phased operating model from research references to hardware gates.</h2>
+          <p id="conops-reading-rule">Describes the intended operating concept and explicit maturity gates across research, integrated synthetic studies, and future hardware-in-the-loop phases.</p>
+        </div>
+        <div class="conops-grid" id="conops-phases"></div>
+      </div>
+    </section>
+
+    <section class="section alt" id="rtm-section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="mini-label">Live Automated Traceability</p>
+          <h2>Candidate Requirements Traceability Matrix (RTM).</h2>
+          <p>Generated directly by <code>scripts/audit_candidate_requirements_rtm.py</code>. Every entry maps to real on-disk source modules and an AST-verified negative-control test function.</p>
+        </div>
+
+        <div class="rtm-controls">
+          <div class="rtm-filter-pills" role="group" aria-label="Filter requirements by group">
+            <button type="button" class="rtm-filter-btn" data-group="all" aria-pressed="true">All (49)</button>
+            <button type="button" class="rtm-filter-btn" data-group="stakeholder" aria-pressed="false">Stakeholder Needs (24)</button>
+            <button type="button" class="rtm-filter-btn" data-group="hbf" aria-pressed="false">Hybrid Array HBF (12)</button>
+            <button type="button" class="rtm-filter-btn" data-group="s3_stap" aria-pressed="false">S3-STAP (8)</button>
+            <button type="button" class="rtm-filter-btn" data-group="s3_sar" aria-pressed="false">S³-SAR (5)</button>
+          </div>
+          <input type="search" id="rtm-search" class="rtm-search" placeholder="Filter by ID, keyword, module, or test…" aria-label="Filter requirements">
+        </div>
+
+        <p class="rtm-count" id="rtm-count"></p>
+
+        <div class="rtm-table-wrap">
+          <table class="rtm-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Group</th>
+                <th>Governance</th>
+                <th>Requirement Summary</th>
+                <th>Implementing Module(s)</th>
+                <th>AST-Verified Negative Control</th>
+              </tr>
+            </thead>
+            <tbody id="rtm-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="s3-mbse.html">S³ MBSE &amp; SysML</a>
+        <a href="systems-engineering.html">Systems Engineering</a>
+        <a href="capabilities.html">Capabilities</a>
+        <a href="about.html">Founder &amp; Lab</a>
+        <a href="contact.html">Contact</a>
+        <a href="https://www.linkedin.com/in/chatterpaul-joseph-300068104" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:chatterpaul@chatterguru.com">chatterpaul@chatterguru.com</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

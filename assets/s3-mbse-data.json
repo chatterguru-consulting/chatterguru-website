@@ -1,0 +1,1467 @@
+{
+  "schema": "chatterguru-s3-mbse-public-v2",
+  "notation_status": "SysML-style architecture documentation (not interoperable XMI or executable SysML v2)",
+  "generated_utc": "2026-11-25T00:00:50Z",
+  "source_revision": "1d1a7b5965",
+  "governance_notice": "Synthetic / educational multisensor research architecture. All candidate requirements retain explicit CANDIDATE_UNAPPROVED status until formal owner baseline approval. AST/file traceability checks are distinct from executed verification, independent validation, and owner acceptance.",
+  "conops": {
+    "document_id": "CG-RAD-CONOPS-001",
+    "version": "0.1",
+    "status": "CANDIDATE_UNAPPROVED",
+    "scope": "Independently created, unclassified, fictional/synthetic laboratory research.",
+    "reading_rule": "Describes the intended operating concept and architecture discipline. Synthetic simulation test passes do not assert operational radar, threat, or field-calibrated performance.",
+    "stakeholders": [
+      {
+        "role": "Research Lead / Systems Engineer",
+        "concern": "Define studies, govern model limitations, allocate budgets, maintain requirements & evidence baselines."
+      },
+      {
+        "role": "Radar / Signal-Processing Engineer",
+        "concern": "Configure waveforms, hybrid arrays, STAP/SFAP, detectors and trackers; inspect measured consequences on identical sources."
+      },
+      {
+        "role": "EW / EP Researcher",
+        "concern": "Compare bounded synthetic interference and electronic-protection mitigations under matched controls."
+      },
+      {
+        "role": "V&V / Independent Reviewer",
+        "concern": "Reproduce runs deterministically, audit truth isolation, challenge negative controls, and verify SHA-256 digests."
+      },
+      {
+        "role": "Workbench Operator",
+        "concern": "Author, preflight, execute, visualize, replay and export multi-sensor runs from one integrated application."
+      }
+    ],
+    "phases": [
+      {
+        "code": "R1",
+        "name": "Research References",
+        "status": "Active",
+        "gate": "Independent analytical oracles, unit conventions, deterministic seeded checks."
+      },
+      {
+        "code": "R2",
+        "name": "Integrated Synthetic Studies",
+        "status": "Active",
+        "gate": "Same-source end-to-end causality (4D world -> I/Q -> DSP -> CFAR -> tracks -> HDF5 -> passive replay)."
+      },
+      {
+        "code": "R3",
+        "name": "Multi-Agent Research (STK-015)",
+        "status": "Deferred / Candidate",
+        "gate": "Policy admission, observation/action contracts, leakage controls; product-owner review required."
+      },
+      {
+        "code": "H1",
+        "name": "Hardware / RFSoC Integration",
+        "status": "Future / External",
+        "gate": "Explicit capture interfaces, calibration receipts, safety and regulatory authorization."
+      },
+      {
+        "code": "T1",
+        "name": "Real-Time Deadline Research",
+        "status": "Future / External",
+        "gate": "Instrumented worst-case latency, determinism, overload behavior and safe failure."
+      }
+    ]
+  },
+  "sysml_elements": {
+    "S3Workbench": {
+      "id": "S3Workbench",
+      "stereotype": "«block»",
+      "name": "S3UnifiedWorkbench",
+      "package": "S3::Architecture",
+      "summary": "Single integrated Qt & browser Workbench coordinating 4D scenario authoring, fail-closed preflight, multi-sensor execution, and passive replay.",
+      "properties": [
+        "studio3D: CesiumStudioView",
+        "sharedSession: SharedSensorPanel",
+        "hybridLab: HybridSfapPanel"
+      ],
+      "requirements": [
+        "STK-018",
+        "S³-SAR-F05",
+        "HBF-10"
+      ],
+      "modules": [
+        "src/eccm_sandbox/workbench/shared_sensor_runner.py",
+        "src/eccm_sandbox/workbench/qt_shared_sensor_session.py",
+        "src/eccm_sandbox/workbench/qt_hybrid_sfap_panel.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "uc"
+      ]
+    },
+    "SceneSnapshot": {
+      "id": "SceneSnapshot",
+      "stereotype": "«block»",
+      "name": "SceneSnapshot",
+      "package": "S3::World",
+      "summary": "Immutable 4D ENU/WGS84 world timebase holding exact sampled platform and target poses, velocities, 6-DoF attitudes, terrain bounds, and SHA-256 content digest.",
+      "properties": [
+        "sample_times_s: float[*]",
+        "origin_wgs84: GeodeticOrigin",
+        "content_digest: sha256"
+      ],
+      "requirements": [
+        "STK-003",
+        "STK-017"
+      ],
+      "modules": [
+        "src/eccm_sandbox/scenario/scene_snapshot.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd"
+      ]
+    },
+    "ObjectSourceEvidence": {
+      "id": "ObjectSourceEvidence",
+      "stereotype": "«block»",
+      "name": "ObjectSourceEvidence",
+      "package": "S3::Eligibility",
+      "summary": "Per-object synthetic geometry, material, spectral/RF band support, and explicit uncertainty contract. Enforces 6-DoF rigid-body rotation preserving edge lengths and normals.",
+      "properties": [
+        "geometry_kind: enum",
+        "material_uncertainty: str",
+        "attitude_rpy_deg: float[3]"
+      ],
+      "requirements": [
+        "STK-005",
+        "STK-017"
+      ],
+      "modules": [
+        "src/eccm_sandbox/scenario/scene_eligibility.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd"
+      ]
+    },
+    "PreflightGate": {
+      "id": "PreflightGate",
+      "stereotype": "«block»",
+      "name": "SensorExecutionPlan & Preflight",
+      "package": "S3::Governance",
+      "summary": "Zero-write, fail-closed admission gate checking memory/work budgets, RMB training support (K >= 2*DOF), spatial aliasing, and receive-gate bounds before any IQ allocation.",
+      "properties": [
+        "memory_budget_bytes: int",
+        "work_budget_units: int",
+        "admitted: bool"
+      ],
+      "requirements": [
+        "S3-STAP-F02",
+        "HBF-09",
+        "STK-024"
+      ],
+      "modules": [
+        "src/eccm_sandbox/scenario/sensor_execution_plan.py",
+        "src/eccm_sandbox/validation/hybrid_trade_readiness.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd",
+        "par",
+        "uc"
+      ]
+    },
+    "SharedRadarAdapter": {
+      "id": "SharedRadarAdapter",
+      "stereotype": "«block»",
+      "name": "SharedRadarAdapter",
+      "package": "S3::Sensors::RF",
+      "summary": "Common-CPI coherent radar producer executing LFM transmit/receive, pulse compression, Doppler RDM, CA-CFAR, monopulse, and closed-loop tracking with zero truth leakage.",
+      "properties": [
+        "carrier_hz: float",
+        "prf_hz: float",
+        "stream_key_policy: str"
+      ],
+      "requirements": [
+        "STK-002",
+        "STK-010",
+        "STK-011"
+      ],
+      "modules": [
+        "src/eccm_sandbox/recording/shared_scene_radar.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd"
+      ]
+    },
+    "SharedSarAdapter": {
+      "id": "SharedSarAdapter",
+      "stereotype": "«block»",
+      "name": "SharedSarAdapter",
+      "package": "S3::Sensors::SAR",
+      "summary": "Coherent spotlight & stripmap SAR producer with per-pulse moving-target phase histories, 3D DEM/building occlusion, flat z=0 and terrain-referenced z=h_DEM(x,y) backprojection, and PFA.",
+      "properties": [
+        "mode: spotlight | stripmap",
+        "allow_moving_targets: bool",
+        "focus_elevation_m: float[*,*]"
+      ],
+      "requirements": [
+        "S³-SAR-F01",
+        "S³-SAR-F02",
+        "S³-SAR-F03",
+        "S³-SAR-F04"
+      ],
+      "modules": [
+        "src/eccm_sandbox/sar/shared_scene.py",
+        "src/eccm_sandbox/sar/acquisition_focus.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd",
+        "par"
+      ]
+    },
+    "SharedIRAdapter": {
+      "id": "SharedIRAdapter",
+      "stereotype": "«block»",
+      "name": "SharedIRAdapter",
+      "package": "S3::Sensors::EOIR",
+      "summary": "Physics-produced synthetic LWIR/MWIR radiometric imager with 6-DoF rigid-body facet rotation, ray-cast z-buffer occlusion, Planck band quadrature, and explicit NoData masking.",
+      "properties": [
+        "band: LWIR_8_12 | MWIR_3_5",
+        "allow_attitude_rotation: bool",
+        "valid_mask: bool[*,*]"
+      ],
+      "requirements": [
+        "STK-003",
+        "STK-005"
+      ],
+      "modules": [
+        "src/eccm_sandbox/recording/shared_scene_ir.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd"
+      ]
+    },
+    "HybridReceiver": {
+      "id": "HybridReceiver",
+      "stereotype": "«block»",
+      "name": "HybridSubarrayReceiver & Channelizer",
+      "package": "S3::Sensors::HBF2",
+      "summary": "Two-stage analog-element to digital-subarray combiner with 4-tap polyphase / FFT subband channelizer producing one immutable (S,P,R,F) cube sealed by full-metadata SHA-256.",
+      "properties": [
+        "N_elements: int",
+        "S_subarrays: int",
+        "F_subbands: int",
+        "source_digest: sha256"
+      ],
+      "requirements": [
+        "STK-021",
+        "STK-022",
+        "HBF-01",
+        "HBF-02",
+        "HBF-03",
+        "HBF-05"
+      ],
+      "modules": [
+        "src/eccm_sandbox/signal/hybrid_subarray_receiver.py",
+        "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd",
+        "par"
+      ]
+    },
+    "AdaptiveBranches": {
+      "id": "AdaptiveBranches",
+      "stereotype": "«block»",
+      "name": "Paired Conventional / STAP / Joint SFAP",
+      "package": "S3::Processing",
+      "summary": "Runs Conventional, GIP-screened Post-Doppler STAP, Per-Subband SFAP, and Joint Space×Frequency SFAP plus CA-CFAR, subarray monopulse, and Kalman tracking on the exact same frozen capture.",
+      "properties": [
+        "gip_screened: bool",
+        "joint_sx_f_dof: S * F",
+        "monopulse_snr_min_db: 6.0"
+      ],
+      "requirements": [
+        "STK-023",
+        "HBF-04",
+        "HBF-06",
+        "HBF-07",
+        "HBF-08",
+        "S3-STAP-F01",
+        "S3-STAP-F03"
+      ],
+      "modules": [
+        "src/eccm_sandbox/scenario/studio_stap_source.py",
+        "src/eccm_sandbox/validation/hybrid_branch_tracker.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd",
+        "par"
+      ]
+    },
+    "SealedArchive": {
+      "id": "SealedArchive",
+      "stereotype": "«block»",
+      "name": "Sealed HDF5 & Passive Session Viewer",
+      "package": "S3::Evidence",
+      "summary": "Immutable HDF5 archives (radar.h5, sar.h5 v2, ir.h5, HBF2 trade ledger) and session.json verified by SHA-256 digests. Passive multi-layer viewing and replay never re-execute sources.",
+      "properties": [
+        "sar_schema: s3-sampled-sar-export-v2",
+        "tamper_check: fail_closed_sha256",
+        "passive_layers: z0 | dem | autofocus"
+      ],
+      "requirements": [
+        "S3-STAP-F05",
+        "S3-STAP-F06",
+        "HBF-11",
+        "S³-SAR-F05",
+        "STK-016"
+      ],
+      "modules": [
+        "src/eccm_sandbox/recording/shared_sensor_session.py",
+        "src/eccm_sandbox/workbench/shared_sensor_view.py",
+        "src/eccm_sandbox/validation/hbf2_measured_trade_benchmark.py"
+      ],
+      "diagrams": [
+        "bdd",
+        "ibd",
+        "uc"
+      ]
+    },
+    "ConstraintRMB": {
+      "id": "ConstraintRMB",
+      "stereotype": "«constraint»",
+      "name": "RMB Training Support",
+      "package": "S3::Constraints",
+      "summary": "Reed-Mallett-Brennan covariance conditioning bound: secondary training cell count K must satisfy K >= 2 * DOF (2*S for STAP/per-subband, 2*S*F for Joint Space×Frequency SFAP) or fail closed.",
+      "properties": [
+        "equation: K >= 2 * DOF",
+        "failure_action: reject_before_inversion"
+      ],
+      "requirements": [
+        "HBF-06",
+        "HBF-07",
+        "HBF-09"
+      ],
+      "modules": [
+        "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+      ],
+      "diagrams": [
+        "par"
+      ]
+    },
+    "ConstraintAliasing": {
+      "id": "ConstraintAliasing",
+      "stereotype": "«constraint»",
+      "name": "SAR Spatial Aliasing & Gate",
+      "package": "S3::Constraints",
+      "summary": "Ensures pulse-to-pulse slant-range change satisfies 4*pi*f_max*|DeltaR|/c <= pi and every scatterer/DEM pixel fits completely inside the declared fast-time receive gate.",
+      "properties": [
+        "equation: 4*pi*f_max*|DeltaR|/c <= pi",
+        "unknown_dem: propagate_NaN"
+      ],
+      "requirements": [
+        "S³-SAR-F02",
+        "S³-SAR-F03"
+      ],
+      "modules": [
+        "src/eccm_sandbox/sar/shared_scene.py",
+        "src/eccm_sandbox/sar/acquisition_focus.py"
+      ],
+      "diagrams": [
+        "par"
+      ]
+    },
+    "ConstraintMonopulse": {
+      "id": "ConstraintMonopulse",
+      "stereotype": "«constraint»",
+      "name": "Monopulse Coherence & Hemisphere",
+      "package": "S3::Constraints",
+      "summary": "Digital subarray monopulse azimuth estimates require coherence SNR >= 6 dB and forward-hemisphere |sin(az)| < 0.999; uncalibrated or low-SNR plots are rejected without truth rescue.",
+      "properties": [
+        "equation: SNR_coh >= 6 dB",
+        "hemisphere: |sin(az)| < 0.999"
+      ],
+      "requirements": [
+        "HBF-08",
+        "STK-007"
+      ],
+      "modules": [
+        "src/eccm_sandbox/validation/hybrid_branch_tracker.py"
+      ],
+      "diagrams": [
+        "par"
+      ]
+    },
+    "ConstraintBudget": {
+      "id": "ConstraintBudget",
+      "stereotype": "«constraint»",
+      "name": "Pre-Allocation Compute & Memory Cap",
+      "package": "S3::Constraints",
+      "summary": "Analytical cube-byte and MFLOP/CPI caps are checked before any IQ allocation; rejected configurations are logged as rejected_preflight_not_executed.",
+      "properties": [
+        "cube_bytes <= max_cube_bytes",
+        "mflops <= max_mflops_per_cpi"
+      ],
+      "requirements": [
+        "HBF-09",
+        "HBF-11",
+        "STK-020",
+        "STK-024"
+      ],
+      "modules": [
+        "src/eccm_sandbox/validation/hybrid_trade_readiness.py",
+        "src/eccm_sandbox/validation/hbf2_measured_trade_benchmark.py"
+      ],
+      "diagrams": [
+        "par"
+      ]
+    }
+  },
+  "multi_level_requirements": [
+    {
+      "id": "S3-SYS-001",
+      "level": "System (SyRS)",
+      "parent": "STK-003, STK-017",
+      "shall": "The S³ system shall store every authored mission scenario as an immutable, SHA-256-sealed 4D SceneSnapshot with explicit WGS84/ENU origin, vertical datum, and monotonic sample timestamps prior to executing any sensor plugin.",
+      "rationale": "Prevents browser Cesium presentation state from drifting away from authoritative simulation truth.",
+      "allocation": "S3::World (SceneSnapshot)",
+      "verification_method": "Test, Inspection",
+      "acceptance_criteria": "Identical config and seed produce identical world.content_digest; mutating any pose changes the digest.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Independent V&V Pending",
+      "evidence_ref": "tests/test_s3_scene_snapshot.py"
+    },
+    {
+      "id": "S3-SSR-WORLD-01",
+      "level": "Subsystem (SSR)",
+      "parent": "S3-SYS-001",
+      "shall": "The S³ Authoritative World subsystem shall represent unknown target or terrain elevations explicitly as height_known=false / NaN rather than substituting z=0.0 m.",
+      "rationale": "Prevents silent elevation fabrication in SAR layover and IR occlusion.",
+      "allocation": "SceneSnapshot, ObjectSourceEvidence",
+      "verification_method": "Test (Negative Control)",
+      "acceptance_criteria": "Unknown-height entity fails closed in IR and SAR preflight before engine execution.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Owner Review Pending",
+      "evidence_ref": "tests/test_s3_shared_ir.py::test_unsupported_inputs_fail_before_radiometric_engine[height]"
+    },
+    {
+      "id": "S3-MOD-IR-01",
+      "level": "Simulation Model",
+      "parent": "S3-SSR-WORLD-01, STK-005",
+      "shall": "When 6-DoF attitude rotation is enabled, the S³ Rigid-Body Facet Transform model shall rotate facet vertices and outward normals via a proper orthogonal ENU matrix R = Rz(yaw) Ry(pitch) Rx(roll) preserving triangle edge lengths and areas within 1e-12 relative tolerance.",
+      "rationale": "Guarantees rigid-body geometric fidelity across multi-epoch rotating IR exposures.",
+      "allocation": "scene_eligibility.py::transform_object_evidence_pose",
+      "verification_method": "Test, Analysis",
+      "acceptance_criteria": "||R^T R - I||_max <= 1e-12, |det(R) - 1| <= 1e-12, edge/area parity <= 1e-12; default allow_attitude_rotation=False fails closed.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Owner Review Pending",
+      "evidence_ref": "tests/test_s3w_01_rotating_ir.py"
+    },
+    {
+      "id": "S3-SYS-002",
+      "level": "System (SyRS)",
+      "parent": "STK-002, STK-022, S³-SAR-F05",
+      "shall": "The S³ system shall bind all sensor products generated from a multi-sensor run to the identical scene_sha256 and seal every HDF5 archive with fail-closed SHA-256 integrity checks.",
+      "rationale": "Guarantees cross-sensor spatial-temporal registration and tamper-evident passive replay.",
+      "allocation": "S3::Evidence, S3::Governance",
+      "verification_method": "Test",
+      "acceptance_criteria": "verify_cross_sensor_spatial_temporal_registration passes across RF, SAR, and IR on king_farm_civilian and south_mountain_civilian.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Owner Review Pending",
+      "evidence_ref": "tests/test_s3w_04_multilayer_and_civilian_3sensor.py"
+    },
+    {
+      "id": "S3-SSR-SAR-01",
+      "level": "Subsystem (SSR)",
+      "parent": "S3-SYS-002, S³-SAR-F03",
+      "shall": "The S³ Sampled SAR subsystem shall focus both flat z=0 and terrain-referenced z=h_DEM(x,y) backprojection from the identical immutable SarAcquisitionHistory and propagate NaN for unknown DEM pixels without fabricating z=0.",
+      "rationale": "Quantifies terrain layover correction without altering raw phase history.",
+      "allocation": "sar/acquisition_focus.py, sar/shared_scene.py",
+      "verification_method": "Test (Positive + Negative Control)",
+      "acceptance_criteria": "80 m elevated target shows >60 m layover in z=0 and |y| <= 2 m in DEM focus; NaN DEM propagates NaN; zero-DEM matches z=0 within 1e-13.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Owner Review Pending",
+      "evidence_ref": "tests/test_s3w_02_03_moving_and_dem_sar.py"
+    },
+    {
+      "id": "S3-MOD-SFAP-01",
+      "level": "Simulation Model",
+      "parent": "S3-SYS-002, HBF-06, HBF-07",
+      "shall": "The S³ Joint Space×Frequency SFAP model shall enforce the Reed-Mallett-Brennan training bound K >= 2 * S * F prior to covariance inversion and fail closed without fabricating adaptive weights when K < 2 * S * F.",
+      "rationale": "Prevents singular or ill-conditioned covariance inversion in wideband adaptive processing.",
+      "allocation": "signal/wideband_sfap_channelizer.py",
+      "verification_method": "Test (Negative Control)",
+      "acceptance_criteria": "K < 2*S*F fails closed; admitted dispersive multipath case shows positive SINR gain over per-subband SFAP.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Test Executed (Pass) — Owner Review Pending",
+      "evidence_ref": "tests/test_hbf2_channelizer_and_joint_sfap.py"
+    },
+    {
+      "id": "S3-SYS-003",
+      "level": "System (SyRS)",
+      "parent": "STK-EDU-01 (ConOps Rev 0.2)",
+      "shall": "The S³ Mission Authoring subsystem shall require explicit human approval of any agent-proposed scenario draft before creating an executable SensorExecutionPlan and shall prohibit arbitrary code execution, unapproved writes, or hardware/RF actuation.",
+      "rationale": "Enforces fail-closed security and instructor authority in AI-assisted educational authoring.",
+      "allocation": "S3::Authoring (Candidate Planned)",
+      "verification_method": "Test, Inspection",
+      "acceptance_criteria": "Unapproved or script-bearing drafts rejected with zero writes; max entity/duration bounds TBD for owner decision.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Not Executed / Not Implemented (Candidate Planned)",
+      "evidence_ref": "Planned — docs/systems_engineering/CONOPS_S3_REV0_2_CANDIDATE.md"
+    },
+    {
+      "id": "S3-SSR-LIDAR-01",
+      "level": "Subsystem (SSR)",
+      "parent": "ConOps Rev 0.2",
+      "shall": "When a LiDAR plugin is added, the S³ LiDAR subsystem shall compute ray-surface returns against shared SceneSnapshot geometry/DEM in ENU metres and omit or mark occluded/out-of-range rays rather than fabricating synthetic ranges.",
+      "rationale": "Extends S³ to 3D point clouds while maintaining occlusion and uncertainty honesty.",
+      "allocation": "S3::Sensors::LiDAR (Candidate Planned)",
+      "verification_method": "Test, Analysis",
+      "acceptance_criteria": "Analytic ray-plane accuracy within TBD m (owner decision); occluded target returns zero points.",
+      "approval_status": "CANDIDATE_UNAPPROVED",
+      "verification_status": "Not Executed / Not Implemented (Candidate Planned)",
+      "evidence_ref": "Planned — docs/mbse/S3_ENGINEERING_COVERAGE_MATRIX.md"
+    }
+  ],
+  "archipelago_slices": [
+    {
+      "id": "slice-cfar",
+      "title": "Radar Detection (2D CA-CFAR → Plot Extraction)",
+      "maturity": "Implemented & Integrated",
+      "modules": [
+        "src/eccm_sandbox/signal/cfar.py",
+        "src/eccm_sandbox/signal/multi_target_measurements.py"
+      ],
+      "pipeline": "Complex RDM (D, R) → Magnitude |X| → Rectangular Guard/Training Window → Threshold T = alpha * mean(Training) → Detection Mask → Plot Peak Selection → Tracker Observations",
+      "equations": [
+        "N_train = (2*(G_d+T_d)+1)*(2*(G_r+T_r)+1) - (2*G_d+1)*(2*G_r+1)",
+        "hat_n(d, r) = (1 / N_train) * sum_{Training} |X(i, j)|",
+        "T(d, r) = alpha * hat_n(d, r)   [direct threshold_scale, not closed-form Pfa]"
+      ],
+      "limits": "edge_policy='skip' leaves border cells NaN; homogeneous background assumed; raw CFAR bins are distinct from post-CFAR accepted plots.",
+      "verification": "tests/test_s3_shared_radar.py & tests/test_hbf2_04_05_tracking_and_benchmark.py"
+    },
+    {
+      "id": "slice-tracker",
+      "title": "Multi-Target Tracking (Scan Kalman & Association)",
+      "maturity": "Implemented & Integrated",
+      "modules": [
+        "src/eccm_sandbox/tracking/tracker_manager.py",
+        "src/eccm_sandbox/tracking/kalman_scan.py",
+        "src/eccm_sandbox/tracking/kalman.py"
+      ],
+      "pipeline": "Cartesian Observations + R_k → Constant-Velocity Predict → Gating → Deterministic Association (nearest_neighbor | global_one_to_one) → Kalman Update / Coast → Track Initiation → Offline Truth Scoring",
+      "equations": [
+        "x = [p_x, p_y, v_x, v_y]^T,   x_{k|k-1} = F(dt) x_{k-1|k-1}",
+        "P_{k|k-1} = F P F^T + Q(dt),   S = H P_{k|k-1} H^T + R_k",
+        "K = P_{k|k-1} H^T S^{-1},   x_{k|k} = x_{k|k-1} + K (z_k - H x_{k|k-1})"
+      ],
+      "limits": "kalman_scan.py supports ONLY nearest_neighbor and global_one_to_one (explicitly NOT PDA/JPDA/MHT; standalone IMM/JPDA lives separately in radar_engineering/imm_jpda.py).",
+      "verification": "tests/test_hbf2_04_05_tracking_and_benchmark.py & tests/test_terrain_stap_multiseed_campaign.py"
+    },
+    {
+      "id": "slice-rdm",
+      "title": "Range-Doppler Map (RDM) Formation",
+      "maturity": "Implemented & Integrated",
+      "modules": [
+        "src/eccm_sandbox/signal/range_doppler.py"
+      ],
+      "pipeline": "Pulse-Compressed IQ (P, R) → Slow-Time Window (hann | None) → Axis-0 FFT → fftshift (0 Hz at P//2) → Magnitude / Power → Physical Axes (m, Hz, m/s)",
+      "equations": [
+        "X_rdm = fftshift(FFT_axis0(w * X_comp), axes=0)",
+        "Delta_R = c / (2 * f_s),   v_r = f_d * (c / (2 * f_c))"
+      ],
+      "limits": "Window limited to 'hann' or None; speeds |v_r| >= PRF*lambda/4 alias; no range-cell migration compensation in base RDM.",
+      "verification": "tests/test_s3_shared_radar.py"
+    },
+    {
+      "id": "slice-eoir",
+      "title": "EO/IR Radiometric Image Formation (LWIR / MWIR)",
+      "maturity": "Implemented & Integrated (Vis/SWIR Planned)",
+      "modules": [
+        "src/eccm_sandbox/recording/shared_scene_ir.py",
+        "src/eccm_sandbox/recording/radiometric_flir_reference.py"
+      ],
+      "pipeline": "SceneSnapshot 6-DoF Pose → Rigid Facet Rotation → Pinhole Ray-Cast & Z-Buffer Occlusion → Planck Band Quadrature (LWIR 8-12 um | MWIR 3-5 um) → Detector Noise & ADC → Validity Mask → Display Palette",
+      "equations": [
+        "B(lambda, T) = c_1 / (lambda^5 * (exp(c_2 / (lambda * T)) - 1))",
+        "L_tot = tau_atm * (eps * L_bb(T) + (1 - eps) * L_bb(T_bg)) + L_path"
+      ],
+      "limits": "Opaque diffuse facets, held exposure-start pose, zero PSF in SharedIRAdapter for explicit NoData masking; Visible EO and SWIR are not in this radiometric chain. The Studio camera's EO and SWIR bands (studio_ir_renderer.js) are display renderers outside it.",
+      "verification": "tests/test_s3_shared_ir.py & tests/test_s3w_01_rotating_ir.py"
+    },
+    {
+      "id": "slice-sar",
+      "title": "SAR Image Formation (z=0 vs 3D DEM Backprojection & PFA)",
+      "maturity": "Implemented & Integrated",
+      "modules": [
+        "src/eccm_sandbox/sar/shared_scene.py",
+        "src/eccm_sandbox/sar/acquisition_signal.py",
+        "src/eccm_sandbox/sar/acquisition_focus.py"
+      ],
+      "pipeline": "Moving/Occluded 4D Targets → Stop-and-Go LFM Phase History (raw_iq) → Matched-Filter Compression → Paired Backprojection (z=0 AND z=h_DEM(x,y)) → Sealed s3-sampled-sar-export-v2",
+      "equations": [
+        "s_rx(p, t) = sum_s rho_s * illum[p,s] * exp(-j 4 pi f_c R[p,s] / c) * s_tx(t - 2 R[p,s]/c)",
+        "I(x, y, z) = (1 / (P * E_tx)) * sum_p s_comp(p, tau(p; x,y,z)) * exp(+j 4 pi f_c R_assumed / c)"
+      ],
+      "limits": "Scalar monostatic point/centroid field; NaN DEM propagates NaN; PFA rejects stripmap mode and far-field curvature violations.",
+      "verification": "tests/test_s3w_02_03_moving_and_dem_sar.py & tests/test_s3_sar_polar_format_and_modes.py"
+    }
+  ],
+  "rtm": {
+    "total_requirements": 49,
+    "stakeholder_count": 24,
+    "system_candidate_count": 25,
+    "group_counts": {
+      "stakeholder": 24,
+      "s3_stap": 8,
+      "hbf": 12,
+      "s3_sar": 5
+    },
+    "approval_status_counts": {
+      "CANDIDATE_UNAPPROVED": 49
+    },
+    "all_verified": true,
+    "entries": [
+      {
+        "req_id": "STK-001",
+        "group": "stakeholder",
+        "title": "Fictional legacy, contemporary and emerging radar comparisons",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/radar_engineering/arrays.py"
+        ],
+        "test_files": [
+          "tests/test_r12_arrays_and_stretch.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r12_arrays_and_stretch.py::test_phase_quantization_metrics_tr_impairments_and_mutual_coupling"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-002",
+        "group": "stakeholder",
+        "title": "Coherent end-to-end physically causal radar simulation",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/recording/shared_scene_radar.py"
+        ],
+        "test_files": [
+          "tests/test_s3_shared_radar.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_shared_radar.py::test_empty_scene_and_no_noise_cannot_create_truth_tracks"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-003",
+        "group": "stakeholder",
+        "title": "Repeatable multi-sensor and target trajectory scenario authoring",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/scene_snapshot.py"
+        ],
+        "test_files": [
+          "tests/test_s3_scene_eligibility.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_scene_eligibility.py::test_missing_geometry_and_height_report_every_target"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-004",
+        "group": "stakeholder",
+        "title": "Explicit propagation, clutter and terrain environment assumptions",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py::test_hbf2_03_south_mountain_opt_in_multielement_preserves_single_channel_default"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-005",
+        "group": "stakeholder",
+        "title": "Generic target EM signature dependence on geometry, aspect and polarization",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/target_geometry/po_convention_qualification.py"
+        ],
+        "test_files": [
+          "tests/test_r7_po_conventions.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r7_po_conventions.py::test_r71_tessellation_convergence_and_rayleigh_breakdown_control"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-006",
+        "group": "stakeholder",
+        "title": "Radar waveform and timing family comparisons (LFM, phase code, stretch)",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/radar_engineering/stretch_eclipsing.py"
+        ],
+        "test_files": [
+          "tests/test_r12_arrays_and_stretch.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r12_arrays_and_stretch.py::test_stretch_dechirp_achieves_submeter_resolution_with_narrowband_adc"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-007",
+        "group": "stakeholder",
+        "title": "Abstract antenna/array steering, beamforming and angular measurements",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hybrid_branch_tracker.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py::test_hbf2_04_subarray_monopulse_angle_estimator_and_coherence_gate"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-008",
+        "group": "stakeholder",
+        "title": "Complex I/Q generation, sample/timing conventions and receiver impairments",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py::test_hbf2_01_full_metadata_digest_seal_rejects_metadata_and_iq_tamper"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-009",
+        "group": "stakeholder",
+        "title": "Conventional vs advanced adaptive processing (STAP/SFAP) in controlled conditions",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/terrain_stap_multiseed_campaign.py"
+        ],
+        "test_files": [
+          "tests/test_terrain_stap_multiseed_campaign.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_terrain_stap_multiseed_campaign.py::test_negative_controls_produce_zero_false_tracks"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-010",
+        "group": "stakeholder",
+        "title": "Detector behavior, measurement generation, false alarms and ROC assessment",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/radar_engineering/swerling_roc.py"
+        ],
+        "test_files": [
+          "tests/test_r12_blake_and_swerling.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r12_blake_and_swerling.py::test_marcum_q_and_swerling_identities_and_monte_carlo_agreement"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-011",
+        "group": "stakeholder",
+        "title": "Multi-target tracking association, initiation, coasting and continuity",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/radar_engineering/imm_jpda.py"
+        ],
+        "test_files": [
+          "tests/test_r12_micro_doppler_and_imm_jpda.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r12_micro_doppler_and_imm_jpda.py::test_jpda_exact_marginal_probabilities_and_crossed_target_resolution"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-012",
+        "group": "stakeholder",
+        "title": "Search/track scheduling, revisit choices and vertical coverage lobing",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/radar_engineering/link_budget_blake.py"
+        ],
+        "test_files": [
+          "tests/test_r12_blake_and_swerling.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r12_blake_and_swerling.py::test_blake_vertical_coverage_lobing_and_horizon_masking"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-013",
+        "group": "stakeholder",
+        "title": "Fictional bounded electronic-attack interference abstractions",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/ew/ew_matrix_qualification.py"
+        ],
+        "test_files": [
+          "tests/test_r7_ew_matrix.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r7_ew_matrix.py::test_r73_resource_budget_guards_before_allocation"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-014",
+        "group": "stakeholder",
+        "title": "Candidate ECCM/electronic-protection mitigation comparisons",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/ew/adaptive.py"
+        ],
+        "test_files": [
+          "tests/test_r7_ew_matrix.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r7_ew_matrix.py::test_r73_adaptive_distortionless_wng_and_negative_controls"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-015",
+        "group": "stakeholder",
+        "title": "Bounded simulated multi-agent radar/interferer experimentation (OPEN)",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/ew/ew_matrix_qualification.py"
+        ],
+        "test_files": [
+          "tests/test_r7_ew_matrix.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r7_ew_matrix.py::test_r73_slb_adc_ordering_and_carrier_coupled_frequency_hopping"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-016",
+        "group": "stakeholder",
+        "title": "Repeatable statistically defensible trade studies across science and tracking",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hbf2_measured_trade_benchmark.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py::test_hbf2_05_measured_trade_benchmark_and_sealed_hdf5_ledger"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-017",
+        "group": "stakeholder",
+        "title": "Objective numerical verification, uncertainty, configuration control and traceability",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/sar/neighborhood_block_audit.py"
+        ],
+        "test_files": [
+          "tests/test_r3_neighborhood_audit.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r3_neighborhood_audit.py::test_r3_1_rejects_invalid_metadata_or_unpermitted_block"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-018",
+        "group": "stakeholder",
+        "title": "Unified Studio authoring, execution, visualization and passive replay",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/workbench/shared_sensor_runner.py"
+        ],
+        "test_files": [
+          "tests/test_s3_u8_studio_workflow.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_u8_studio_workflow.py::test_shared_mission_preflight_zero_writes_and_fail_closed"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-019",
+        "group": "stakeholder",
+        "title": "Defined versioned interfaces for authorized laboratory RFSoC/SDR & STK co-sim",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/stk_connector.py"
+        ],
+        "test_files": [
+          "tests/test_r11_stk_cosim.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_r11_stk_cosim.py::test_stk_connect_and_vo_bridge_input_and_parser_hardening"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-020",
+        "group": "stakeholder",
+        "title": "Real-time throughput, latency and memory profiling under declared budgets",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "scripts/profile_studio_playback.py"
+        ],
+        "test_files": [
+          "tests/test_studio_playback_profiler.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_studio_playback_profiler.py::test_perf_probe_embedded_and_dormant_by_default"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-021",
+        "group": "stakeholder",
+        "title": "Hybrid analog-element / digital-subarray beamforming architecture studies",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_subarray_stap_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_subarray_stap_sfap.py::test_hb01_admission_rejects_invalid_partitions_calibration_rmb_and_over_budget"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-022",
+        "group": "stakeholder",
+        "title": "Single immutable phase- and time-coherent multichannel receive source",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_subarray_stap_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_subarray_stap_sfap.py::test_hb02_two_stage_combiner_impairments_and_immutable_capture_replay"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-023",
+        "group": "stakeholder",
+        "title": "Distinguish terrain angle-Doppler clutter from space-frequency interference",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py::test_hbf2_02_joint_sfap_fail_closed_rmb_and_dispersive_multipath_advantage"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "STK-024",
+        "group": "stakeholder",
+        "title": "Configurable admitted N/S/P/R/F/K trade studies in Workbench",
+        "spec_doc": "docs/requirements/STAKEHOLDER_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hybrid_trade_readiness.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_trade_readiness.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_trade_readiness.py::test_training_support_failure_is_not_reported_as_ready"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F01",
+        "group": "s3_stap",
+        "title": "RDM processing selection (STAP Off vs STAP On)",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_rdm_stap_toggle.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_rdm_stap_toggle.py::test_stap_rdm_negative_control_noise_only_has_zero_suppression_and_preserves_target"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F02",
+        "group": "s3_stap",
+        "title": "Source eligibility preflight rejects unsupported STAP requests",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_s3_stap_ab_acceptance.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_stap_ab_acceptance.py::test_s3_stap_05_south_mountain_fail_closed_and_nonstationary_stress_replay"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F03",
+        "group": "s3_stap",
+        "title": "Immutable same-source pairing across conventional and adaptive branches",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/terrain_stap_multiseed_campaign.py"
+        ],
+        "test_files": [
+          "tests/test_terrain_stap_multiseed_campaign.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_terrain_stap_multiseed_campaign.py::test_source_parity_across_conventional_and_adaptive_branches"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F04",
+        "group": "s3_stap",
+        "title": "Fair common-scale display comparison across paired RDMs",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_rdm_stap_toggle.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_rdm_stap_toggle.py::test_cesium_frames_include_physics_backed_stap_rdm_and_suppress_clutter"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F05",
+        "group": "s3_stap",
+        "title": "Passive deterministic replay of retained STAP A/B frames",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_rdm_stap_toggle.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_rdm_stap_toggle.py::test_studio_html_contains_synchronized_stap_toggle_and_passes_node_vm"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F06",
+        "group": "s3_stap",
+        "title": "Explicit evidence provenance and failure-mode distinction",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/terrain_stap_multiseed_campaign.py"
+        ],
+        "test_files": [
+          "tests/test_terrain_stap_multiseed_campaign.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_terrain_stap_multiseed_campaign.py::test_sustained_rejects_unfrozen_or_caller_supplied_evidence"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F07",
+        "group": "s3_stap",
+        "title": "King Farm educational STAP acceptance pack",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_s3_stap_ab_acceptance.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_stap_ab_acceptance.py::test_s3_stap_04_king_farm_three_mandatory_cases_and_hdf5_tamper_gate"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S3-STAP-F08",
+        "group": "s3_stap",
+        "title": "South Mountain terrain-rich STAP stress and release admission",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_s3_stap_ab_acceptance.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_stap_ab_acceptance.py::test_s3_stap_05_south_mountain_fail_closed_and_nonstationary_stress_replay"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-01",
+        "group": "hbf",
+        "title": "Physical element positions, responses and analog subarray membership",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_count_admission.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_count_admission.py::test_valid_integer_but_impossible_subarray_count_remains_reported"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-02",
+        "group": "hbf",
+        "title": "Analog phase/amplitude combining from element-domain responses",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_subarray_stap_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_subarray_stap_sfap.py::test_hb02_two_stage_combiner_impairments_and_immutable_capture_replay"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-03",
+        "group": "hbf",
+        "title": "Immutable multi-subarray coherent source identity and metadata seal",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py::test_hbf2_01_full_metadata_digest_seal_rejects_metadata_and_iq_tamper"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-04",
+        "group": "hbf",
+        "title": "Conventional, STAP and SFAP consume identical admitted received source",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_subarray_stap_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_subarray_stap_sfap.py::test_hb03_same_source_paired_conventional_stap_and_sfap_controls"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-05",
+        "group": "hbf",
+        "title": "Physically derived complex frequency subbands from admitted channelizer",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py::test_hbf2_01_polyphase_improves_leakage_and_negative_controls_fail_closed"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-06",
+        "group": "hbf",
+        "title": "Explicit separation of per-subband vs joint space-frequency SFAP",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/wideband_sfap_channelizer.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_channelizer_and_joint_sfap.py::test_hbf2_02_joint_sfap_fail_closed_rmb_and_dispersive_multipath_advantage"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-07",
+        "group": "hbf",
+        "title": "Bounded training/CUT guards, GIP screening and conditioning controls",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py::test_hbf2_03_gip_screened_training_censors_discrete_outliers_and_preserves_target"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-08",
+        "group": "hbf",
+        "title": "Matched conventional/STAP/SFAP detection, monopulse angle and tracking evidence",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hybrid_branch_tracker.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py::test_hbf2_04_multi_cpi_branch_detection_angle_and_kalman_tracking"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-09",
+        "group": "hbf",
+        "title": "Preflight bounds N/S/P/R/F/K work and memory before allocation",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hybrid_trade_readiness.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_trade_readiness.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_trade_readiness.py::test_narrowband_stap_candidate_does_not_claim_sfap_eligibility"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-10",
+        "group": "hbf",
+        "title": "Studio exposes supported elements, digitized subarrays, pulses and subbands",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/signal/hybrid_subarray_receiver.py"
+        ],
+        "test_files": [
+          "tests/test_hybrid_count_admission.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hybrid_count_admission.py::test_discrete_capture_dimensions_never_coerce"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-11",
+        "group": "hbf",
+        "title": "Preserve source/processor/scene identities and failure cases in sealed ledger",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/validation/hbf2_measured_trade_benchmark.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_04_05_tracking_and_benchmark.py::test_hbf2_05_measured_trade_benchmark_and_sealed_hdf5_ledger"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "HBF-12",
+        "group": "hbf",
+        "title": "End-to-end hybrid/STAP/SFAP qualification in King Farm and South Mountain",
+        "spec_doc": "docs/requirements/HYBRID_ARRAY_STAP_SFAP_CANDIDATE_REQUIREMENTS.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/scenario/studio_stap_source.py"
+        ],
+        "test_files": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py",
+          "tests/test_s3_hybrid_stap_acceptance_pack.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_hbf2_03_terrain_and_gip_stap.py::test_hbf2_03_king_farm_terrain_dihedral_coupling_and_gip_vs_sliding"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S³-SAR-F01",
+        "group": "s3_sar",
+        "title": "Independent stripmap and spotlight SAR collection modes in shared S³ scenes",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/sar/shared_scene.py"
+        ],
+        "test_files": [
+          "tests/test_s3_sar_polar_format_and_modes.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_sar_polar_format_and_modes.py::test_pfa_rejects_stripmap_mode_and_invalid_inputs"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S³-SAR-F02",
+        "group": "s3_sar",
+        "title": "Civilian geographic terrain occlusion and moving-traffic coherent SAR",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/sar/shared_scene.py"
+        ],
+        "test_files": [
+          "tests/test_s3w_02_03_moving_and_dem_sar.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3w_02_03_moving_and_dem_sar.py::test_s3w_02_occlusion_zeroes_pulse_echo_and_rejects_unknown_building_heights"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S³-SAR-F03",
+        "group": "s3_sar",
+        "title": "Independent flat z=0, DEM 3D backprojection and polar-format focusing",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/sar/acquisition_focus.py"
+        ],
+        "test_files": [
+          "tests/test_s3w_02_03_moving_and_dem_sar.py",
+          "tests/test_s3_sar_polar_format_and_modes.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3w_02_03_moving_and_dem_sar.py::test_s3w_03_dem_3d_backprojection_corrects_layover_propagates_nan_and_seals_v2"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S³-SAR-F04",
+        "group": "s3_sar",
+        "title": "Educational autofocus candidates (PGA, Map Drift, MEA) and provenance",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/workbench/shared_sensor_view.py"
+        ],
+        "test_files": [
+          "tests/test_s3_sar_autofocus.py",
+          "tests/test_s3w_04_multilayer_and_civilian_3sensor.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3_sar_autofocus.py::test_distinguish_scene_motion_from_platform_phase_error_negative_control"
+        ],
+        "verified": true
+      },
+      {
+        "req_id": "S³-SAR-F05",
+        "group": "s3_sar",
+        "title": "Synchronized multi-product 3-sensor civilian inspection and passive layer switching",
+        "spec_doc": "docs/requirements/SYSTEM_REQUIREMENTS_SPECIFICATION_CANDIDATE.md",
+        "approval_status": "CANDIDATE_UNAPPROVED",
+        "source_modules": [
+          "src/eccm_sandbox/workbench/shared_sensor_runner.py",
+          "src/eccm_sandbox/workbench/shared_sensor_view.py"
+        ],
+        "test_files": [
+          "tests/test_s3w_04_multilayer_and_civilian_3sensor.py"
+        ],
+        "negative_control_tests": [
+          "tests/test_s3w_04_multilayer_and_civilian_3sensor.py::test_s3w_04_passive_autofocus_layers_and_qt_layer_selector"
+        ],
+        "verified": true
+      }
+    ]
+  },
+  "payload_sha256": "6c71e20f41dbf2394d6e2101fa854002c13c6a437d95b2e8c30d01deda68402a"
+}
