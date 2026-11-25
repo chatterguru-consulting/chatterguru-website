@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn Sensor Physics | Chatterguru Consulting LLC</title>
+  <meta name="description" content="Explore how sensors turn physics into images and tracks. Start with an interactive SAR lesson, then follow the S³ learning roadmap.">
+  <link rel="canonical" href="https://www.chatterguru.com/s3-learn.html">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Chatterguru">
+  <meta name="theme-color" content="#0b6d82">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-20">
+  <link rel="stylesheet" href="assets/s3-engineering-reference.css">
+  <link rel="stylesheet" href="assets/s3-learn.css">
+  <script src="assets/site.js?v=2026-11-20" defer></script>
+  <script src="assets/s3-learn.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+  <main id="main">
+    <section class="reference-hero" aria-labelledby="learn-title">
+      <div class="section-inner">
+        <p class="eyebrow">Sensor Scenario Studio</p>
+        <h1 id="learn-title">Learn sensor physics</h1>
+        <p>Make a prediction, change one thing, and see what the sensor does. Then follow the math into the engineering reference or open a scene in Studio.</p>
+        <div class="hero-actions">
+          <a class="button" href="#sar-lab">Try the SAR lesson</a>
+          <a class="button secondary" href="#curriculum">See the learning roadmap</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sar-lab" aria-labelledby="sar-lab-title">
+      <div class="section-inner learn-lab">
+        <div class="section-heading">
+          <h2 id="sar-lab-title">Can smaller pixels make SAR sharper?</h2>
+          <p>Imagine a single bright point in a synthetic radar image. Predict what happens to its blur when you change pixel spacing alone. Then try changing bandwidth while holding pixel spacing fixed.</p>
+        </div>
+        <div class="learn-controls" hidden>
+          <label for="lab-bandwidth">Signal bandwidth
+            <select id="lab-bandwidth">
+              <option value="50">50 MHz</option>
+              <option value="100" selected>100 MHz</option>
+              <option value="200">200 MHz</option>
+            </select>
+          </label>
+          <label for="lab-pitch">Pixel spacing
+            <select id="lab-pitch">
+              <option value="0.25">0.25 m</option>
+              <option value="0.5" selected>0.50 m</option>
+              <option value="1">1.00 m</option>
+            </select>
+          </label>
+        </div>
+        <figure class="learn-response" hidden>
+          <canvas id="lab-response" role="img" aria-label="Ideal slant-range response to a single point with sample locations on the curve"></canvas>
+          <figcaption>Solid curve shows the point response. Dots show the samples on the image grid.</figcaption>
+        </figure>
+        <p class="learn-result" id="lab-result" aria-live="polite">At 100 MHz, the first null is 1.50 m from the peak. The example samples the response every 0.50 m.</p>
+        <details class="learn-math">
+          <summary>See the equation and its assumptions</summary>
+          <p class="reference-equation"><code>d = c/(2B) &nbsp;·&nbsp; A(x) = |sinc(x/d)|</code></p>
+          <p>Here <var>x</var> is slant-range offset in metres, <var>B</var> is bandwidth in hertz, and <var>c</var> is the speed of light. The normalized sinc is sin(πu)/(πu) and equals 1 at zero. The first null is at <var>x</var> = ±<var>d</var>. This model uses one point, a rectangular effective spectrum, and perfect focus. Look angle, weighting, motion, and azimuth aperture affect the resolution of a real image.</p>
+          <p>At 100 MHz, switching from 1.00 m to 0.25 m spacing puts more dots on the same curve. Doubling bandwidth to 200 MHz moves the first null from 1.50 m to 0.75 m. <a href="s3-engineering-reference.html#sar">Read the SAR engineering reference</a>.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="section alt" id="curriculum" aria-labelledby="curriculum-title">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2 id="curriculum-title">Learning roadmap</h2>
+          <p>The engineering reference covers selected foundations. Each series below has a concrete next lesson that connects an observable effect to an equation and a check.</p>
+        </div>
+        <ul class="learn-curriculum">
+          <li><h3>Signal and waveform physics</h3><p><strong>Read now.</strong> Pulse compression, sampling, and range–Doppler maps.</p><p><strong>Next lessons.</strong> Rectangular pulses, up/down linear chirps, nonlinear chirps, stepped frequency, and phase coding. Compare their matched responses and show where each sampled or stepped workflow applies.</p><a href="s3-engineering-reference.html#echoes">Start with echoes</a></li>
+          <li><h3>Detection and tracking</h3><p><strong>Read now.</strong> Local thresholding, plots, and the scan Kalman model.</p><p><strong>Next lessons.</strong> Uncertainty ellipses, gating, and two crossing objects. Compare nearest-neighbor and one-to-one matching, then introduce maneuver and probabilistic association references.</p><a href="s3-engineering-reference.html#detection">Start with plots and tracks</a></li>
+          <li><h3>Resource management</h3><p><strong>Next lessons.</strong> Allocate a shared clock across a synthetic survey. Use a timeline to show task requests, finite capacity, priority, deadlines, and the effects of deferring work.</p></li>
+          <li><h3>RF interference and receiver resilience</h3><p><strong>Next lessons.</strong> Learn the vocabulary behind electronic counter-countermeasures (ECCM). Use an offline coexistence example to separate noise, clutter, and interference and compare how a receiver measurement changes under a controlled disturbance.</p></li>
+          <li><h3>Scene generation and RF scattering</h3><p><strong>Read now.</strong> Shared geometry, terrain, and time.</p><p><strong>Next lessons.</strong> Build a point, a surface patch, and a synthetic terrain scene. Compare statistical clutter with scene-generated echoes using the same view and explain which material and motion assumptions change the result.</p><a href="s3-engineering-reference.html#world">Start with the shared world</a></li>
+          <li><h3>Atmosphere and EO/IR image formation</h3><p><strong>Read now.</strong> Infrared radiance, emissivity, and the display palette.</p><p><strong>Next lessons.</strong> Compare the same surface through clear air and haze. Distinguish RF path loss and atmospheric attenuation from optical transmission and path radiance. Then show how optics and exposure shape the image.</p><a href="s3-engineering-reference.html#thermal">Start with thermal imaging</a></li>
+          <li><h3>Imaging, fusion, and evidence</h3><p><strong>Try now.</strong> Change bandwidth and pixel spacing in the SAR lesson.</p><p><strong>Next lessons.</strong> Compare flat and terrain-focused images, then follow one observation through fusion, replay, and scoring with timestamps and uncertainties visible.</p><a href="#sar-lab">Run the first lesson</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-studio.html">S³ Studio</a>
+        <a href="s3-mbse.html">Systems engineering</a>
+        <a href="s3-engineering-reference.html">Engineering reference</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

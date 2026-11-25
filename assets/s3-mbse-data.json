@@ -1,8 +1,8 @@
 {
   "schema": "chatterguru-s3-mbse-public-v2",
   "notation_status": "SysML-style architecture documentation (not interoperable XMI or executable SysML v2)",
-  "generated_utc": "2026-11-25T03:36:36Z",
-  "source_revision": "73c48072c3",
+  "generated_utc": "2026-11-25T06:33:51Z",
+  "source_revision": "ace26fbca8",
   "governance_notice": "Synthetic / educational multisensor research architecture. All candidate requirements retain explicit CANDIDATE_UNAPPROVED status until formal owner baseline approval. AST/file traceability checks are distinct from executed verification, independent validation, and owner acceptance.",
   "conops": {
     "document_id": "CG-RAD-CONOPS-001",
@@ -1476,11 +1476,11 @@
   "systems_evidence": {
     "reading_rule": "Computed at export by running the repository's own audits, gates and qualification campaign on this revision. Engineering readiness is not owner acceptance: every human gate stays open until the owner signs it off.",
     "readiness": {
-      "epics_audited": 6,
+      "epics_audited": 9,
       "all_engineering_artifacts_present": true,
       "dag_passed": true,
-      "dag_modules_scanned": 314,
-      "human_gates_total": 7,
+      "dag_modules_scanned": 317,
+      "human_gates_total": 10,
       "human_gates_signed_off": 0,
       "epics": [
         {
@@ -1603,6 +1603,48 @@
           "engineering_artifacts_present": true,
           "human_acceptance_gates": [
             "Owner scientific review of the articulated-dismount, Billingsley/multipath and stop-and-go IMM receipts (#1577)."
+          ],
+          "human_acceptance_completed": false
+        },
+        {
+          "epic_issue": "#1600",
+          "title": "EPIC S3-FUSE — Multisensor Fusion",
+          "child_issues": [],
+          "merged_prs": [
+            "#1603"
+          ],
+          "declared_file_count": 4,
+          "engineering_artifacts_present": true,
+          "human_acceptance_gates": [
+            "Owner review of synthetic fusion evidence and its limitations (#1600)."
+          ],
+          "human_acceptance_completed": false
+        },
+        {
+          "epic_issue": "#1601",
+          "title": "EPIC S3-LIDAR — Synthetic LiDAR and Point Clouds",
+          "child_issues": [],
+          "merged_prs": [
+            "#1602"
+          ],
+          "declared_file_count": 4,
+          "engineering_artifacts_present": true,
+          "human_acceptance_gates": [
+            "Owner review of synthetic LiDAR point-cloud evidence and its limitations (#1601)."
+          ],
+          "human_acceptance_completed": false
+        },
+        {
+          "epic_issue": "#1607",
+          "title": "EPIC S3-AAR — Offline Scoring and Instructional Debrief",
+          "child_issues": [],
+          "merged_prs": [
+            "#1608"
+          ],
+          "declared_file_count": 3,
+          "engineering_artifacts_present": true,
+          "human_acceptance_gates": [
+            "Owner review of the offline instructional debrief and evidence labels (#1607)."
           ],
           "human_acceptance_completed": false
         }
@@ -1810,11 +1852,11 @@
       "limits": "Synthetic educational models with one deterministic seed. These are physics and tracking sanity gates, not detection-probability claims or field performance."
     },
     "repository_scale": {
-      "source_modules": 818,
-      "test_files": 846,
-      "test_functions_defined": 8321,
-      "note": "Test functions defined in the repository; parametrized cases run more. This is not a pass count."
+      "source_modules": 837,
+      "test_files": 866,
+      "test_functions_defined": 8375,
+      "note": "Counts use Git-tracked checkout files. Test functions are definitions. Parametrized tests can execute more than once."
     }
   },
-  "payload_sha256": "9a4f98156e07870b8dc5b6b28303016695e678a8d9fd3b51bc6cbba0edd00102"
+  "payload_sha256": "2ad4dcd16724c30c6ee342dbc5868d9dad68d157e46f77db7cd08164def53edb"
 }

@@ -464,7 +464,7 @@
     if (!grid || !slices.length) return;
     grid.innerHTML = slices
       .map((s) => `
-        <article class="conops-phase">
+          <article class="conops-phase mbse-equation-slice" id="${esc(s.id)}">
           <div class="conops-phase-head">
             <h3>${esc(s.title)}</h3>
             <span class="mbse-gov-pill phase-active">${esc(s.maturity)}</span>
@@ -475,6 +475,7 @@
           </ul>
           <p style="margin-bottom:6px;"><strong>Limits:</strong> ${esc(s.limits)}</p>
           <p><strong>Modules:</strong> ${s.modules.map((m) => `<code>${esc(m)}</code>`).join(" ")}</p>
+            ${s.verification ? `<p><strong>Referenced tests:</strong> ${esc(s.verification)}</p>` : ""}
         </article>
       `)
       .join("");
@@ -745,6 +746,9 @@
     wireTabKeys();
     if (state.scrollToExplorer) {
       setTimeout(() => $("sysml-explorer").scrollIntoView({ block: "start" }), 50);
+    } else {
+      const slice = document.getElementById(location.hash.slice(1));
+      if (slice?.classList.contains("mbse-equation-slice")) slice.scrollIntoView();
     }
   }
 

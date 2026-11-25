@@ -20,9 +20,9 @@
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="Chatterguru">
   <link rel="stylesheet" href="assets/site.css?v=2026-11-20">
-  <link rel="stylesheet" href="assets/s3-mbse.css?v=2026-11-25e">
+  <link rel="stylesheet" href="assets/s3-mbse.css?v=2026-11-25-reference">
   <script src="assets/site.js?v=2026-11-20" defer></script>
-  <script src="assets/s3-mbse.js?v=2026-11-25e" defer></script>
+  <script src="assets/s3-mbse.js?v=2026-11-25-reference" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -36,7 +36,7 @@
       <a href="index.html">Home</a>
       <a href="s3-studio.html">S³ Studio</a>
       <a href="radar-rf-ew.html">Radar/RF</a>
-      <a aria-current="page" href="capabilities.html">Capabilities</a>
+      <a href="capabilities.html">Capabilities</a>
       <a href="about.html">Founder &amp; Lab</a>
       <a class="nav-contact" href="contact.html">Contact</a>
     </nav>
@@ -47,12 +47,12 @@
     <section class="hero page-hero">
       <div class="hero-content">
         <p class="eyebrow">Systems engineering · Sensor Scenario Studio (S³)</p>
-        <h1>How S³ is engineered, with the evidence attached.</h1>
-        <p>S³ is built from a concept of operations down to traced requirements, architecture views, source modules and tests. Its governance gates and a physics qualification campaign are run every time this page’s data is exported. The page also shows what is not done: no requirement is approved until the owner signs it off.</p>
+        <h1>S³ systems engineering</h1>
+        <p>Follow the architecture from the operating concept to candidate requirements, sensor models, and verification evidence. The results below come from the source revision listed here. Owner acceptance is tracked separately.</p>
         <div class="hero-actions">
           <a class="button" href="#thread">Follow the digital thread</a>
-          <a class="button secondary" href="#evidence">See the executed evidence</a>
-          <a class="button secondary" href="s3-studio.html">Open the S³ demos</a>
+          <a class="button secondary" href="s3-engineering-reference.html">Read the engineering reference</a>
+          <a class="button secondary" href="#evidence">Inspect verification evidence</a>
         </div>
         <div class="mbse-kpis" aria-label="Traceability and verification figures from this export">
           <div class="mbse-kpi"><strong id="kpi-total-reqs">–</strong><span>Candidate requirements, each traced to code and a test</span></div>
@@ -64,12 +64,22 @@
       </div>
     </section>
 
+    <nav class="mbse-contents" aria-label="Systems engineering page contents">
+      <a href="#conops">Operating concept</a>
+      <a href="#sysml-explorer">Architecture views</a>
+      <a href="#multilevel-reqs">Requirements</a>
+      <a href="#rtm-section">Trace matrix</a>
+      <a href="#archipelago">Model equations</a>
+      <a href="#evidence">Verification</a>
+      <a href="#readiness">Owner sign-off</a>
+    </nav>
+
     <section class="section" id="thread">
       <div class="section-inner">
         <div class="section-heading">
           <p class="mini-label">The digital thread at a glance</p>
-          <h2>From operating concept to owner sign-off, counted from the source.</h2>
-          <p>Each step is counted from the same export. Select a step to inspect it.</p>
+          <h2>From operating concept to owner sign-off</h2>
+          <p>Each step links to a part of the same evidence export.</p>
         </div>
         <ol class="thread-chain" id="thread-chain" aria-label="Digital thread steps"></ol>
       </div>
@@ -79,7 +89,7 @@
       <div class="section-inner">
         <div class="mbse-gov-banner" role="note">
           <div>
-            <strong>Governance &amp; Notation Honesty:</strong> These interactive views are <strong>SysML-style architecture documentation</strong> (not interoperable XMI or executable SysML v2). All requirements retain explicit <code>CANDIDATE_UNAPPROVED</code> status; AST/file traceability is tracked separately from executed verification, independent validation, and owner acceptance.
+            These interactive views use SysML-style notation to explain the architecture and trace requirements. The requirements retain <code>CANDIDATE_UNAPPROVED</code> status. Source traceability, executed verification, independent validation, and owner acceptance have separate evidence.
           </div>
           <span class="mbse-gov-pill candidate">CANDIDATE_UNAPPROVED · Draft Preview</span>
         </div>
@@ -125,7 +135,7 @@
       <div class="section-inner">
         <div class="section-heading">
           <p class="mini-label">Verification evidence · executed at export</p>
-          <h2>The gates are run, not described.</h2>
+          <h2>Checks executed for this export</h2>
           <p id="evidence-rule"></p>
         </div>
         <div class="ev-grid" id="gate-cards"></div>
@@ -139,10 +149,10 @@
       <div class="section-inner">
         <div class="section-heading">
           <p class="mini-label">Readiness and sign-off</p>
-          <h2>Engineering readiness is checked; acceptance is left to a human.</h2>
+          <h2>Engineering readiness and owner acceptance</h2>
           <p id="readiness-summary"></p>
         </div>
-        <div class="rtm-table-wrap">
+        <div class="rtm-table-wrap" role="region" aria-label="Readiness and owner acceptance table" tabindex="0">
           <table class="rtm-table">
             <thead>
               <tr><th>Epic</th><th>Scope</th><th>Merged PRs</th><th>Declared files</th><th>Owner acceptance (open)</th></tr>
@@ -157,9 +167,8 @@
     <section class="section" id="archipelago">
       <div class="section-inner">
         <div class="section-heading">
-          <p class="mini-label">The Documented Archipelago · Progressive Technical Depth</p>
-          <h2>Drill from system context down to exact implemented equations &amp; limits.</h2>
-          <p>Each implemented sensor and processing island documents its real data flow, governing equations, algorithm compatibility boundaries, and verification links—while planned capabilities (LiDAR, fusion, governed AI authoring) remain explicitly marked unimplemented.</p>
+          <h2>Model equations and limits</h2>
+          <p>These five records describe the methods in this export. The engineering reference adds units, worked examples, ways to inspect a replay, and a catalog of public documentation gaps. <a href="s3-engineering-reference.html">Open the engineering reference</a>.</p>
         </div>
         <div class="conops-grid" id="archipelago-grid"></div>
       </div>
@@ -170,9 +179,9 @@
         <div class="section-heading">
           <p class="mini-label">Multi-Level Requirements Tree · System → Subsystem → Model</p>
           <h2>Full atomic <code>shall</code> statements with objective acceptance criteria.</h2>
-          <p>Separates stakeholder needs from normative System (SyRS), Subsystem (SSR), and Simulation-Model requirements—tracking verification execution independently from AST traceability and owner approval.</p>
+          <p>Browse candidate system, subsystem, and model requirements. Maturity notes describe the scope and evidence recorded for each candidate. The <a href="s3-engineering-reference.html#coverage">public documentation catalog</a> lists what visitors can inspect today.</p>
         </div>
-        <div class="rtm-table-wrap">
+        <div class="rtm-table-wrap" role="region" aria-label="Candidate requirements tree table" tabindex="0">
           <table class="rtm-table">
             <thead>
               <tr>
@@ -204,9 +213,8 @@
     <section class="section alt" id="rtm-section">
       <div class="section-inner">
         <div class="section-heading">
-          <p class="mini-label">Live Automated Traceability</p>
-          <h2>Candidate Requirements Traceability Matrix (RTM).</h2>
-          <p>Generated by <code>scripts/audit_candidate_requirements_rtm.py</code>. Every entry names source modules that exist and a negative-control test function that the audit finds in the test code. That proves the trace, not a test result; the executed evidence is above.</p>
+          <h2>Candidate Requirements Traceability Matrix (RTM)</h2>
+          <p>The audit checks each source module and negative-control test definition named in the export. <a href="#evidence">Open executed verification evidence</a>.</p>
         </div>
 
         <div class="rtm-controls">
@@ -222,7 +230,7 @@
 
         <p class="rtm-count" id="rtm-count"></p>
 
-        <div class="rtm-table-wrap">
+        <div class="rtm-table-wrap" role="region" aria-label="Requirements traceability table" tabindex="0">
           <table class="rtm-table">
             <thead>
               <tr>
