@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S³ Engineering Reference | Chatterguru Consulting LLC</title>
+  <meta name="description" content="Engineering reference for Sensor Scenario Studio. Read the architecture, model assumptions, worked equations, and verification boundaries behind the public S³ demos.">
+  <link rel="canonical" href="https://www.chatterguru.com/s3-engineering-reference.html">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Chatterguru">
+  <meta name="theme-color" content="#0b6d82">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-20">
+  <link rel="stylesheet" href="assets/s3-engineering-reference.css">
+  <script src="assets/site.js?v=2026-11-20" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/brochure-image.png" alt="" width="46" height="46">
+      <span>Chatterguru<small>Consulting LLC</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav class="nav" id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="s3-studio.html">S³ Studio</a>
+      <a href="radar-rf-ew.html">Radar/RF</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="about.html">Founder &amp; Lab</a>
+      <a class="nav-contact" href="contact.html">Contact</a>
+    </nav>
+    <a class="button" href="contact.html">Contact</a>
+  </header>
+
+  <main id="main">
+    <section class="reference-hero" aria-labelledby="reference-title">
+      <div class="section-inner">
+        <p class="eyebrow">Sensor Scenario Studio</p>
+        <h1 id="reference-title">Engineering reference</h1>
+        <p>Follow a scene from geometry and sensor physics to images, observations, and saved evidence. Each model explains its inputs, assumptions, and what to check in a replay.</p>
+        <div class="hero-actions">
+          <a class="button" href="s3-mbse.html#sysml-explorer">Explore the SysML views</a>
+          <a class="button secondary" href="s3-studio.html">Open the Studio demos</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="section reference-body">
+      <div class="section-inner reference-layout">
+        <nav class="reference-nav" aria-label="Engineering reference contents">
+          <a href="#architecture">Architecture and requirements</a>
+          <a href="#world">Shared world and terrain</a>
+          <a href="#echoes">Waveforms and clutter</a>
+          <a href="#rdm">Range–Doppler processing</a>
+          <a href="#detection">Detection and tracking</a>
+          <a href="#sar">SAR image formation</a>
+          <a href="#thermal">Thermal imaging</a>
+          <a href="#lidar">LiDAR and fusion</a>
+          <a href="#assurance">Verification and replay</a>
+          <a href="#coverage">Documentation coverage</a>
+        </nav>
+
+        <div class="reference-content">
+          <section id="architecture" aria-labelledby="architecture-title">
+            <h2 id="architecture-title">Architecture and requirements</h2>
+            <p>Start with the concept of operations (ConOps) to see who uses S³ and what they do. Use the architecture views to follow ownership and interfaces, then the requirements and evidence to check a particular claim.</p>
+            <ol class="reference-flow" aria-label="S³ simulation and review flow">
+              <li><strong>Scene</strong><span>Geometry, actors, clock</span></li>
+              <li><strong>Sensor</strong><span>Sampled signal or image</span></li>
+              <li><strong>Product</strong><span>Image, plot, or track</span></li>
+              <li><strong>Review</strong><span>Recording and evidence</span></li>
+            </ol>
+            <dl class="reference-views">
+              <div><dt>Use cases</dt><dd>Who authors, runs, and reviews a scenario? <a href="s3-mbse.html#uc">Open the context view</a>.</dd></div>
+              <div><dt>Block definition (BDD)</dt><dd>Which part owns each responsibility? <a href="s3-mbse.html#bdd">Open the architecture view</a>.</dd></div>
+              <div><dt>Internal block (IBD)</dt><dd>What crosses an interface? <a href="s3-mbse.html#ibd">Follow the same-source flow</a>.</dd></div>
+              <div><dt>Requirements</dt><dd>Which source and tests trace to a candidate requirement? <a href="s3-mbse.html#req">Open the requirements view</a>.</dd></div>
+              <div><dt>Parametric</dt><dd>Which variables and assumptions limit a calculation? <a href="s3-mbse.html#par">Open the constraint view</a>.</dd></div>
+            </dl>
+            <p>The public diagrams use SysML-style notation for explanation and traceability. The requirements are candidate statements awaiting owner approval. <a href="s3-mbse.html#conops">Read the ConOps</a> · <a href="s3-mbse.html#multilevel-reqs">Browse the requirements tree</a> · <a href="https://www.omg.org/spec/SysML/">OMG SysML specification</a></p>
+          </section>
+
+          <section id="world" aria-labelledby="world-title">
+            <h2 id="world-title">Shared world and terrain</h2>
+            <p>The scene supplies geometry and time to the sensor models. A radar pulse and a thermal exposure can occur at different times, so a synchronized view has to preserve the timestamp and pose of each observation.</p>
+            <p class="reference-equation"><code>p<sub>world</sub>(t) = R(t) p<sub>body</sub> + p<sub>origin</sub>(t)</code></p>
+            <p>Use the same coordinate frame and time in both the rotation <var>R</var> and translation <var>p</var>. For example, an offset of 2 m along local east maps to a world point 2 m east of the origin when the local axes align.</p>
+            <p><strong>Check in replay.</strong> Confirm the coordinate frame, terrain vertical reference, time of the last observation, and treatment of missing elevations. A bare-earth elevation grid and a lidar point cloud represent different geometry. <a href="s3-mbse.html#ibd">Inspect the shared scene interfaces</a> · <a href="https://www.usgs.gov/3d-elevation-program/about-3dep-products-services">USGS 3DEP product definitions</a></p>
+          </section>
+
+          <section id="echoes" aria-labelledby="echoes-title">
+            <h2 id="echoes-title">Waveforms and clutter</h2>
+            <p>A matched filter compares received complex samples with a delayed copy of the transmitted waveform. A statistical clutter model can draw background values for an experiment. A scene-based clutter model builds returns from geometry and surface assumptions before processing.</p>
+            <p class="reference-equation"><code>y[ℓ] = ∑<sub>n</sub> x[n] s<sup>*</sup>[n − ℓ]</code></p>
+            <p><var>x</var> is the recorded signal, <var>s</var> is the reference waveform, <sup>*</sup> denotes complex conjugation, and <var>ℓ</var> is lag in samples. In a noiseless single-echo example with a matching reference, the correlation peaks at the echo lag.</p>
+            <p><strong>Check in replay.</strong> Identify where clutter enters the chain and whether it retains phase. Compare repeated runs with the same geometry and seed when isolating a single change. Retain the measured response and processing settings. <a href="s3-mbse.html#ibd">Follow the sensor data flow</a></p>
+          </section>
+
+          <section id="rdm" aria-labelledby="rdm-title">
+            <h2 id="rdm-title">Range–Doppler processing</h2>
+            <p>Pulse compression produces complex samples by range. A Fourier transform across pulses maps those samples into Doppler frequency. The window changes the width of peaks and how much energy leaks into nearby bins.</p>
+            <p class="reference-equation"><code>ΔR<sub>bin</sub> = c/(2f<sub>s</sub>) &nbsp;·&nbsp; Δf<sub>D</sub> = PRF/N</code></p>
+            <p>In this evenly sampled example, <var>f<sub>s</sub></var> is the range sample rate in Hz, <abbr title="pulse repetition frequency">PRF</abbr> is in Hz, <var>N</var> is the pulse count, and <var>c</var> is the speed of light. With 16 pulses at a PRF of 1,600 Hz, adjacent Doppler bins are 100 Hz apart. Bandwidth and weighting determine what the image can resolve.</p>
+            <p><strong>Check in replay.</strong> Look for metres on the range axis, hertz on the Doppler axis, and the declared magnitude or power scale. Compare display settings and sampling before comparing images. <a href="s3-mbse.html#slice-rdm">Read the implemented RDM equations</a></p>
+          </section>
+
+          <section id="detection" aria-labelledby="detection-title">
+            <h2 id="detection-title">Detection and tracking</h2>
+            <p>The documented cell-averaging detector estimates local background from training cells outside the guard region. The processor can consolidate threshold crossings into plots. A tracker then associates observations across time and updates its state.</p>
+            <p class="reference-equation"><code>T = α · mean(training magnitudes) &nbsp;·&nbsp; y = z − Hx<sub>pred</sub></code></p>
+            <p>In the detector example, a mean magnitude of 2 and a multiplier <var>α</var> of 3 produce a threshold of 6 in the same magnitude units. The multiplier is a direct setting. A false-alarm probability requires its own statistical assumptions or measurements. In the Kalman update, the innovation <var>y</var> is the observation <var>z</var> minus the predicted measurement <var>Hx<sub>pred</sub></var>.</p>
+            <p><strong>Check in replay.</strong> Inspect detections and tracks separately. A coasting track carries a prediction from past observations. The recorded scene truth is available for scoring. <a href="s3-mbse.html#slice-cfar">Read the detector and edge policy</a> · <a href="s3-mbse.html#slice-tracker">Read the tracker equations</a></p>
+          </section>
+
+          <section id="sar" aria-labelledby="sar-title">
+            <h2 id="sar-title">SAR image formation</h2>
+            <p>Synthetic aperture radar (SAR) coherently combines returns collected at different positions. Backprojection evaluates the delay and phase for each image coordinate. Using terrain heights changes that geometry, especially where the terrain differs from the flat focus plane.</p>
+            <p class="reference-equation"><code>τ = 2R/c &nbsp;·&nbsp; δR<sub>slant</sub> ≈ c/(2B)</code></p>
+            <p><var>R</var> is slant range in metres, <var>τ</var> is round-trip time in seconds, and <var>B</var> is bandwidth in Hz. An idealized 100 MHz waveform gives about 1.50 m nominal slant-range resolution. A 0.25 m pixel grid would sample that response more finely. Measure resolution from a point-target response along the stated axis and with the actual weighting.</p>
+            <p><strong>Check in replay.</strong> Compare flat and terrain-focused views from the same history where available. Check terrain NoData, shadow, layover, image axes, and point-response width. In this synthetic reference, surface scattering uses simplified assumptions. <a href="s3-mbse.html#slice-sar">Read the sampled-SAR equations and scope</a> · <a href="s3-studio.html">View available scenes</a></p>
+          </section>
+
+          <section id="thermal" aria-labelledby="thermal-title">
+            <h2 id="thermal-title">Thermal imaging</h2>
+            <p>The radiometric model integrates Planck radiance over a declared medium- or long-wave infrared band. The sensor receives emitted and reflected radiance after atmospheric transmission, plus path radiance. A display palette maps stored values to screen colors.</p>
+            <p class="reference-equation"><code>L<sub>sensor</sub> = τ<sub>atm</sub>[ε L<sub>bb</sub>(T) + (1 − ε)L<sub>bg</sub>] + L<sub>path</sub></code></p>
+            <p><var>ε</var> and <var>τ<sub>atm</sub></var> are dimensionless emissivity and transmission. Radiance terms use the same band and units (W·m<sup>−2</sup>·sr<sup>−1</sup>). <var>T</var> is in kelvin. With <var>ε</var> = 1, the reflected-background contribution vanishes in this opaque diffuse model.</p>
+            <p><strong>Check in replay.</strong> Read the band, exposure time, and validity mask before inspecting colors. Visible and short-wave Studio display modes have their own rendering path. <a href="s3-mbse.html#slice-eoir">Read the radiometric equations and validity rules</a></p>
+          </section>
+
+          <section id="lidar" aria-labelledby="lidar-title">
+            <h2 id="lidar-title">LiDAR and observation fusion</h2>
+            <p>These are theory references. They describe what a measured example should demonstrate when a public replay and its evidence are available.</p>
+            <h3>LiDAR time of flight</h3>
+            <p class="reference-equation"><code>R = cΔt/2</code></p>
+            <p>A 150 ns round trip corresponds to about 22.5 m in air. An example should report which return was measured, the coordinate frame, and how missing or multiple returns are represented. A point cloud used to build scenery has different provenance from a point cloud a simulated sensor emits.</p>
+            <h3>Uncertainty in fusion</h3>
+            <p class="reference-equation"><code>σ<sup>−2</sup><sub>fused</sub> = σ<sup>−2</sup><sub>1</sub> + σ<sup>−2</sup><sub>2</sub></code></p>
+            <p>This scalar example assumes two independent, unbiased estimates of the same quantity. Two independent position measurements with 2 m standard deviation give a fused standard deviation of about 1.41 m. Shared inputs can correlate the errors. A public evidence example should identify the input sources, time alignment, uncertainty assumptions, and a correlated-input control.</p>
+          </section>
+
+          <section id="assurance" aria-labelledby="assurance-title">
+            <h2 id="assurance-title">Verification and replay</h2>
+            <dl class="reference-views">
+              <div><dt>Traceability</dt><dd>The requirements export records links between candidate statements, source modules, and test definitions. <a href="s3-mbse.html#rtm-section">Search the trace matrix</a>.</dd></div>
+              <div><dt>Executed verification</dt><dd>Each published receipt states which checks ran and under what source revision. <a href="s3-mbse.html#evidence">Inspect the exported results</a>.</dd></div>
+              <div><dt>Validation</dt><dd>Validation compares model behavior to a suitable independent reference for the intended use. Keep synthetic controls, calibrated measurements, and human review identifiable.</dd></div>
+              <div><dt>Owner acceptance</dt><dd>Check the sign-off ledger for the actual decision and remaining gates. <a href="s3-mbse.html#readiness">Review acceptance status</a>.</dd></div>
+            </dl>
+            <p>For an experiment, keep the scenario and source revision, the observation clock, the processing settings, the output identity, and the evidence used to interpret it. Two display views can share a saved recording and still use different palettes, geometry, or layer selections.</p>
+            <p class="reference-equation"><code>RMSE = √[∑<sub>i</sub> ‖p<sub>estimated,i</sub> − p<sub>reference,i</sub>‖² / N]</code></p>
+            <p>This basic review measure uses <var>N</var> matched positions at comparable times and in the same frame. Residual distances of 1 m and 3 m give an RMSE of about 2.24 m. Report missed and unmatched observations separately so the matched-pair error can be interpreted in context.</p>
+          </section>
+
+          <section id="coverage" aria-labelledby="coverage-title">
+            <h2 id="coverage-title">Documentation coverage</h2>
+            <p>This catalog describes what a visitor can inspect in the public documentation. Implementation details and tested scope are tied to the cited export and examples.</p>
+            <ul class="reference-coverage">
+              <li><strong>Concept, requirements, and interfaces</strong><span>Public ConOps, candidate statements, a trace matrix, and five interactive SysML-style views. <a href="#architecture">Read the architecture guide</a>.</span></li>
+              <li><strong>Scene geometry and synchronized views</strong><span>Public overview and examples. A field-level catalog of coordinate references and timestamp mappings would make individual exports easier to compare. <a href="#world">Read the world model</a>.</span></li>
+              <li><strong>Radar processing, plots, and tracking</strong><span>Public equations for RDM, CA-CFAR, the scan Kalman model, and pulse compression. Waveform variants, clutter distributions, adaptive processing, and end-to-end uncertainty remain areas for additional reviewed references. <a href="#rdm">Read the processing guide</a>.</span></li>
+              <li><strong>SAR and thermal radiometry</strong><span>Public equations, validity rules, and synthetic examples. Publish measured comparison and calibration evidence where available. <a href="#sar">Read the SAR guide</a> · <a href="#thermal">Read the thermal guide</a>.</span></li>
+              <li><strong>LiDAR, sensor fusion, and debrief</strong><span>LiDAR and fusion theory are introduced above. Public, revision-bound replays and worked debrief scoring examples are coverage gaps. <a href="#lidar">Read the theory notes</a>.</span></li>
+              <li><strong>Governance and authoring</strong><span>The public export reports exercised gate controls and tracks owner sign-off. A full authoring walkthrough could tie those controls to a reviewable scenario. <a href="#assurance">Read how to interpret evidence</a>.</span></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Chatterguru Consulting LLC</span>
+      <nav aria-label="Footer">
+        <a href="s3-mbse.html">S³ digital thread</a>
+        <a href="s3-studio.html">Sensor Scenario Studio</a>
+        <a href="systems-engineering.html">Systems Engineering</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

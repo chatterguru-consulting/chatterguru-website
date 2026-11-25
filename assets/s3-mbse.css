@@ -1,5 +1,31 @@
 /* S³ MBSE & SysML v1.6 Digital Thread Explorer — matches Chatterguru site.css tokens */
 
+.mbse-contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  border-bottom: 1px solid #d5e5e9;
+}
+
+.mbse-contents a {
+  padding: 8px 4px;
+  font-weight: 700;
+}
+
+.mbse-equation-slice {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  scroll-margin-top: 110px;
+}
+
+.rtm-table-wrap:focus-visible {
+  outline: 2px solid var(--teal-dark);
+  outline-offset: 3px;
+}
+
 .mbse-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
