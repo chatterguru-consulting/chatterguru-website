@@ -14250,8 +14250,20 @@ void main(){
     console.warn('EO/IR GPU renderer off:', G.error);
     gl = null; scene = null;
   }
+  // Probe once and release the probe context. Browsers cap live WebGL contexts (about 16 in
+  // Chrome) and drop the oldest one when the cap is passed, which is the 3D map's own: a
+  // probe per redraw made Cesium stop with "Fragment shader failed to compile. Compile log: null".
+  let supportedCache = null;
   G.supported = function () {
-    try { const c = document.createElement('canvas'); return !!c.getContext('webgl2'); } catch (e) { return false; }
+    if (gl) return true;
+    if (supportedCache !== null) return supportedCache;
+    try {
+      const probe = document.createElement('canvas').getContext('webgl2');
+      supportedCache = !!probe;
+      const lose = probe && probe.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+    } catch (e) { supportedCache = false; }
+    return supportedCache;
   };
 
   // ---------- textures ----------
