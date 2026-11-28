@@ -20,6 +20,7 @@
     { group: 'Sensors', label: 'RF range-Doppler', icon: '📡', call: ['studioOpenSensor', 'rdm'], need: 'rdmPopoutCanvas' },
     { group: 'Sensors', label: 'SAR image', icon: '🛰', call: ['studioOpenSensor', 'sar'], need: 'sarPopoutCanvas', sar: true },
     { group: 'Sensors', label: 'SAR on the map', icon: '🗺', call: ['studioSarOnMap', true], need: 'sarPopoutCanvas', sar: true },
+    { group: 'Sensors', label: 'LiDAR on the map', icon: '◈', click: 'btnStudioLidar', toggle: true },
     { group: 'Scene', label: 'Restart', icon: '↺', click: 'btnResetSim' },
     { group: 'Scene', label: 'Map controls', icon: '\u{1F5FA}', click: 'workspaceView' },
     // Inspect opens the radar console as a sheet (on a phone it stays hidden until opened).
@@ -159,7 +160,14 @@
     var sheet = byId('psSheet');
     if (!sheet) return;
     sheet.querySelectorAll('[data-ps]').forEach(function (b) {
-      b.classList.toggle('ps-on', ACTIONS[+b.getAttribute('data-ps')].label === state.panel);
+      var action = ACTIONS[+b.getAttribute('data-ps')];
+      var control = action.toggle && byId(action.click);
+      var pressed = control && control.getAttribute('aria-pressed') === 'true';
+      b.classList.toggle('ps-on', action.label === state.panel || pressed === true);
+      if (control) {
+        b.disabled = control.disabled;
+        b.setAttribute('aria-pressed', String(pressed));
+      }
     });
   }
 
