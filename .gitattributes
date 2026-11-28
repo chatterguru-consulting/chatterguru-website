@@ -1,1 +1,2 @@
 demos/s3/** -text
+assets/learn/*.vtt text eol=lf

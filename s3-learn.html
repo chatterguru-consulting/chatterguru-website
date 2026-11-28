@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#0b6d82">
   <link rel="stylesheet" href="assets/site.css?v=2026-11-20">
   <link rel="stylesheet" href="assets/s3-engineering-reference.css">
-  <link rel="stylesheet" href="assets/s3-learn.css">
+  <link rel="stylesheet" href="assets/s3-learn.css?v=2026-11-28">
   <script src="assets/site.js?v=2026-11-20" defer></script>
   <script src="assets/s3-learn.js" defer></script>
 </head>
@@ -42,8 +42,64 @@
         <h1 id="learn-title">Learn sensor physics</h1>
         <p>Make a prediction, change one thing, and see what the sensor does. Then follow the math into the engineering reference or open a scene in Studio.</p>
         <div class="hero-actions">
-          <a class="button" href="#sar-lab">Try the SAR lesson</a>
+          <a class="button" href="#lessons">Watch the video lessons</a>
+          <a class="button secondary" href="#sar-lab">Try the SAR lesson</a>
           <a class="button secondary" href="#curriculum">See the learning roadmap</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="lessons" aria-labelledby="lessons-title">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2 id="lessons-title">Watch the video lessons</h2>
+          <p>Short narrated lessons with captions. Every number on screen comes from the S³ code when the lesson is built, so the lessons match what Studio runs. The narration uses a synthetic voice.</p>
+        </div>
+        <div class="learn-videos">
+          <article class="learn-video" id="lesson-burn-through">
+            <video controls preload="none" playsinline poster="assets/learn/burn-through.jpg" width="960" height="540" aria-describedby="lesson-burn-through-summary">
+              <source src="assets/learn/burn-through.mp4" type="video/mp4">
+              <track kind="captions" src="assets/learn/burn-through.vtt" srclang="en" label="English" default>
+            </video>
+            <p class="learn-video-meta">RF interference and receiver resilience · 1:06</p>
+            <h3>Burn-through: when the echo beats the jammer</h3>
+            <p id="lesson-burn-through-summary">Why a noise jammer loses as the target closes, and how processing gain and sidelobes change the range.</p>
+            <p class="learn-video-links"><a href="assets/learn/burn-through.m4a">Listen to the audio only</a></p>
+            <details class="learn-transcript"><summary>Read the transcript</summary><p>A self-screening jammer rides on the target and fills the radar&#x27;s receiver with noise. Whether the radar can still see the target depends on range.</p><p>The radar&#x27;s echo makes a round trip, so its power falls as one over range to the fourth. The jamming travels only one way, so it falls as one over range squared.</p><p>Their ratio, signal to jamming, therefore improves as the target closes. Burn-through is the range where it reaches what detection needs, 13 decibels here. Without any processing gain that happens at only about 80 metres.</p><p>Pulse compression and Doppler filtering add 20 decibels of gain against noise. Burn-through moves out tenfold, to about 795 metres.</p><p>A stand-off jammer is farther away, and if it sits in the radar&#x27;s sidelobes its jamming enters through a much lower gain. Burn-through then reaches about 49 kilometres. You can explore this in the Studio&#x27;s RF window, under receiver comparisons.</p></details>
+          </article>
+          <article class="learn-video" id="lesson-follower-jammer">
+            <video controls preload="none" playsinline poster="assets/learn/follower-jammer.jpg" width="960" height="540" aria-describedby="lesson-follower-jammer-summary">
+              <source src="assets/learn/follower-jammer.mp4" type="video/mp4">
+              <track kind="captions" src="assets/learn/follower-jammer.vtt" srclang="en" label="English" default>
+            </video>
+            <p class="learn-video-meta">RF interference and receiver resilience · 0:58</p>
+            <h3>Outrunning a follower jammer</h3>
+            <p id="lesson-follower-jammer-summary">Why hopping inside the pulse beats a jammer that listens and follows, and where that stops working.</p>
+            <p class="learn-video-links"><a href="assets/learn/follower-jammer.m4a">Listen to the audio only</a></p>
+            <details class="learn-transcript"><summary>Read the transcript</summary><p>Frequency agility moves the radar&#x27;s carrier to a new channel for every pulse, so a jammer parked on one frequency misses most of them.</p><p>A follower jammer listens instead, and jumps to each new channel. But detecting and retuning takes time, here 4 microseconds. Until then it is still on the old channel. With 20 microsecond pulses it still covers 80 percent of every dwell.</p><p>Now hop eight times inside each pulse. Each dwell lasts 2.5 microseconds, shorter than the reaction time, so by the time the jammer lands the radar has already moved.</p><p>The jammer&#x27;s best answer is then to spread its power over all sixteen channels, which is twelve decibels weaker. The rule is simple: make the dwell shorter than the jammer&#x27;s reaction time. A faster jammer still lands, and that limit is stated in the Studio.</p></details>
+          </article>
+          <article class="learn-video" id="lesson-nlfm">
+            <video controls preload="none" playsinline poster="assets/learn/nlfm.jpg" width="960" height="540" aria-describedby="lesson-nlfm-summary">
+              <source src="assets/learn/nlfm.mp4" type="video/mp4">
+              <track kind="captions" src="assets/learn/nlfm.vtt" srclang="en" label="English" default>
+            </video>
+            <p class="learn-video-meta">Signal and waveform physics · 0:53</p>
+            <h3>Low sidelobes without the loss: nonlinear FM</h3>
+            <p id="lesson-nlfm-summary">Why shaping the transmitted chirp beats windowing the receiver.</p>
+            <p class="learn-video-links"><a href="assets/learn/nlfm.m4a">Listen to the audio only</a></p>
+            <details class="learn-transcript"><summary>Read the transcript</summary><p>Pulse compression turns a long chirp into a sharp peak. A plain linear chirp, though, leaves sidelobes only about 13 decibels down, enough to hide a small target next to a large one.</p><p>The usual fix is a window on the receive filter. Sidelobes drop a long way, but the filter no longer matches the pulse, and you give up about 1.4 decibels of signal to noise.</p><p>Nonlinear FM tapers the transmitted spectrum instead. The sweep slows down near the centre frequency and speeds up at the edges, so the pulse spends more energy in the middle of the band.</p><p>The matched filter is still matched. Sidelobes fall to about 33 decibels with no loss at all. The price is Doppler tolerance: a fast mover degrades this pulse more than a linear chirp.</p></details>
+          </article>
+          <article class="learn-video" id="lesson-nearest-neighbour">
+            <video controls preload="none" playsinline poster="assets/learn/nearest-neighbour.jpg" width="960" height="540" aria-describedby="lesson-nearest-neighbour-summary">
+              <source src="assets/learn/nearest-neighbour.mp4" type="video/mp4">
+              <track kind="captions" src="assets/learn/nearest-neighbour.vtt" srclang="en" label="English" default>
+            </video>
+            <p class="learn-video-meta">Detection and tracking · 0:43</p>
+            <h3>Greedy versus one-to-one track association</h3>
+            <p id="lesson-nearest-neighbour-summary">Why solving all pairings at once keeps crossing tracks on their own targets.</p>
+            <p class="learn-video-links"><a href="assets/learn/nearest-neighbour.m4a">Listen to the audio only</a></p>
+            <details class="learn-transcript"><summary>Read the transcript</summary><p>Every scan, a tracker must decide which new plot belongs to which track. The dashed circles show where each track expects its target, one standard deviation wide.</p><p>Greedy nearest neighbour serves the tracks one at a time. Track one takes its closest plot, which leaves track two with a plot far outside its expectation. The total statistical cost is 13.3.</p><p>Global nearest neighbour solves every pairing at once, with the Hungarian algorithm, and picks the set with the lowest total cost, 3.7 here. Each track keeps its own target. This is the one-to-one matching in the learning roadmap.</p></details>
+          </article>
         </div>
       </div>
     </section>
@@ -91,10 +147,10 @@
           <p>The engineering reference covers selected foundations. Each series below has a concrete next lesson that connects an observable effect to an equation and a check.</p>
         </div>
         <ul class="learn-curriculum">
-          <li><h3>Signal and waveform physics</h3><p><strong>Read now.</strong> Pulse compression, sampling, and range–Doppler maps.</p><p><strong>Next lessons.</strong> Rectangular pulses, up/down linear chirps, nonlinear chirps, stepped frequency, and phase coding. Compare their matched responses and show where each sampled or stepped workflow applies.</p><a href="s3-engineering-reference.html#echoes">Start with echoes</a></li>
-          <li><h3>Detection and tracking</h3><p><strong>Read now.</strong> Local thresholding, plots, and the scan Kalman model.</p><p><strong>Next lessons.</strong> Uncertainty ellipses, gating, and two crossing objects. Compare nearest-neighbor and one-to-one matching, then introduce maneuver and probabilistic association references.</p><a href="s3-engineering-reference.html#detection">Start with plots and tracks</a></li>
+          <li><h3>Signal and waveform physics</h3><p><strong>Read now.</strong> Pulse compression, sampling, and range–Doppler maps.</p><p><strong>Watch now.</strong> <a href="#lesson-nlfm">Low sidelobes without the loss: nonlinear FM</a>.</p><p><strong>Next lessons.</strong> Rectangular pulses, up/down linear chirps, stepped frequency, and phase coding. Compare their matched responses and show where each sampled or stepped workflow applies.</p><a href="s3-engineering-reference.html#echoes">Start with echoes</a></li>
+          <li><h3>Detection and tracking</h3><p><strong>Read now.</strong> Local thresholding, plots, and the scan Kalman model.</p><p><strong>Watch now.</strong> <a href="#lesson-nearest-neighbour">Greedy versus one-to-one track association</a>.</p><p><strong>Next lessons.</strong> Uncertainty ellipses, gating, and two crossing objects, then maneuver and probabilistic association references.</p><a href="s3-engineering-reference.html#detection">Start with plots and tracks</a></li>
           <li><h3>Resource management</h3><p><strong>Next lessons.</strong> Allocate a shared clock across a synthetic survey. Use a timeline to show task requests, finite capacity, priority, deadlines, and the effects of deferring work.</p></li>
-          <li><h3>RF interference and receiver resilience</h3><p><strong>Next lessons.</strong> Learn the vocabulary behind electronic counter-countermeasures (ECCM). Use an offline coexistence example to separate noise, clutter, and interference and compare how a receiver measurement changes under a controlled disturbance.</p></li>
+          <li><h3>RF interference and receiver resilience</h3><p><strong>Watch now.</strong> <a href="#lesson-burn-through">Burn-through</a> and <a href="#lesson-follower-jammer">outrunning a follower jammer</a>.</p><p><strong>Next lessons.</strong> Learn the vocabulary behind electronic counter-countermeasures (ECCM). Use an offline coexistence example to separate noise, clutter, and interference and compare how a receiver measurement changes under a controlled disturbance.</p></li>
           <li><h3>Scene generation and RF scattering</h3><p><strong>Read now.</strong> Shared geometry, terrain, and time.</p><p><strong>Next lessons.</strong> Build a point, a surface patch, and a synthetic terrain scene. Compare statistical clutter with scene-generated echoes using the same view and explain which material and motion assumptions change the result.</p><a href="s3-engineering-reference.html#world">Start with the shared world</a></li>
           <li><h3>Atmosphere and EO/IR image formation</h3><p><strong>Read now.</strong> Infrared radiance, emissivity, and the display palette.</p><p><strong>Next lessons.</strong> Compare the same surface through clear air and haze. Distinguish RF path loss and atmospheric attenuation from optical transmission and path radiance. Then show how optics and exposure shape the image.</p><a href="s3-engineering-reference.html#thermal">Start with thermal imaging</a></li>
           <li><h3>Imaging, fusion, and evidence</h3><p><strong>Try now.</strong> Change bandwidth and pixel spacing in the SAR lesson.</p><p><strong>Next lessons.</strong> Compare flat and terrain-focused images, then follow one observation through fusion, replay, and scoring with timestamps and uncertainties visible.</p><a href="#sar-lab">Run the first lesson</a></li>

@@ -1,0 +1,146 @@
+{
+  "schema": "s3-learning-videos-v1",
+  "voice": "Microsoft Zira Desktop (synthetic, offline Windows speech)",
+  "lessons": [
+    {
+      "id": "burn-through",
+      "title": "Burn-through: when the echo beats the jammer",
+      "summary": "Why a noise jammer loses as the target closes, and how processing gain and sidelobes change the range.",
+      "roadmap": "RF interference and receiver resilience",
+      "duration_s": 66.1,
+      "transcript": [
+        "A self-screening jammer rides on the target and fills the radar's receiver with noise. Whether the radar can still see the target depends on range.",
+        "The radar's echo makes a round trip, so its power falls as one over range to the fourth. The jamming travels only one way, so it falls as one over range squared.",
+        "Their ratio, signal to jamming, therefore improves as the target closes. Burn-through is the range where it reaches what detection needs, 13 decibels here. Without any processing gain that happens at only about 80 metres.",
+        "Pulse compression and Doppler filtering add 20 decibels of gain against noise. Burn-through moves out tenfold, to about 795 metres.",
+        "A stand-off jammer is farther away, and if it sits in the radar's sidelobes its jamming enters through a much lower gain. Burn-through then reaches about 49 kilometres. You can explore this in the Studio's RF window, under receiver comparisons."
+      ],
+      "files": {
+        "video": {
+          "name": "burn-through.mp4",
+          "sha256": "cc8bec819463e5143deb2195ece2b91e5fbee6998e6b01e2c6ac677e448f4e60",
+          "bytes": 636857
+        },
+        "audio": {
+          "name": "burn-through.m4a",
+          "sha256": "2434c61ac4b5aad6fad9a63268ed52f4b92295baf72460088748c1296cd3e346",
+          "bytes": 469034
+        },
+        "captions": {
+          "name": "burn-through.vtt",
+          "sha256": "7e44ae833f131e72e0a2d67b50a3727ae00f82eaca50403e9a27ac4cba1b597e",
+          "bytes": 1315
+        },
+        "poster": {
+          "name": "burn-through.jpg",
+          "sha256": "20a1f4b6c1708799f791712a8bf5ec53c03ab005ec48359da0119005ba685357",
+          "bytes": 26617
+        }
+      }
+    },
+    {
+      "id": "follower-jammer",
+      "title": "Outrunning a follower jammer",
+      "summary": "Why hopping inside the pulse beats a jammer that listens and follows, and where that stops working.",
+      "roadmap": "RF interference and receiver resilience",
+      "duration_s": 57.5,
+      "transcript": [
+        "Frequency agility moves the radar's carrier to a new channel for every pulse, so a jammer parked on one frequency misses most of them.",
+        "A follower jammer listens instead, and jumps to each new channel. But detecting and retuning takes time, here 4 microseconds. Until then it is still on the old channel. With 20 microsecond pulses it still covers 80 percent of every dwell.",
+        "Now hop eight times inside each pulse. Each dwell lasts 2.5 microseconds, shorter than the reaction time, so by the time the jammer lands the radar has already moved.",
+        "The jammer's best answer is then to spread its power over all sixteen channels, which is twelve decibels weaker. The rule is simple: make the dwell shorter than the jammer's reaction time. A faster jammer still lands, and that limit is stated in the Studio."
+      ],
+      "files": {
+        "video": {
+          "name": "follower-jammer.mp4",
+          "sha256": "047f75736c43fab39ff15d00aff264ada414a2222d4dae0d9ad2257baeba6545",
+          "bytes": 570217
+        },
+        "audio": {
+          "name": "follower-jammer.m4a",
+          "sha256": "7d2d6cd1b7a54a9bf360dd5e75e91b9ad8555c2ca881c8d0473a5b6c0d710d9a",
+          "bytes": 409858
+        },
+        "captions": {
+          "name": "follower-jammer.vtt",
+          "sha256": "57e82898023ccd24177c9402d5b3a1206ee186af08287f8a6f9e8ec34cfba679",
+          "bytes": 1137
+        },
+        "poster": {
+          "name": "follower-jammer.jpg",
+          "sha256": "2cbddb4f1188f43a1818150a26d5a87deaff8629a333e17cd24cfd2323d6f2a1",
+          "bytes": 33656
+        }
+      }
+    },
+    {
+      "id": "nlfm",
+      "title": "Low sidelobes without the loss: nonlinear FM",
+      "summary": "Why shaping the transmitted chirp beats windowing the receiver.",
+      "roadmap": "Signal and waveform physics",
+      "duration_s": 53.2,
+      "transcript": [
+        "Pulse compression turns a long chirp into a sharp peak. A plain linear chirp, though, leaves sidelobes only about 13 decibels down, enough to hide a small target next to a large one.",
+        "The usual fix is a window on the receive filter. Sidelobes drop a long way, but the filter no longer matches the pulse, and you give up about 1.4 decibels of signal to noise.",
+        "Nonlinear FM tapers the transmitted spectrum instead. The sweep slows down near the centre frequency and speeds up at the edges, so the pulse spends more energy in the middle of the band.",
+        "The matched filter is still matched. Sidelobes fall to about 33 decibels with no loss at all. The price is Doppler tolerance: a fast mover degrades this pulse more than a linear chirp."
+      ],
+      "files": {
+        "video": {
+          "name": "nlfm.mp4",
+          "sha256": "a8f87e95e3d37f967401c1e79b798289b7f2f505fba6119f4eae2a285fd6e0b1",
+          "bytes": 643738
+        },
+        "audio": {
+          "name": "nlfm.m4a",
+          "sha256": "dee31f8f53cdf126fefb1376576198659c662dd2e6bf104b68392980ddb2bd8d",
+          "bytes": 375601
+        },
+        "captions": {
+          "name": "nlfm.vtt",
+          "sha256": "a3ff63c9fb4bf6fdfde975a1e773a4fcc37c7983a7074a17c11cfc79acfe3cb6",
+          "bytes": 1035
+        },
+        "poster": {
+          "name": "nlfm.jpg",
+          "sha256": "dede15277a872315436653d42894fa04a9461d143e95b67a2ff4cfc162545ea3",
+          "bytes": 48548
+        }
+      }
+    },
+    {
+      "id": "nearest-neighbour",
+      "title": "Greedy versus one-to-one track association",
+      "summary": "Why solving all pairings at once keeps crossing tracks on their own targets.",
+      "roadmap": "Detection and tracking",
+      "duration_s": 42.8,
+      "transcript": [
+        "Every scan, a tracker must decide which new plot belongs to which track. The dashed circles show where each track expects its target, one standard deviation wide.",
+        "Greedy nearest neighbour serves the tracks one at a time. Track one takes its closest plot, which leaves track two with a plot far outside its expectation. The total statistical cost is 13.3.",
+        "Global nearest neighbour solves every pairing at once, with the Hungarian algorithm, and picks the set with the lowest total cost, 3.7 here. Each track keeps its own target. This is the one-to-one matching in the learning roadmap."
+      ],
+      "files": {
+        "video": {
+          "name": "nearest-neighbour.mp4",
+          "sha256": "b1ccfe490d8daac4758e42d0b2ea5265eede51b6729ab01359966e0ba66f979e",
+          "bytes": 401371
+        },
+        "audio": {
+          "name": "nearest-neighbour.m4a",
+          "sha256": "29ec734e0f4a82ca5b7349ef425ec2249eadf5d2f5ef45de8f9b6e2f6cc899a6",
+          "bytes": 302188
+        },
+        "captions": {
+          "name": "nearest-neighbour.vtt",
+          "sha256": "1594ab81caafae6f3c446e4b1aab8f731fd90d150c928fe3098906196d478283",
+          "bytes": 857
+        },
+        "poster": {
+          "name": "nearest-neighbour.jpg",
+          "sha256": "7b2111b47f3f424f707b7971a16c386bd60f972576784c9059d0bdc4bbdfb6be",
+          "bytes": 31392
+        }
+      }
+    }
+  ]
+}

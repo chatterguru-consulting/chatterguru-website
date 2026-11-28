@@ -1,0 +1,37 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.924
+Pulse compression turns a long chirp into a sharp peak.
+
+2
+00:00:03.974 --> 00:00:13.027
+A plain linear chirp, though, leaves sidelobes only about 13 decibels down, enough to hide a small target next to a large one.
+
+3
+00:00:13.677 --> 00:00:17.063
+The usual fix is a window on the receive filter.
+
+4
+00:00:17.113 --> 00:00:26.010
+Sidelobes drop a long way, but the filter no longer matches the pulse, and you give up about 1.4 decibels of signal to noise.
+
+5
+00:00:26.660 --> 00:00:30.038
+Nonlinear FM tapers the transmitted spectrum instead.
+
+6
+00:00:30.088 --> 00:00:38.642
+The sweep slows down near the centre frequency and speeds up at the edges, so the pulse spends more energy in the middle of the band.
+
+7
+00:00:39.292 --> 00:00:41.866
+The matched filter is still matched.
+
+8
+00:00:41.916 --> 00:00:45.948
+Sidelobes fall to about 33 decibels with no loss at all.
+
+9
+00:00:45.998 --> 00:00:52.509
+The price is Doppler tolerance: a fast mover degrades this pulse more than a linear chirp.

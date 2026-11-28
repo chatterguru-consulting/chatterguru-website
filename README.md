@@ -27,6 +27,36 @@ Open [the local homepage](http://127.0.0.1:8000/). Use the server for the 3D sce
 
 ## Validate before publishing
 
+### Replace lesson narration
+
+Use one WAV, MP3, or M4A recording per lesson from a source cleared for
+website publication. The [Radar repository's lesson builder](https://github.com/chatterguru-consulting/chatterguru-radar-eccm-sandbox/pull/1918)
+accepts the audio and a same-named JSON file containing a `cues` array.
+Each cue records the caption sentence and its measured times in the new
+recording, using seconds from the beginning of that file.
+
+```json
+{"cues": [{"text": "First caption sentence.", "start_s": 0.2, "end_s": 2.4}]}
+```
+
+Run the builder from the Radar repository and write to a fresh staging
+directory.
+
+```bash
+PYTHONPATH=src python scripts/build_learning_videos.py \
+  --out ../lesson-preview --narration-dir ../approved-narration \
+  --narration-credit "Narration credit"
+```
+
+Review each rebuilt MP4, audio-only M4A, caption track, and poster
+before copying the staged outputs into `assets/learn/`. For a pilot,
+`--only <lesson-id>` writes a manifest for the selected lessons. Preserve
+the other lesson entries if you use a partial build. Carry the narration
+credit into `lessons.json` and match the disclosure on the Learn page
+to the published audio.
+
+### Site checks
+
 ```bash
 python -B -m unittest discover -s tools
 python -B tools/verify_s3_preview.py . --bundle demos/s3/recorded-crossing
