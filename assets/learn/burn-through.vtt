@@ -1,0 +1,21 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:09.803
+A self-screening jammer rides on the target and fills the radar's receiver with noise. Whether the radar can still see the target depends on range.
+
+2
+00:00:09.853 --> 00:00:21.650
+The radar's echo makes a round trip, so its power falls as one over range to the fourth. The jamming travels only one way, so it falls as one over range squared.
+
+3
+00:00:21.700 --> 00:00:37.792
+Their ratio, signal to jamming, therefore improves as the target closes. Burn-through is the range where it reaches what detection needs, 13 decibels here. Without any processing gain that happens at only about 80 metres.
+
+4
+00:00:37.842 --> 00:00:48.980
+Pulse compression and Doppler filtering add 20 decibels of gain against noise. Burn-through moves out tenfold, to about 795 metres.
+
+5
+00:00:49.030 --> 00:01:06.036
+A stand-off jammer is farther away, and if it sits in the radar's sidelobes its jamming enters through a much lower gain. Burn-through then reaches about 49 kilometres. You can explore this in the Studio's RF window, under receiver comparisons.

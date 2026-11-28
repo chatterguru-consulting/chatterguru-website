@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:11.792
+Every scan, a tracker must decide which new plot belongs to which track. The dashed circles show where each track expects its target, one standard deviation wide.
+
+2
+00:00:11.842 --> 00:00:26.354
+Greedy nearest neighbour serves the tracks one at a time. Track one takes its closest plot, which leaves track two with a plot far outside its expectation. The total statistical cost is 13.3.
+
+3
+00:00:26.404 --> 00:00:42.721
+Global nearest neighbour solves every pairing at once, with the Hungarian algorithm, and picks the set with the lowest total cost, 3.7 here. Each track keeps its own target. This is the one-to-one matching in the learning roadmap.
