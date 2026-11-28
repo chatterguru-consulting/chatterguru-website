@@ -28,8 +28,8 @@
         },
         "captions": {
           "name": "burn-through.vtt",
-          "sha256": "90b81b76ccef971703bb602474c6de1773e6a0915e1a2d915b9569941e838fa5",
-          "bytes": 1081
+          "sha256": "7e44ae833f131e72e0a2d67b50a3727ae00f82eaca50403e9a27ac4cba1b597e",
+          "bytes": 1315
         },
         "poster": {
           "name": "burn-through.jpg",
@@ -63,8 +63,8 @@
         },
         "captions": {
           "name": "follower-jammer.vtt",
-          "sha256": "98ce61261bdc9464d1b241a1423a6076f71594eae2fe998ff07f88fa43c34096",
-          "bytes": 938
+          "sha256": "57e82898023ccd24177c9402d5b3a1206ee186af08287f8a6f9e8ec34cfba679",
+          "bytes": 1137
         },
         "poster": {
           "name": "follower-jammer.jpg",
@@ -98,8 +98,8 @@
         },
         "captions": {
           "name": "nlfm.vtt",
-          "sha256": "512df47c7af43cc5a2d6254ac5e4812663a8d8a85d8c59bf6fae9af7df3cc8f6",
-          "bytes": 870
+          "sha256": "a3ff63c9fb4bf6fdfde975a1e773a4fcc37c7983a7074a17c11cfc79acfe3cb6",
+          "bytes": 1035
         },
         "poster": {
           "name": "nlfm.jpg",
@@ -132,8 +132,8 @@
         },
         "captions": {
           "name": "nearest-neighbour.vtt",
-          "sha256": "7a545bf27a0c4034667712012efbaeb8d7a93b2760aac28705bcd3662ccff9d8",
-          "bytes": 692
+          "sha256": "1594ab81caafae6f3c446e4b1aab8f731fd90d150c928fe3098906196d478283",
+          "bytes": 857
         },
         "poster": {
           "name": "nearest-neighbour.jpg",

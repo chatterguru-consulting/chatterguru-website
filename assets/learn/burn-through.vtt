@@ -1,21 +1,49 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:09.803
-A self-screening jammer rides on the target and fills the radar's receiver with noise. Whether the radar can still see the target depends on range.
+00:00:00.000 --> 00:00:05.400
+A self-screening jammer rides on the target and fills the radar's receiver with noise.
 
 2
-00:00:09.853 --> 00:00:21.650
-The radar's echo makes a round trip, so its power falls as one over range to the fourth. The jamming travels only one way, so it falls as one over range squared.
+00:00:05.450 --> 00:00:09.203
+Whether the radar can still see the target depends on range.
 
 3
-00:00:21.700 --> 00:00:37.792
-Their ratio, signal to jamming, therefore improves as the target closes. Burn-through is the range where it reaches what detection needs, 13 decibels here. Without any processing gain that happens at only about 80 metres.
+00:00:09.853 --> 00:00:15.989
+The radar's echo makes a round trip, so its power falls as one over range to the fourth.
 
 4
-00:00:37.842 --> 00:00:48.980
-Pulse compression and Doppler filtering add 20 decibels of gain against noise. Burn-through moves out tenfold, to about 795 metres.
+00:00:16.039 --> 00:00:21.050
+The jamming travels only one way, so it falls as one over range squared.
 
 5
-00:00:49.030 --> 00:01:06.036
-A stand-off jammer is farther away, and if it sits in the radar's sidelobes its jamming enters through a much lower gain. Burn-through then reaches about 49 kilometres. You can explore this in the Studio's RF window, under receiver comparisons.
+00:00:21.700 --> 00:00:26.760
+Their ratio, signal to jamming, therefore improves as the target closes.
+
+6
+00:00:26.810 --> 00:00:32.579
+Burn-through is the range where it reaches what detection needs, 13 decibels here.
+
+7
+00:00:32.629 --> 00:00:37.192
+Without any processing gain that happens at only about 80 metres.
+
+8
+00:00:37.842 --> 00:00:44.145
+Pulse compression and Doppler filtering add 20 decibels of gain against noise.
+
+9
+00:00:44.195 --> 00:00:48.380
+Burn-through moves out tenfold, to about 795 metres.
+
+10
+00:00:49.030 --> 00:00:57.208
+A stand-off jammer is farther away, and if it sits in the radar's sidelobes its jamming enters through a much lower gain.
+
+11
+00:00:57.258 --> 00:01:00.336
+Burn-through then reaches about 49 kilometres.
+
+12
+00:01:00.386 --> 00:01:05.436
+You can explore this in the Studio's RF window, under receiver comparisons.

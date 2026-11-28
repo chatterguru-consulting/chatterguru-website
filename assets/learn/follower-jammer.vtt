@@ -1,17 +1,41 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:09.163
+00:00:00.000 --> 00:00:08.563
 Frequency agility moves the radar's carrier to a new channel for every pulse, so a jammer parked on one frequency misses most of them.
 
 2
-00:00:09.213 --> 00:00:26.889
-A follower jammer listens instead, and jumps to each new channel. But detecting and retuning takes time, here 4 microseconds. Until then it is still on the old channel. With 20 microsecond pulses it still covers 80 percent of every dwell.
+00:00:09.213 --> 00:00:13.900
+A follower jammer listens instead, and jumps to each new channel.
 
 3
-00:00:26.939 --> 00:00:39.952
-Now hop eight times inside each pulse. Each dwell lasts 2.5 microseconds, shorter than the reaction time, so by the time the jammer lands the radar has already moved.
+00:00:13.950 --> 00:00:18.200
+But detecting and retuning takes time, here 4 microseconds.
 
 4
-00:00:40.002 --> 00:00:57.408
-The jammer's best answer is then to spread its power over all sixteen channels, which is twelve decibels weaker. The rule is simple: make the dwell shorter than the jammer's reaction time. A faster jammer still lands, and that limit is stated in the Studio.
+00:00:18.250 --> 00:00:21.261
+Until then it is still on the old channel.
+
+5
+00:00:21.311 --> 00:00:26.289
+With 20 microsecond pulses it still covers 80 percent of every dwell.
+
+6
+00:00:26.939 --> 00:00:29.759
+Now hop eight times inside each pulse.
+
+7
+00:00:29.809 --> 00:00:39.352
+Each dwell lasts 2.5 microseconds, shorter than the reaction time, so by the time the jammer lands the radar has already moved.
+
+8
+00:00:40.002 --> 00:00:47.355
+The jammer's best answer is then to spread its power over all sixteen channels, which is twelve decibels weaker.
+
+9
+00:00:47.405 --> 00:00:52.313
+The rule is simple: make the dwell shorter than the jammer's reaction time.
+
+10
+00:00:52.363 --> 00:00:56.808
+A faster jammer still lands, and that limit is stated in the Studio.
