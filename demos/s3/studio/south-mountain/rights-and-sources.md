@@ -1,7 +1,7 @@
 # South Mountain I-70, Maryland: data sources and credits
 
 This page is the S³ Workbench Cesium Scenario Studio exported for the public website.
-The scene, target motion and sensor overlays come from the Workbench export at source revision `d5b63d323345fc23ccc120632e58abb82de07180`.
+The scene, target motion and sensor overlays come from the Workbench export at source revision `a6b9c686c5318e44e3f0421285edae468dbc6b1e`.
 Your browser draws them. The sensors are simulated with generic, educational models, and the
 targets and missions are fictional.
 

@@ -1324,13 +1324,30 @@ html.studio-in-workbench .wb-dup { display: none !important; }
 .rdm-lab-scale i { display: inline-block; width: 110px; height: 8px; border-radius: 2px;
   background: linear-gradient(90deg, #0d0887, #6a00a8, #b12a90, #e16462, #fca636, #f0f921); }
 .rdm-lab-axes { flex-basis: 100%; }
-.rdm-lab-verdict b { display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 11.5px; background: #334155; color: #f8fafc; }
-.rdm-lab-verdict b[data-verdict="helps"] { background: #14532d; color: #bbf7d0; }
-.rdm-lab-verdict b[data-verdict="partial"] { background: #713f12; color: #fde68a; }
-.rdm-lab-verdict b[data-verdict="harmful"] { background: #7f1d1d; color: #fecaca; }
 @media (max-width: 560px) { .rdm-lab-maps { grid-template-columns: 1fr; } }
 .rf-examples-controls label { flex: 1 1 180px; min-width: 0; }
 .rf-examples-controls select { width: 100%; }
+.rdm-lab-step { margin: 8px 0; padding: 8px 10px; border: 1px solid #2c4560; border-radius: 6px; background: #0e1d30; }
+.rdm-lab-step-title { display: flex; align-items: center; gap: 7px; font-weight: 700; margin-bottom: 6px; color: #edf7ff; }
+.rdm-lab-step-title span { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: #38bdf8; color: #06101c; font-size: 12px; }
+.rdm-lab-step select { width: 100%; min-height: 40px; padding: 4px 8px; border: 1px solid #58718c; border-radius: 5px;
+  background: #0b1828; color: #edf7ff; font: inherit; }
+.rdm-lab-ep { display: flex; flex-wrap: wrap; gap: 6px; }
+.rdm-lab-ep button { min-height: 38px; padding: 4px 10px; border: 1px solid #58718c; border-radius: 18px;
+  background: #0b1828; color: #edf7ff; font: inherit; cursor: pointer; }
+.rdm-lab-ep button[aria-checked="true"] { background: #38bdf8; border-color: #38bdf8; color: #06101c; font-weight: 700; }
+.rdm-lab-effect { margin: 7px 0 0 !important; font-size: 12.5px; }
+.rdm-lab-harm { color: #fca5a5 !important; font-weight: 600; }
+.rdm-lab-harm.rdm-lab-harm-none { color: #c4d6e7 !important; font-weight: 400; }
+.rdm-lab-jammed canvas { border-color: #ef4444; }
+#studioEaepRdmCFig[data-verdict="helps"] canvas { border-color: #22c55e; }
+#studioEaepRdmCFig[data-verdict="partial"] canvas { border-color: #f59e0b; }
+#studioEaepRdmCFig[data-verdict="harmful"] canvas { border-color: #ef4444; }
+.rdm-lab-effect b { display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 11.5px; background: #334155; color: #f8fafc; }
+.rdm-lab-effect b[data-verdict="helps"] { background: #14532d; color: #bbf7d0; }
+.rdm-lab-effect b[data-verdict="partial"] { background: #713f12; color: #fde68a; }
+.rdm-lab-effect b[data-verdict="harmful"] { background: #7f1d1d; color: #fecaca; }
 
   </style>
   <style>
@@ -2018,22 +2035,23 @@ html.studio-in-workbench .wb-dup { display: none !important; }
       <details id="studioEaepRdmLab" class="rf-examples" open>
   <summary>EA × EP range-Doppler lab</summary>
   <div class="rf-examples-body">
-    <p>Pick a jamming technique (EA) and a protection (EP). All three maps come from the same computed IQ: A clean, B jammed, C the jammed data through the protection. Rings mark CFAR detections; the white square is the real target.</p>
-    <div class="rf-examples-controls">
-      <label>EA · jamming
-        <select id="studioEaepRdmEa"></select>
-      </label>
-      <label>EP · protection
-        <select id="studioEaepRdmEp"></select>
-      </label>
+    <p>Step 1: jam the radar and see the harm. Step 2: try protections, one at a time, and see what each one recovers. All maps come from the same computed IQ. The white square is the real target; rings are CFAR detections.</p>
+    <div class="rdm-lab-step">
+      <label class="rdm-lab-step-title" for="studioEaepRdmEa"><span>1</span> Jam the radar (EA)</label>
+      <select id="studioEaepRdmEa"></select>
+      <p id="studioEaepRdmHarm" class="rdm-lab-effect rdm-lab-harm" role="status"></p>
+    </div>
+    <div class="rdm-lab-step">
+      <div class="rdm-lab-step-title" id="studioEaepRdmEpTitle"><span>2</span> Protect the radar (EP)</div>
+      <div id="studioEaepRdmEp" class="rdm-lab-ep" role="radiogroup" aria-labelledby="studioEaepRdmEpTitle"></div>
+      <p class="rdm-lab-effect"><b id="studioEaepRdmVerdict"></b> <span id="studioEaepRdmFix" role="status"></span></p>
     </div>
     <div class="rdm-lab-maps">
-      <figure><canvas id="studioEaepRdmA" width="256" height="128" aria-label="Map A, clean"></canvas><figcaption>A · Clean</figcaption></figure>
-      <figure><canvas id="studioEaepRdmB" width="256" height="128" aria-label="Map B, with jamming"></canvas><figcaption>B · EA</figcaption></figure>
-      <figure><canvas id="studioEaepRdmC" width="256" height="128" aria-label="Map C, jamming with protection"></canvas><figcaption>C · EA + EP</figcaption></figure>
+      <figure><canvas id="studioEaepRdmA" width="256" height="128" aria-label="Map A, clean"></canvas><figcaption>A · Clean (reference)</figcaption></figure>
+      <figure class="rdm-lab-jammed"><canvas id="studioEaepRdmB" width="256" height="128" aria-label="Map B, jammed"></canvas><figcaption id="studioEaepRdmBCap">B · Jammed: the harm</figcaption></figure>
+      <figure id="studioEaepRdmCFig"><canvas id="studioEaepRdmC" width="256" height="128" aria-label="Map C, jammed with protection"></canvas><figcaption id="studioEaepRdmCCap">C · Jammed + protection</figcaption></figure>
     </div>
     <div class="rdm-lab-scale"><span id="studioEaepRdmScaleLo"></span><i></i><span id="studioEaepRdmScaleHi"></span><span class="rdm-lab-axes" id="studioEaepRdmAxes"></span></div>
-    <p class="rdm-lab-verdict"><b id="studioEaepRdmVerdict" role="status"></b> <span id="studioEaepRdmKpis"></span></p>
     <p id="studioEaepRdmEaText" class="rf-example-facts"></p>
     <p id="studioEaepRdmEpText" class="rf-example-facts"></p>
     <p id="studioEaepRdmModel" class="rf-example-facts"></p>
@@ -13824,6 +13842,7 @@ window.studioInstallGroundTerrain = studioInstallGroundTerrain;
 
 /* EA x EP range-Doppler lab. Data: STUDIO_EAEP_RDM_LAB from eccm_sandbox.ew.eaep_rdm_lab, a sealed
  * matrix of computed maps (one shared IQ model, same seeds per pair). Nothing is recomputed here.
+ * Flow: pick a jammer and see the harm (protection starts at "none"), then try protections.
  */
 (function () {
   "use strict";
@@ -13831,11 +13850,12 @@ window.studioInstallGroundTerrain = studioInstallGroundTerrain;
   const panel = document.getElementById("studioEaepRdmLab");
   if (!panel || !lab || !lab.cells) { if (panel) panel.hidden = true; return; }
   const $ = id => panel.querySelector("#" + id);
-  const eaSelect = $("studioEaepRdmEa"), epSelect = $("studioEaepRdmEp");
+  const eaSelect = $("studioEaepRdmEa"), epGroup = $("studioEaepRdmEp");
   const STOPS = [[13, 8, 135], [106, 0, 168], [177, 42, 144], [225, 100, 98], [252, 166, 54], [240, 249, 33]];
-  const VERDICT = { reference: "Reference", helps: "EP helps", partial: "EP helps partly",
+  const VERDICT = { reference: "No protection yet", helps: "EP helps", partial: "EP helps partly",
     "no effect": "No effect", harmful: "EP makes it worse", cost: "Costs a little" };
   const decoded = {};
+  let ep = "none";
 
   function colour(v) {
     const x = v / 255 * (STOPS.length - 1), i = Math.min(STOPS.length - 2, Math.floor(x)), f = x - i;
@@ -13843,10 +13863,7 @@ window.studioInstallGroundTerrain = studioInstallGroundTerrain;
   }
 
   function bytes(key) {
-    if (!decoded[key]) {
-      const raw = atob(lab.cells[key].map);
-      decoded[key] = Uint8Array.from(raw, ch => ch.charCodeAt(0));
-    }
+    if (!decoded[key]) decoded[key] = Uint8Array.from(atob(lab.cells[key].map), ch => ch.charCodeAt(0));
     return decoded[key];
   }
 
@@ -13874,43 +13891,63 @@ window.studioInstallGroundTerrain = studioInstallGroundTerrain;
     });
   }
 
-  function describe(cell) {
-    return `target ${cell.target_detected ? "detected" : "missed"}, ${cell.false_detections} false, SINR ${cell.sinr_db.toFixed(1)} dB`;
+  const db = v => `${v.toFixed(1)} dB`;
+  const signed = v => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(1)} dB`;
+
+  function harmText(a, b, eaT) {
+    if (eaT.tid === "none") return "No jamming: this is the clean radar picture.";
+    const lost = a.target_detected && !b.target_detected;
+    return `Harm: SINR ${db(a.sinr_db)} → ${db(b.sinr_db)} (${signed(b.sinr_db - a.sinr_db)}). ` +
+      `${lost ? "Target lost." : "Target still detected."} ${b.false_detections} false target${b.false_detections === 1 ? "" : "s"}.`;
+  }
+
+  function fixText(b, c, epT) {
+    if (epT.tid === "none") return "Pick a protection above to see how much it recovers.";
+    const found = c.target_detected ? "target detected" : "target still missed";
+    return `SINR ${db(b.sinr_db)} → ${db(c.sinr_db)} (${signed(c.sinr_db - b.sinr_db)}), ${found}, ` +
+      `${c.false_detections} false (was ${b.false_detections}).`;
   }
 
   function render() {
-    const ea = eaSelect.value, ep = epSelect.value;
-    const keyB = `${ea}|none`, keyC = `${ea}|${ep}`, b = lab.cells[keyB], c = lab.cells[keyC];
+    const ea = eaSelect.value, keyB = `${ea}|none`, keyC = `${ea}|${ep}`;
+    const a = lab.cells["none|none"], b = lab.cells[keyB], c = lab.cells[keyC];
+    const eaT = lab.ea.find(t => t.tid === ea), epT = lab.ep.find(t => t.tid === ep);
     draw($("studioEaepRdmA"), "none|none");
     draw($("studioEaepRdmB"), keyB);
     draw($("studioEaepRdmC"), keyC);
+    $("studioEaepRdmHarm").textContent = harmText(a, b, eaT);
+    $("studioEaepRdmHarm").classList.toggle("rdm-lab-harm-none", ea === "none");
     const badge = $("studioEaepRdmVerdict");
     badge.textContent = VERDICT[c.verdict] || c.verdict;
     badge.dataset.verdict = c.verdict;
-    $("studioEaepRdmKpis").textContent = `A: ${describe(lab.cells["none|none"])}. B: ${describe(b)}. C: ${describe(c)}.`;
-    const eaT = lab.ea.find(t => t.tid === ea), epT = lab.ep.find(t => t.tid === ep);
+    $("studioEaepRdmFix").textContent = fixText(b, c, epT);
+    $("studioEaepRdmBCap").textContent = ea === "none" ? "B · No jamming" : `B · Jammed: the harm`;
+    $("studioEaepRdmCCap").textContent = ep === "none" ? "C · No protection yet (same as B)" : `C · Jammed + ${epT.label}`;
+    $("studioEaepRdmCFig").dataset.verdict = c.verdict;
+    epGroup.querySelectorAll("button").forEach(btn => btn.setAttribute("aria-checked", String(btn.value === ep)));
     $("studioEaepRdmEaText").textContent = `EA · ${eaT.label}: ${eaT.summary} Limitation: ${eaT.limitation}`;
-    $("studioEaepRdmEpText").textContent = `EP · ${epT.label}: ${epT.summary} Limitation: ${epT.limitation}`;
+    $("studioEaepRdmEpText").textContent = ep === "none" ? "" : `EP · ${epT.label}: ${epT.summary} Limitation: ${epT.limitation}`;
   }
 
-  function fill(select, list) {
-    select.replaceChildren(...list.map(t => {
-      const o = document.createElement("option"); o.value = t.tid; o.textContent = t.label; return o;
-    }));
-  }
-
-  fill(eaSelect, lab.ea);
-  fill(epSelect, lab.ep);
+  eaSelect.replaceChildren(...lab.ea.map(t => {
+    const o = document.createElement("option"); o.value = t.tid; o.textContent = t.label; return o;
+  }));
+  epGroup.replaceChildren(...lab.ep.map(t => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.value = t.tid; btn.setAttribute("role", "radio");
+    btn.textContent = t.tid === "none" ? "None" : t.label;
+    btn.addEventListener("click", () => { ep = t.tid; render(); });
+    return btn;
+  }));
   eaSelect.value = lab.ea.length > 1 ? lab.ea[1].tid : lab.ea[0].tid;
-  epSelect.value = lab.ep.length > 1 ? lab.ep[1].tid : lab.ep[0].tid;
   $("studioEaepRdmScaleLo").textContent = `${lab.db_min} dB`;
   $("studioEaepRdmScaleHi").textContent = `${lab.db_max} dB over thermal noise`;
   const vmax = lab.velocity_bin_mps * lab.doppler_bins / 2;
   $("studioEaepRdmAxes").textContent =
     `Range 0–${(lab.range_bins * lab.range_bin_m / 1000).toFixed(2)} km left to right · velocity ±${vmax.toFixed(0)} m/s bottom to top`;
   $("studioEaepRdmModel").textContent = `Model: ${lab.model} ${lab.limitation}`;
-  eaSelect.addEventListener("change", render);
-  epSelect.addEventListener("change", render);
+  // A new jammer starts unprotected, so its harm is visible before any EP is tried.
+  eaSelect.addEventListener("change", () => { ep = "none"; render(); });
   render();
 })();
 
